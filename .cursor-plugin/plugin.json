@@ -1,0 +1,9 @@
+{
+  "name": "superpowers-sage",
+  "description": "Sage + Acorn + Lando skills for AI-assisted WordPress development: ACF Composer, Livewire, Eloquent, routes, middleware, queues, performance, security, and modern architecture patterns with Tailwind v4 and Vite.",
+  "version": "0.2.0",
+  "author": {
+    "name": "codigodoleo",
+    "url": "https://github.com/codigodoleo"
+  }
+}

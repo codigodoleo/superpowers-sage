@@ -1,0 +1,18 @@
+{
+  "name": "superpowers-sage",
+  "description": "Modern WordPress development with Sage, Acorn & Lando. Gerund-based workflow skills: /architecting, /building, /designing, /verifying + design tool integration (Stitch, Figma), content modeling, visual verification, and comprehensive hooks.",
+  "version": "1.0.0",
+  "author": {
+    "name": "codigodoleo",
+    "url": "https://github.com/codigodoleo"
+  },
+  "homepage": "https://github.com/codigodoleo/superpowers-sage",
+  "repository": "https://github.com/codigodoleo/superpowers-sage",
+  "license": "MIT",
+  "keywords": [
+    "wordpress", "sage", "acorn", "lando", "roots",
+    "livewire", "acf", "tailwind", "blade",
+    "stitch", "figma", "design-tools", "visual-verification",
+    "architecture", "content-modeling"
+  ]
+}
