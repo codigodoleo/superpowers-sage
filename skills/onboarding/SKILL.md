@@ -18,31 +18,23 @@ Analyze a Sage/Acorn project's current state and present a clear overview with n
 
 ### 0) Run project inventory
 
-Scan the project to build a snapshot:
+Scan the project using native tools (Glob, Grep, Read — no bash pipes needed):
 
-**Sage themes:**
-!`find . -name composer.json -not -path "*/vendor/*" -not -path "*/node_modules/*" | xargs grep -l '"roots/acorn"' 2>/dev/null`
+**Sage themes:** Use `Grep` with pattern `"roots/acorn"` on glob `**/composer.json` (excluding vendor/node_modules).
 
-**Acorn version:**
-!`find . -name composer.lock -not -path "*/vendor/*" 2>/dev/null | head -1 | xargs python3 -c "import json,sys; d=json.load(open(sys.argv[1])); pkgs=d.get('packages',[])+d.get('packages-dev',[]); [print(p['name'],'=',p['version']) for p in pkgs if p['name']=='roots/acorn']" 2>/dev/null || echo "(not found)"`
+**Acorn version:** Use `Glob` to find `**/composer.lock` (excluding vendor), then `Read` it and extract the `roots/acorn` version from the `packages` array.
 
-**Service Providers:**
-!`find . -path "*/app/Providers/*.php" -not -path "*/vendor/*" 2>/dev/null | sed 's|.*/||'`
+**Service Providers:** Use `Glob` with pattern `**/app/Providers/*.php` (excluding vendor). Extract filenames from paths.
 
-**ACF Blocks:**
-!`find . -path "*/app/Blocks/*.php" -not -path "*/vendor/*" 2>/dev/null | sed 's|.*/||'`
+**ACF Blocks:** Use `Glob` with pattern `**/app/Blocks/*.php` (excluding vendor). Extract filenames from paths.
 
-**Routes:**
-!`find . \( -name "web.php" -o -name "api.php" \) -path "*/routes/*" -not -path "*/vendor/*" 2>/dev/null`
+**Routes:** Use `Glob` with patterns `**/routes/web.php` and `**/routes/api.php` (excluding vendor).
 
-**Livewire components:**
-!`find . -path "*/app/Livewire/*.php" -not -path "*/vendor/*" 2>/dev/null | sed 's|.*/||'`
+**Livewire components:** Use `Glob` with pattern `**/app/Livewire/*.php` (excluding vendor). Extract filenames from paths.
 
-**Installed packages (theme):**
-!`find . -name composer.json -not -path "*/vendor/*" | xargs grep -l '"roots/acorn"' 2>/dev/null | head -1 | xargs python3 -c "import json,sys; d=json.load(open(sys.argv[1])); [print(' -',k,v) for k,v in d.get('require',{}).items() if not k.startswith('php')]" 2>/dev/null`
+**Installed packages (theme):** Use `Glob` to find the theme's `composer.json` (the one containing `"roots/acorn"`), then `Read` it and extract the `require` block.
 
-**Lando config:**
-!`cat .lando.yml 2>/dev/null | head -40`
+**Lando config:** Use `Read` on `.lando.yml` (top-level only).
 
 ### 1) Detect design tools
 
