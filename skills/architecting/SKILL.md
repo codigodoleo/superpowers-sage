@@ -21,7 +21,26 @@ $ARGUMENTS
 
 ## Procedure
 
-### 0) Invoke `/designing` to capture design reference
+### 0) Establish feature branch
+
+Before any design capture or analysis:
+
+1. Run `git branch --show-current` to check current branch
+2. If already on a feature branch (not main/master):
+   - Confirm with user: "Currently on `{branch}`. Continue here or start a new feature branch?"
+3. If on main/master:
+   - Propose branch name: `feat/<topic>-YYYY-MM-DD` (e.g., `feat/onepage-blocks-2026-03-23`)
+   - Ask: "I'll create branch `feat/<topic>-YYYY-MM-DD` from latest main. Confirm?"
+   - On confirmation:
+     ```bash
+     git checkout main && git pull && git checkout -b feat/<topic>-YYYY-MM-DD
+     ```
+4. Record in `plan.md` frontmatter after the plan is created:
+   ```yaml
+   branch: feat/<topic>-YYYY-MM-DD
+   ```
+
+### 1) Invoke `/designing` to capture design reference
 
 Before any analysis:
 1. Check for active design tools (Stitch/Figma MCP)
@@ -29,7 +48,12 @@ Before any analysis:
 3. Save extracted data to `docs/plans/YYYY-MM-DD-<topic>/assets/`
 4. If no design tools, ask user for screenshots or skip to architecture
 
-### 1) Explore project context
+After capturing design reference, dispatch the `design-extractor` agent in **PANORAMIC mode**:
+- Provide: the plan assets directory path
+- Agent produces: `assets/design-tokens.md` and `assets/overview-ref.png`
+- Use `design-tokens.md` to define the `@theme` block in `app.css` before any component work begins
+
+### 2) Explore project context
 
 Read the project state:
 - Theme structure, installed packages, existing blocks
@@ -37,7 +61,7 @@ Read the project state:
 - Existing service providers and routes
 - Active plans (check `docs/plans/`)
 
-### 2) Ask clarifying questions (one at a time)
+### 3) Ask clarifying questions (one at a time)
 
 Understand the full scope:
 - What is being built? (page, feature, block set, full site)
@@ -46,13 +70,13 @@ Understand the full scope:
 - Are there forms or interactivity?
 - What content will editors manage?
 
-### 3) Identify components
+### 4) Identify components
 
 Break the feature into discrete components:
 - List each section/block/page
 - For each, note: name, complexity, dependencies
 
-### 4) Invoke `/modeling` for content analysis
+### 5) Invoke `/modeling` for content analysis
 
 For each component with content:
 1. Run the content classification checklist
@@ -60,7 +84,7 @@ For each component with content:
 3. Generate Poet config for any CPTs needed
 4. Document in `content-model.md`
 
-### 5) Decide execution strategy per component
+### 6) Decide execution strategy per component
 
 For each component, assess complexity:
 
@@ -71,7 +95,7 @@ For each component, assess complexity:
 | Independent of other components | Can run in parallel |
 | Depends on shared CPT or service | Must run sequentially |
 
-### 6) Generate plan directory
+### 7) Generate plan directory
 
 Create the plan structure:
 
@@ -80,12 +104,25 @@ mkdir -p docs/plans/YYYY-MM-DD-<topic>/{assets,components,logs}
 ```
 
 Write:
-- `plan.md` — frontmatter with title, date, status: in-progress, strategy, design-tool, components list
+- `plan.md` — frontmatter with title, date, status: in-progress, strategy, design-tool, branch, components list
 - `architecture.md` — ADR with context, decision, components, data flow, justification
 - `content-model.md` — output from modeling analysis
 - `components/NN-name.md` — sub-plan per component (for complex projects)
 
-### 7) Present design for approval
+The `plan.md` frontmatter template:
+```yaml
+title: <feature title>
+date: YYYY-MM-DD
+status: in-progress
+strategy: <autonomous|interactive|mixed>
+design-tool: <stitch|figma|none>
+branch: feat/<topic>-YYYY-MM-DD
+components:
+  - name: <ComponentName>
+    strategy: <autonomous|interactive>
+```
+
+### 8) Present design for approval
 
 Present the architecture in sections:
 1. Overview (goal + approach)
@@ -95,7 +132,7 @@ Present the architecture in sections:
 
 Ask after each section if it looks right.
 
-### 8) Transition to implementation
+### 9) Transition to implementation
 
 After approval, offer:
 
