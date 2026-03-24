@@ -41,6 +41,17 @@ Based on content model:
 
 For each component in order:
 
+#### 0) Dispatch design-extractor in SURGICAL mode
+
+Before reading any cached assets, dispatch the `design-extractor` agent fresh for this component:
+- Mode: SURGICAL
+- Target: this specific component section only
+- Output: `assets/section-<name>-spec.md` and `assets/section-<name>-ref.png`
+
+This is always fresh — do NOT skip to use cached assets from context memory.
+The surgical extraction provides exact px values, SVG code, and Verification Inputs
+that the `visual-verifier` agent requires.
+
 #### a) Re-read design reference (ALWAYS)
 - Read `assets/section-{name}.png` or `assets/section-{name}.md` from disk
 - **NEVER rely on context memory** — always re-read from disk before each component
@@ -58,15 +69,58 @@ Auto-discover which reference skills are relevant:
 - Routes → read `@acorn-routes`
 - Tailwind/CSS → read `@sage-lando` references/frontend-stack.md
 
-#### d) Implement
-1. PHP Block class (ACF Composer) with `fields()` and `with()`
-2. Blade view with Tailwind CSS
-3. Any supporting services or providers
+#### d) Create worktree and implement
 
-#### e) Verify
-Invoke `/verifying` for this component:
-- Compare implementation screenshot with design reference
-- Report MATCH / DRIFT / MISSING
+Before writing any code, create an isolated worktree for this component:
+
+```bash
+# Read branch from plan.md frontmatter
+FEATURE_BRANCH=$(grep '^branch:' docs/plans/<active-plan>/plan.md | awk '{print $2}')
+COMPONENT_BRANCH="${FEATURE_BRANCH}-<component-name>"
+
+git worktree add .worktrees/<component-name> -b $COMPONENT_BRANCH $FEATURE_BRANCH
+```
+
+Example: if feature branch is `feat/onepage-blocks-2026-03-23` and component is `hero`:
+```bash
+git worktree add .worktrees/hero -b feat/onepage-blocks-2026-03-23-hero feat/onepage-blocks-2026-03-23
+```
+
+**Implement inside the worktree.** The worktree mirrors the full repo root.
+Theme files are at `.worktrees/<component>/content/themes/<theme>/`.
+Example: `.worktrees/hero/content/themes/leolabs/resources/views/blocks/hero.blade.php`
+
+**ZERO ARBITRARY TAILWIND VALUES.**
+Every colour, font, spacing value must be a token declared in `@theme`.
+
+```blade
+{{-- ✅ Correct — use token names --}}
+<section class="bg-bg text-text py-24">
+
+{{-- ❌ Forbidden — arbitrary values are a Critical issue --}}
+<section class="bg-[#131313] text-[#e5e2e1] py-[96px]">
+```
+
+#### e) Build and verify
+
+After implementing:
+
+1. `lando flush` — clears Acorn/Blade/OPcache (required after PHP changes)
+2. `lando theme-build` — compiles Tailwind + JS
+   - If exit non-zero: **stop, report build failure. Do NOT proceed to verification.**
+3. Dispatch `visual-verifier` agent with inputs from `assets/section-<name>-spec.md`:
+   - `url`: read from spec `Verification Inputs` block
+   - `selector`: read from spec `Verification Inputs` block
+   - `spec`: `docs/plans/<plan>/assets/section-<name>-spec.md`
+   - `ref`: `docs/plans/<plan>/assets/section-<name>-ref.png`
+4. On `MATCH`:
+   ```bash
+   git checkout <feature-branch>
+   git merge <component-branch>
+   git worktree remove .worktrees/<component-name>
+   git branch -d <component-branch>
+   ```
+5. On `DRIFT` or `FAIL_ARBITRARY_VALUES`: fix in worktree → re-run `lando theme-build` → re-dispatch `visual-verifier` → merge on MATCH
 
 #### f) Strategy gate
 - **Interactive strategy**: pause for user approval before next component
@@ -94,3 +148,5 @@ After all components:
 - **Consult reference skills** — don't guess patterns, read the reference
 - **Respect the strategy** — autonomous for simple, interactive for complex
 - **Hooks handle cache** — post-edit hook auto-runs `lando flush` and `lando theme-build`
+- **Worktree per component** — every component is implemented in an isolated branch+worktree, merged to the feature branch only after visual verification passes
+- **Zero arbitrary Tailwind values** — all colours, fonts, and spacing must be `@theme` tokens; arbitrary `[#hex]` classes are a Critical issue caught by visual-verifier
