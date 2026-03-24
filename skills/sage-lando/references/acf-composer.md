@@ -6,6 +6,124 @@
 
 **Always generate with CLI:** `lando acorn acf:block`, `acf:field`, `acf:partial`, `acf:options`, `acf:widget`. Never create these files manually.
 
+---
+
+## Installing ACF Pro via Composer
+
+ACF Pro is distributed through a private Composer repository at `connect.advancedcustomfields.com`. Authentication requires the license email and license key from your ACF account (`https://www.advancedcustomfields.com/my-account/`).
+
+### Step 1 — Export credentials as environment variables
+
+```bash
+export ACF_PRO_EMAIL="your@email.com"
+export ACF_PRO_KEY="your-license-key-here"
+```
+
+These two variables drive `auth.json` generation. Do not hard-code them anywhere — never commit `auth.json` to git.
+
+### Step 2 — Create `auth.json` at the project root
+
+```bash
+cat > auth.json << EOF
+{
+    "http-basic": {
+        "connect.advancedcustomfields.com": {
+            "username": "${ACF_PRO_EMAIL}",
+            "password": "${ACF_PRO_KEY}"
+        }
+    }
+}
+EOF
+```
+
+Confirm `auth.json` is in `.gitignore` (Bedrock includes this by default):
+
+```bash
+grep auth.json .gitignore
+```
+
+### Step 3 — Add the private repository to `composer.json`
+
+This goes in the **project root** `composer.json` (Bedrock level), not the theme's.
+
+```json
+"repositories": [
+    {
+        "type": "composer",
+        "url": "https://connect.advancedcustomfields.com"
+    }
+]
+```
+
+Add it with Composer to avoid editing JSON manually:
+
+```bash
+lando composer config repositories.acf-pro composer https://connect.advancedcustomfields.com
+```
+
+### Step 4 — Require ACF Pro
+
+```bash
+lando composer require wpengine/advanced-custom-fields-pro
+```
+
+Composer will authenticate against `connect.advancedcustomfields.com` using `auth.json` and install the latest Pro release into `web/app/plugins/` (Bedrock's plugin directory).
+
+### Step 5 — Add `ACF_PRO_KEY` to `.env`
+
+Even after installing via Composer, ACF Pro requires the license key at runtime for update checks:
+
+```env
+ACF_PRO_KEY=your-license-key-here
+```
+
+### Step 6 — Install `log1x/acf-composer` in the theme
+
+ACF Pro is a WordPress plugin (installed at root level). `acf-composer` is a theme-level Laravel package:
+
+```bash
+lando theme-composer require log1x/acf-composer
+```
+
+Then publish the config:
+
+```bash
+lando acorn vendor:publish --provider="Log1x\AcfComposer\AcfComposerServiceProvider"
+```
+
+### CI / Team onboarding
+
+For CI pipelines or teammates, `auth.json` must be regenerated from environment variables. Add a bootstrap step:
+
+```bash
+# In CI or onboarding script — run before composer install
+cat > auth.json << EOF
+{
+    "http-basic": {
+        "connect.advancedcustomfields.com": {
+            "username": "${ACF_PRO_EMAIL}",
+            "password": "${ACF_PRO_KEY}"
+        }
+    }
+}
+EOF
+lando composer install
+```
+
+Make `ACF_PRO_EMAIL` and `ACF_PRO_KEY` available as secrets in your CI environment (GitHub Actions: Repository Secrets; Forge/Envoyer: Environment Variables).
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `Could not find package wpengine/advanced-custom-fields-pro` | Repository not added | Run Step 3 |
+| `403 Forbidden` from `connect.advancedcustomfields.com` | Wrong credentials in `auth.json` | Re-export envs and recreate `auth.json` |
+| `auth.json` not found inside Lando container | File exists on host but not mounted | It should be at the project root — Lando mounts the full project root into `/app` |
+| ACF shows "license inactive" in WP admin | `ACF_PRO_KEY` missing from `.env` | Add it (Step 5) |
+| Composer asks for credentials interactively | `auth.json` missing or malformed | Recreate from envs |
+
+---
+
 ## Blocks
 
 ### Anatomy of a Block class
