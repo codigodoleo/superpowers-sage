@@ -382,3 +382,51 @@ Accessing options values: `get_field('facebook_url', 'option')` — always pass 
 ## Widgets
 
 Created with `lando acorn acf:widget`. With Gutenberg and block-based widget areas, traditional widgets are rarely needed. Use only when the project explicitly requires classic widgets.
+
+---
+
+## Field Keys in Block Data
+
+### Two contexts — two different behaviours
+
+**Inside `with()` (ACF Composer context):**
+`get_field('badge_label')` works correctly. ACF Composer sets up the block meta context
+automatically — you always use the field **name**.
+
+**Inside block `data` attribute (WP-CLI / raw Gutenberg JSON):**
+The Gutenberg block `data` attribute requires field **keys**, not names.
+Using field names here returns `null` with no error.
+
+### Field key convention
+
+`field_<block-slug>_<field-name>`
+
+Examples:
+| Block slug | Field name | Field key |
+|---|---|---|
+| `hero` | `badge_label` | `field_hero_badge_label` |
+| `about` | `heading` | `field_about_heading` |
+| `hero` | `feature_cards` (repeater) | `field_hero_feature_cards` |
+
+### Populating via WP-CLI
+
+```bash
+# ✅ Correct — use field key
+wp post update 5 --post_content='<!-- wp:acf/hero {"name":"acf/hero","data":{"field_hero_badge_label":"01 / HELLO"}} /-->'
+
+# ❌ Wrong — field name returns null
+wp post update 5 --post_content='<!-- wp:acf/hero {"name":"acf/hero","data":{"badge_label":"01 / HELLO"}} /-->'
+```
+
+### Diagnostic
+
+```bash
+# Confirm a field key works
+lando wp eval 'acf_setup_meta(["field_hero_badge_label" => "Test"], 0, true); var_dump(get_field("badge_label"));'
+# Expected: string(4) "Test"
+```
+
+### Symptom
+
+`get_field()` returns `null` even though the block is on the page and has data in its attributes.
+Check the browser DevTools → block markup → `data-*` attributes to see what keys are stored.

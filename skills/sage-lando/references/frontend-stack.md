@@ -67,8 +67,8 @@ Tailwind CSS v4 introduces a paradigm shift: there is no `tailwind.config.js` fi
 @theme {
   --color-primary: #1a365d;
   --color-secondary: #2d3748;
-  --font-family-sans: 'Inter', sans-serif;
-  --font-family-heading: 'Playfair Display', serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Playfair Display', serif;
   /* Custom spacing, breakpoints, etc. */
 }
 ```
@@ -76,6 +76,7 @@ Tailwind CSS v4 introduces a paradigm shift: there is no `tailwind.config.js` fi
 - **`@import "tailwindcss"`** -- Replaces the old `@tailwind base; @tailwind components; @tailwind utilities;` directives from v3. This single import loads everything.
 - **`@source`** -- Tells Tailwind where to scan for class usage. This replaces the `content` array from `tailwind.config.js` in v3. Point it at your Blade templates and JS files so unused classes are purged in production.
 - **`@theme`** -- Replaces the `theme.extend` object from `tailwind.config.js`. Define custom colors, fonts, spacing, breakpoints, and any other design tokens as CSS custom properties. These become available as Tailwind utilities (e.g., `--color-primary` enables `text-primary`, `bg-primary`, etc.).
+- > **Tailwind v4 gotcha:** Font utilities (`font-sans`, `font-heading`) only work when declared as `--font-sans` / `--font-heading`. Using `--font-family-*` (v3 syntax) silently fails — the utility class is generated but applies the wrong value. No error is shown.
 
 ### `resources/css/editor.css`
 
@@ -268,3 +269,42 @@ This generates:
 The Vite facade automatically reads the manifest in production (when the dev server is not running) and outputs the correct `<link>` and `<script>` tags with cache-busted URLs.
 
 No manual cache-busting is needed -- hashed filenames ensure browsers always load the latest assets after a deploy.
+
+---
+
+## Design Tokens — Golden Rule
+
+**Never use arbitrary Tailwind values in Blade templates.** Every visual value must be declared as a design token in the `@theme` block of `app.css` and referenced by its token name.
+
+```css
+/* ✅ Correct — declare in @theme */
+@theme {
+  --color-bg: #131313;
+  --color-surface: #1c1b1b;
+  --color-card: #2a2a2a;
+  --color-card-alt: #20201f;
+  --color-text: #e5e2e1;
+  --color-muted: #d4c5ab;
+  --color-accent: #ffc107;
+  --color-accent-warm: #ffe4af;
+  --color-border: rgba(79, 70, 50, 0.2);
+  --color-border-subtle: rgba(79, 70, 50, 0.1);
+}
+```
+
+```blade
+{{-- ✅ Correct — use token name --}}
+<section class="bg-bg text-text">
+<span class="text-accent">
+<div class="border border-border">
+
+{{-- ❌ Forbidden — never arbitrary values in Blade --}}
+<section class="bg-[#131313] text-[#e5e2e1]">
+<span class="text-[#ffc107]">
+```
+
+### Why this matters
+
+- Arbitrary values bypass the design system → inconsistency accumulates
+- The `sage-reviewer` agent will flag any `[#...]`, `[rgba...]`, `[px...]`, `[em...]` class as a **Critical** issue
+- The `visual-verifier` agent will block a MATCH result if arbitrary values are found in the Blade file
