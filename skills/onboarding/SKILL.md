@@ -45,6 +45,27 @@ Use ToolSearch to check for available design MCPs:
 
 Report which design tools are available.
 
+### 1b) HARD GATE — Playwright MCP
+
+After detecting design tools, before suggesting next steps:
+
+Use ToolSearch to search for `mcp__plugin_playwright_playwright__browser_take_screenshot`.
+
+If NOT found, output this message and **stop completely**. Do not suggest any next steps.
+Do not proceed to step 2.
+
+```
+⛔ STOP — Playwright MCP is required
+
+Visual verification is mandatory in this workflow.
+/building and /verifying cannot proceed without Playwright.
+
+Install:
+  claude mcp add playwright -- npx -y @anthropic/playwright-mcp
+
+After installing, restart this session and run /onboarding again.
+```
+
 ### 2) Check for active plans
 
 Look for `docs/plans/*/plan.md` files with `status: in-progress`. If found, report the active plan path and component status.
@@ -75,6 +96,11 @@ Look for `docs/plans/*/plan.md` files with `status: in-progress`. If found, repo
 ### Active Plans
 {list or "No active plans"}
 
+### Branch Status
+- Current branch: {output of `git branch --show-current`}
+- {If on main/master}: ⚠️ Start a feature branch before implementing: `git checkout -b feat/<topic>-YYYY-MM-DD`
+- {If on feature branch}: ✅ Working on `{branch}` — aligned with workflow
+
 ### Lando Services
 {services and URLs from proxy config}
 ```
@@ -86,6 +112,7 @@ Based on project state:
 - Active plan → suggest `/building` to resume implementation
 - Existing code → suggest `/reviewing` for health check
 - Issue reported → suggest `/debugging`
+- Playwright confirmed ✅ — visual verification is available
 
 ## Key Principles
 - **Be factual** — only report what you actually found
