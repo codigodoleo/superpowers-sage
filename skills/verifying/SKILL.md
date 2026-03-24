@@ -15,22 +15,37 @@ $ARGUMENTS
 
 ## Procedure
 
-### 0) Determine reference source
+### 0) Playwright gate
+
+Before any verification work, ToolSearch for `mcp__plugin_playwright_playwright__browser_take_screenshot`.
+
+If NOT found:
+```
+⛔ Cannot verify without Playwright MCP.
+
+Install: claude mcp add playwright -- npx -y @anthropic/playwright-mcp
+Restart session after installing. Stop.
+```
+
+Do NOT proceed to reference source detection.
+
+### 1) Determine reference source
 
 Priority order:
-1. **Plan assets**: `docs/plans/<active-plan>/assets/section-*.png` — read with Read tool (Claude reads images natively)
-2. **Design MCP**: Stitch `get_screen` or Figma `get_frame` — fetch current design
-3. **Textual description**: `docs/plans/<active-plan>/assets/section-*.md` — structured text description
+1. **Spec file**: `docs/plans/<active-plan>/assets/section-*-spec.md` — read "Verification Inputs" block to get url, selector, and ref path
+2. **Plan assets**: `docs/plans/<active-plan>/assets/section-*.png` — reference image for comparison
+3. **Design MCP**: Stitch `get_screen` or Figma `get_design_context`
 4. **Last resort**: ask user to provide screenshot or describe expected appearance
 
-### 1) Capture implementation
+### 2) Capture implementation
 
-Try in order:
-1. **Playwright MCP**: `mcp__playwright__screenshot` — headless browser capture
-2. **Chrome MCP**: `mcp__Claude_in_Chrome__computer` action=screenshot — if Chrome MCP available
-3. **Fallback**: ask user to provide screenshot of the implemented section
+1. Read `Verification Inputs` block from the spec file — extract `url`, `selector`, `ref`
+2. Navigate Playwright to `url`: `mcp__plugin_playwright_playwright__browser_navigate`
+3. Take screenshot scoped to `selector`:
+   `mcp__plugin_playwright_playwright__browser_take_screenshot`
+4. If `selector` fails (element not found), take full-page screenshot and note the difference
 
-### 2) Compare visually
+### 3) Compare visually
 
 Read both reference and implementation images. Compare on these axes:
 
@@ -45,7 +60,7 @@ Read both reference and implementation images. Compare on these axes:
 | **Images** | Placeholder or actual? Right aspect ratio? |
 | **Responsive** | Does the layout adapt appropriately? |
 
-### 3) Report findings
+### 4) Report findings
 
 Output a structured report:
 
@@ -70,7 +85,7 @@ Output a structured report:
 {proceed / fix before continuing}
 ```
 
-### 4) Act on findings
+### 5) Act on findings
 
 - **MATCH**: Mark component as verified, proceed
 - **DRIFT**: List specific fixes needed, implement if in `/building` flow
