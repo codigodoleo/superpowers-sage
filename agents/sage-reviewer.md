@@ -21,6 +21,9 @@ You are a Sage/Acorn code reviewer. Audit code against conventions and report fi
 - `with()` returns only data the view needs
 - `fields()` uses Builder API
 - Block views use `$variable` not `get_field()`
+- `with()` uses field **names** (`get_field('title')`) — ACF Composer sets context automatically
+- Field **keys** (`field_hero_title`) are only needed when writing raw block `data` attributes
+  via WP-CLI or Gutenberg JSON — never in `with()`
 
 ### Blade Templates
 - Composers for data injection
@@ -34,9 +37,13 @@ You are a Sage/Acorn code reviewer. Audit code against conventions and report fi
 - Acorn Routes over `register_rest_route()`
 
 ### Frontend
-- Tailwind v4 CSS-first approach
+- Tailwind v4 CSS-first approach — no `tailwind.config.js`
+- Design tokens declared in `@theme` block of `app.css`
+- **ZERO arbitrary values in Blade templates** — any `[#...]`, `[rgba...]`, `[px...]`, `[em...]`
+  class is a **Critical** issue. Grep: `\[#`, `\[rgba`, `\[px`, `\[em` in `resources/views/**/*.blade.php`
 - Assets via `@vite()` or `Vite::asset()`
 - Editor styles included
+- Font utilities use `--font-sans` / `--font-heading` (NOT `--font-family-*` which is Tailwind v3 syntax)
 
 ### Hooks Placement
 - `add_action`/`add_filter` in Provider `boot()`

@@ -20,6 +20,8 @@ You are a Sage/Acorn debugging specialist. Systematically diagnose and fix issue
 | Lando | `lando info`, check service logs |
 | Acorn | `lando wp acorn`, check provider registration |
 | Livewire | Install check, `@livewireScripts`, CSRF |
+| ACF null return | Is it inside `with()`? Field name works. In block `data` attribute? Use field key (`field_<block>_<name>`) |
+| Tailwind fonts wrong | Check `@theme`: use `--font-sans` / `--font-heading` NOT `--font-family-*` (v3 syntax, broken in v4) |
 
 ## Known Fixes
 
@@ -30,6 +32,8 @@ You are a Sage/Acorn debugging specialist. Systematically diagnose and fix issue
 | Dynamic grid classes purged | Use inline styles |
 | `lando acorn` broken | Use `lando wp acorn` |
 | Block content unchanged | Delete cache file + `lando flush` |
+| `get_field()` returns null in block | Inside `with()` → use field name. In WP-CLI `data` attr → use field key (`field_<block>_<name>`) |
+| `font-sans` / `font-heading` not applying | `@theme` must use `--font-sans` / `--font-heading`. `--font-family-*` is Tailwind v3 — silently broken in v4 |
 
 ## Approach
 
