@@ -91,7 +91,25 @@ If active plan has assets:
 {X} critical, {Y} improvements, {Z} good practices.
 ```
 
-### 4) After review
+### 4) Visual verification — all components
+
+After sage-reviewer completes:
+
+1. Glob for all spec files: `docs/plans/<active-plan>/assets/section-*-spec.md`
+2. For each spec file found:
+   a. Read the `### Verification Inputs` block — extract `url`, `selector`, `ref`
+   b. Dispatch `visual-verifier` agent with:
+      - `url`: from spec Verification Inputs
+      - `selector`: from spec Verification Inputs
+      - `spec`: this spec file path
+      - `ref`: from spec Verification Inputs
+   c. Collect report: MATCH | DRIFT | MISSING | FAIL_ARBITRARY_VALUES
+3. Present consolidated report:
+   - List all components with their verification status
+   - If any DRIFT or FAIL: list fixes needed before merge
+   - If all MATCH: proceed to `finishing-a-development-branch`
+
+### 5) After review
 
 - Offer `finishing-a-development-branch` for merge/PR workflow
 - Use base skills: `requesting-code-review`, `receiving-code-review`
