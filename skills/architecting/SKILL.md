@@ -43,12 +43,14 @@ Before any design capture or analysis:
 ### 1) Invoke `/designing` to capture design reference
 
 Before any analysis:
+
 1. Check for active design tools (Stitch/Figma MCP)
 2. If available, invoke `/designing` to extract layout and content per section
 3. Save extracted data to `docs/plans/YYYY-MM-DD-<topic>/assets/`
 4. If no design tools, ask user for screenshots or skip to architecture
 
 After capturing design reference, dispatch the `design-extractor` agent in **PANORAMIC mode**:
+
 - Provide: the plan assets directory path
 - Agent produces: `assets/design-tokens.md` and `assets/overview-ref.png`
 - Use `design-tokens.md` to define the `@theme` block in `app.css` before any component work begins
@@ -56,6 +58,7 @@ After capturing design reference, dispatch the `design-extractor` agent in **PAN
 ### 2) Explore project context
 
 Read the project state:
+
 - Theme structure, installed packages, existing blocks
 - `config/poet.php` for existing CPTs
 - Existing service providers and routes
@@ -64,6 +67,7 @@ Read the project state:
 ### 3) Ask clarifying questions (one at a time)
 
 Understand the full scope:
+
 - What is being built? (page, feature, block set, full site)
 - What is the user-facing behavior?
 - Does it need Gutenberg editor integration?
@@ -73,12 +77,14 @@ Understand the full scope:
 ### 4) Identify components
 
 Break the feature into discrete components:
+
 - List each section/block/page
 - For each, note: name, complexity, dependencies
 
 ### 5) Invoke `/modeling` for content analysis
 
 For each component with content:
+
 1. Run the content classification checklist
 2. Determine static vs dynamic content
 3. Generate Poet config for any CPTs needed
@@ -88,12 +94,12 @@ For each component with content:
 
 For each component, assess complexity:
 
-| Indicator | Strategy |
-|---|---|
-| Simple ACF block + Blade view, no dynamic content | Autonomous |
-| Needs CPT setup, custom query, or Livewire | Interactive (user approval per step) |
-| Independent of other components | Can run in parallel |
-| Depends on shared CPT or service | Must run sequentially |
+| Indicator                                         | Strategy                             |
+| ------------------------------------------------- | ------------------------------------ |
+| Simple ACF block + Blade view, no dynamic content | Autonomous                           |
+| Needs CPT setup, custom query, or Livewire        | Interactive (user approval per step) |
+| Independent of other components                   | Can run in parallel                  |
+| Depends on shared CPT or service                  | Must run sequentially                |
 
 ### 7) Generate plan directory
 
@@ -104,12 +110,15 @@ mkdir -p docs/plans/YYYY-MM-DD-<topic>/{assets,components,logs}
 ```
 
 Write:
+
 - `plan.md` — frontmatter with title, date, status: in-progress, strategy, design-tool, branch, components list
 - `architecture.md` — ADR with context, decision, components, data flow, justification
 - `content-model.md` — output from modeling analysis
-- `components/NN-name.md` — sub-plan per component (for complex projects)
+- `components/NN-name/plan.md` — sub-plan per component (for complex projects)
+- `assets/` — design reference images and tokens
 
 The `plan.md` frontmatter template:
+
 ```yaml
 title: <feature title>
 date: YYYY-MM-DD
@@ -125,6 +134,7 @@ components:
 ### 8) Present design for approval
 
 Present the architecture in sections:
+
 1. Overview (goal + approach)
 2. Components list with strategies
 3. Content model summary
@@ -148,6 +158,7 @@ If Subagent-Driven: invoke `subagent-driven-development` base skill
 If Direct: invoke `/building` with the plan path
 
 ## Key Principles
+
 - **Design first** — always capture visual reference before analyzing
 - **Model content** — classify every content element before implementing
 - **Plan directories** — persist everything to disk (survives context compression)

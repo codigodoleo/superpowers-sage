@@ -56,6 +56,7 @@ Skills are **activities** — gerund naming communicates what's happening, not w
 | `/verifying` | Visual comparison: screenshots vs design reference |
 | `/reviewing` | Convention audit + design alignment check |
 | `/debugging` | Sage-aware troubleshooting with cache and OPcache knowledge |
+| `/install-plugin` | Install WordPress plugins via Composer from local `.zip` or `wp-packages.org` |
 
 ### Recommended flow for new features
 
@@ -69,9 +70,9 @@ For simple tasks, invoke any skill directly.
 
 ## Reference Skills
 
-17 deep technical references, used internally by workflow skills and agents:
+18 deep technical references, used internally by workflow skills and agents:
 
-- **Sage/Lando** — project setup, ACF Composer, Blade templates, Vite + Tailwind, service providers, routing, testing, troubleshooting
+- **Sage/Lando** — project setup, ACF Composer, Blade templates, Vite + Tailwind, service providers, routing, testing, troubleshooting, WordPress Composer packages
 - **Acorn** — routes, livewire, eloquent, middleware, queues, logging, commands, redis
 - **WordPress** — native blocks, capabilities, WP-CLI, hooks lifecycle, performance, PHPStan, REST API, security
 

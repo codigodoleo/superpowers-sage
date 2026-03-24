@@ -75,12 +75,14 @@ Flags:
 
 ### 3. Plugin and theme management
 
+Installations in this ecosystem are Composer-first. Use `/install-plugin` to add new plugins from `wp-packages.org` or local `.zip` files, then use WP-CLI for runtime operations.
+
 ```bash
 # List plugins with status
 lando wp plugin list
 
-# Install and activate a plugin
-lando wp plugin install <plugin-slug> --activate
+# Activate a plugin installed via Composer
+lando wp plugin activate <plugin-slug>
 
 # Deactivate a plugin
 lando wp plugin deactivate <plugin-slug>
@@ -258,15 +260,15 @@ lando wp site health
 
 ## Failure modes
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| `lando wp` command not found | Lando not running or misconfigured | Run `lando start`, check `.lando.yml` tooling |
-| Search-replace corrupts serialized data | Missing `--precise` flag | Restore from backup, re-run with `--precise` |
-| Database import fails | SQL file too large or charset mismatch | Split the file, check `max_allowed_packet`, verify charset |
-| Plugin activation fatal error | PHP compatibility or dependency conflict | Check PHP version, review error log with `lando logs` |
-| Cron events not firing | `DISABLE_WP_CRON` set without system cron | Add system cron or remove the constant in dev |
-| Maintenance mode stuck | `.maintenance` file not removed | `lando wp maintenance-mode deactivate` or manually remove the file |
-| `wp acorn` commands fail | Acorn not bootstrapped | Verify Acorn is installed and activated, check `app/Providers/` |
+| Symptom                                 | Likely cause                              | Fix                                                                |
+| --------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| `lando wp` command not found            | Lando not running or misconfigured        | Run `lando start`, check `.lando.yml` tooling                      |
+| Search-replace corrupts serialized data | Missing `--precise` flag                  | Restore from backup, re-run with `--precise`                       |
+| Database import fails                   | SQL file too large or charset mismatch    | Split the file, check `max_allowed_packet`, verify charset         |
+| Plugin activation fatal error           | PHP compatibility or dependency conflict  | Check PHP version, review error log with `lando logs`              |
+| Cron events not firing                  | `DISABLE_WP_CRON` set without system cron | Add system cron or remove the constant in dev                      |
+| Maintenance mode stuck                  | `.maintenance` file not removed           | `lando wp maintenance-mode deactivate` or manually remove the file |
+| `wp acorn` commands fail                | Acorn not bootstrapped                    | Verify Acorn is installed and activated, check `app/Providers/`    |
 
 ## Escalation
 
