@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "./hooks/session-start.sh"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "./hooks/post-edit.sh"
+      }
+    ],
+    "preCompact": [
+      {
+        "command": "./hooks/post-compact.sh"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "./hooks/pre-commit.sh",
+        "matcher": "git commit"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "./hooks/post-subagent.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": "./hooks/post-stop.sh"
+      }
+    ]
+  }
+}
