@@ -9,6 +9,22 @@ claude plugin marketplace add codigodoleo/superpowers-sage
 claude plugin install codigodoleo/superpowers-sage
 ```
 
+### VS Code (GitHub Copilot)
+
+Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
+
+```
+Chat: Install Plugin From Source
+```
+
+Enter the repository URL:
+
+```
+https://github.com/codigodoleo/superpowers-sage
+```
+
+Alternatively, enable the `chat.plugins.enabled` setting and search `@agentPlugins` in the Extensions view.
+
 ### Prerequisites
 
 | Requirement | Version |

@@ -90,6 +90,7 @@ if (existsSync(skillsDir)) {
 const pluginFiles = [
   [".claude-plugin/plugin.json", "Claude"],
   [".cursor-plugin/plugin.json", "Cursor"],
+  ["plugin.json", "VSCode"],
 ];
 const versions = {};
 
@@ -124,6 +125,22 @@ if (versions.Claude && versions.Cursor && versions.Claude !== versions.Cursor) {
   log(
     "✗",
     `Version mismatch: Claude=${versions.Claude}, Cursor=${versions.Cursor}`,
+  );
+  errors++;
+}
+
+if (versions.Claude && versions.VSCode && versions.Claude !== versions.VSCode) {
+  log(
+    "✗",
+    `Version mismatch: Claude=${versions.Claude}, VSCode=${versions.VSCode}`,
+  );
+  errors++;
+}
+
+if (versions.Cursor && versions.VSCode && versions.Cursor !== versions.VSCode) {
+  log(
+    "✗",
+    `Version mismatch: Cursor=${versions.Cursor}, VSCode=${versions.VSCode}`,
   );
   errors++;
 }
