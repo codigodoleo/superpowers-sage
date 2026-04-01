@@ -11,7 +11,11 @@
       "name": "superpowers-sage",
       "description": "Sage + Acorn + Lando skills for Claude Code: ACF Composer blocks, Livewire, Eloquent, routes, middleware, queues, and modern WordPress architecture patterns with Tailwind v4 and Vite.",
       "version": "0.2.0",
-      "source": "./",
+      "source": {
+        "source": "github",
+        "repo": "codigodoleo/superpowers-sage",
+        "ref": "main"
+      },
       "author": {
         "name": "codigodoleo",
         "url": "https://github.com/codigodoleo"
