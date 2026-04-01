@@ -1,16 +1,25 @@
 {
   "name": "superpowers-sage-marketplace",
-  "description": "Marketplace for Sage Superpowers plugin.",
   "owner": {
-    "name": "codigodoleo",
-    "url": "https://github.com/codigodoleo"
+    "name": "codigodoleo"
+  },
+  "metadata": {
+    "description": "Marketplace for Sage Superpowers plugin."
   },
   "plugins": [
     {
       "name": "superpowers-sage",
       "description": "Sage + Acorn + Lando skills for AI-assisted WordPress development.",
-      "version": "0.2.0",
-      "source": "./"
+      "version": "1.0.0",
+      "source": {
+        "source": "github",
+        "repo": "codigodoleo/superpowers-sage",
+        "ref": "main"
+      },
+      "author": {
+        "name": "codigodoleo",
+        "url": "https://github.com/codigodoleo"
+      }
     }
   ]
 }

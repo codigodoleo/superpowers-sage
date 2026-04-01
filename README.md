@@ -1,41 +1,118 @@
 # Superpowers Sage
 
-Comprehensive [Claude Code](https://claude.com/claude-code) plugin for modern WordPress development with the **Roots ecosystem**. Workflow skills, design tool integration, visual verification, content modeling, and zero-token automation hooks for **Sage**, **Acorn**, and **Lando** projects.
+Agent plugin for modern WordPress development with the **Roots ecosystem** — works with **Claude Code**, **VS Code (GitHub Copilot)**, **Cursor**, and any AI assistant that supports the agent plugin format. Workflow skills, design tool integration, visual verification, content modeling, and zero-token automation hooks for **Sage**, **Acorn**, and **Lando** projects.
 
-## Installation
-
-```bash
-claude plugin marketplace add codigodoleo/superpowers-sage
-claude plugin install codigodoleo/superpowers-sage
-```
-
-### VS Code (GitHub Copilot)
-
-Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
-
-```
-Chat: Install Plugin From Source
-```
-
-Enter the repository URL:
-
-```
-https://github.com/codigodoleo/superpowers-sage
-```
-
-Alternatively, enable the `chat.plugins.enabled` setting and search `@agentPlugins` in the Extensions view.
-
-### Prerequisites
+## Prerequisites
 
 | Requirement | Version |
 |---|---|
-| [obra/superpowers](https://github.com/obra/superpowers) | latest |
 | [Lando](https://lando.dev) | 3.x |
 | [Sage](https://roots.io/sage/) + [Acorn](https://roots.io/acorn/) | 11+ / 4+ |
 | PHP | 8.2+ |
 | Node.js | 20+ |
 
+## Installation
+
+> **One repository, three loaders.** The same plugin installs identically regardless of your AI assistant. Pick the section for your tool below.
+
+---
+
+### Claude Code
+
+```bash
+claude plugin marketplace add codigodoleo/superpowers-sage
+claude plugin install superpowers-sage@superpowers-sage
+```
+
+Alternatively, install directly from the repository URL:
+
+```bash
+claude plugin install --source https://github.com/codigodoleo/superpowers-sage
+```
+
+Verify the installation:
+
+```bash
+claude plugin list
+```
+
+---
+
+### VS Code (GitHub Copilot Chat)
+
+1. Enable the preview feature in your settings:
+
+   ```json
+   // settings.json
+   "chat.plugins.enabled": true
+   ```
+
+2. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run:
+
+   ```
+   Chat: Install Plugin From Source
+   ```
+
+3. Enter the repository URL:
+
+   ```
+   https://github.com/codigodoleo/superpowers-sage
+   ```
+
+**Alternative — install via Extensions view:**  
+Search `@agentPlugins` in the Extensions sidebar, or add the repository as a marketplace source in your settings:
+
+```json
+// settings.json
+"chat.plugins.marketplaces": [
+  "codigodoleo/superpowers-sage"
+]
+```
+
+Then search for and install `superpowers-sage` from the Extensions view.
+
+---
+
+### Cursor
+
+1. Open **Settings → Features → AI Rules / Plugins** (or the equivalent plugin panel for your Cursor version).
+2. Add the repository as a plugin source:
+
+   ```
+   https://github.com/codigodoleo/superpowers-sage
+   ```
+
+3. Cursor discovers skills and agents from the `skills/` and `agents/` directories automatically. Hooks are loaded from `hooks/cursor-hooks.json`.
+
+---
+
+### Local / Generic (any compatible assistant)
+
+Clone the repository and register the plugin directory:
+
+```bash
+git clone https://github.com/codigodoleo/superpowers-sage ~/.ai-plugins/superpowers-sage
+```
+
+Then point your AI assistant to the cloned directory. For tools that support `chat.pluginLocations` (VS Code) or `--plugin-dir` (Claude Code):
+
+```json
+// VS Code settings.json
+"chat.pluginLocations": {
+  "/Users/you/.ai-plugins/superpowers-sage": true
+}
+```
+
+```bash
+# Claude Code — session-scoped
+claude --plugin-dir ~/.ai-plugins/superpowers-sage
+```
+
+---
+
 ### Design Tools (optional)
+
+These MCP integrations unlock the `/designing` and `/verifying` skills. Configure once per machine independent of which AI assistant you use:
 
 ```bash
 # Stitch (Google) — extract screens and sections from designs
@@ -47,6 +124,21 @@ claude mcp add figma -- npx -y figma-developer-mcp --figma-api-key=YOUR_KEY
 # Playwright — capture implementation screenshots for visual verification
 claude mcp add playwright -- npx -y @anthropic/playwright-mcp
 ```
+
+For VS Code, add MCP servers in `.vscode/mcp.json` or user settings under `"mcp"`.
+
+---
+
+## Compatibility Matrix
+
+| Feature | Claude Code | VS Code Copilot | Cursor | Notes |
+|---|---|---|---|---|
+| Workflow skills (`/building`, etc.) | ✅ | ✅ | ✅ | All tools load `skills/` |
+| Custom agents | ✅ | ✅ | ✅ | All tools load `agents/` |
+| Hooks (lifecycle automation) | ✅ | ✅ | ✅ | Claude/VS Code use `hooks/hooks.json`; Cursor uses `hooks/cursor-hooks.json` |
+| MCP design tools | ✅ | ✅ | ✅ | Configure per tool's MCP settings |
+| Marketplace install | ✅ | ✅ | — | Cursor installs direct from repository |
+| Namespaced skills | `superpowers-sage:building` | `superpowers-sage:building` | `/building` | Cursor may omit namespace prefix |
 
 ## Getting Started
 
