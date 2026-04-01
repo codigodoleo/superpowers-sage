@@ -1,9 +1,10 @@
 {
   "name": "superpowers-sage-marketplace",
-  "description": "Marketplace for Sage Superpowers plugin.",
   "owner": {
-    "name": "codigodoleo",
-    "url": "https://github.com/codigodoleo"
+    "name": "codigodoleo"
+  },
+  "metadata": {
+    "description": "Marketplace for Sage Superpowers plugin."
   },
   "plugins": [
     {
