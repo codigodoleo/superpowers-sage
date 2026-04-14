@@ -41,6 +41,7 @@ Scan the project using native tools (Glob, Grep, Read — no bash pipes needed):
 
 Use ToolSearch to check for available design MCPs:
 
+- Search for `mcp__paper__` — Paper.design MCP (preferred when the user works from paper.design)
 - Search for `mcp__stitch__` — Stitch (Google) MCP
 - Search for `mcp__figma__` — Figma MCP
 - Search for `mcp__playwright__` — Playwright MCP for screenshots
@@ -91,6 +92,7 @@ Look for `docs/plans/*/plan.md` files with `status: in-progress`. If found, repo
 - Livewire: {installed or not}
 
 ### Design Tools
+- Paper: {available/not available}  (preferred when designs live on paper.design)
 - Stitch: {available/not available}
 - Figma: {available/not available}
 - Playwright: {available/not available}
