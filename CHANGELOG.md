@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.4.1...superpowers-sage-v1.4.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* **manifest:** remove skills/agents/hooks path fields for auto-discovery ([#7](https://github.com/codigodoleo/superpowers-sage/issues/7)) ([bd1b2ca](https://github.com/codigodoleo/superpowers-sage/commit/bd1b2ca3b591c5174227e671d9553f5e8a4d7221))
+
 ## [1.4.1](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.4.0...superpowers-sage-v1.4.1) (2026-04-14)
 
 
