@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.4.2...superpowers-sage-v1.4.3) (2026-04-14)
+
+
+### Bug Fixes
+
+* **hooks:** add .gitattributes to force LF on shell scripts ([#9](https://github.com/codigodoleo/superpowers-sage/issues/9)) ([4fe481b](https://github.com/codigodoleo/superpowers-sage/commit/4fe481b7ea39650dcbde85ff796f4d8cb319404b))
+
 ## [1.4.2](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.4.1...superpowers-sage-v1.4.2) (2026-04-14)
 
 
