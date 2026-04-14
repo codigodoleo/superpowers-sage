@@ -6,7 +6,7 @@ user-invocable: true
 
 # Designing — Design Tool Integration
 
-Detect and use design tools (Stitch MCP, Figma MCP, or local assets) to extract layout, content, and visual references for implementation.
+Route to the right design tool based on the URL the user provides — Paper (preferred), Stitch, Figma, or local assets — to extract layout, content, and visual references for implementation.
 
 ## When to use
 - Starting implementation of a visual design
