@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.4.0...superpowers-sage-v1.4.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* **manifest:** add trailing slash to skills and agents paths ([70c355e](https://github.com/codigodoleo/superpowers-sage/commit/70c355ef11b57a1eb75a60346a20df99b921f1c0))
+* **manifest:** add trailing slash to skills and agents paths ([3718d40](https://github.com/codigodoleo/superpowers-sage/commit/3718d403d84d9a9beb8b0097694b4fcf534d2043))
+
 ## [1.4.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.3.0...superpowers-sage-v1.4.0) (2026-04-14)
 
 
