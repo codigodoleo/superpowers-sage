@@ -34,7 +34,7 @@ Do NOT proceed to reference source detection.
 Priority order:
 1. **Spec file**: `docs/plans/<active-plan>/assets/section-*-spec.md` — read "Verification Inputs" block to get url, selector, and ref path
 2. **Plan assets**: `docs/plans/<active-plan>/assets/section-*.png` — reference image for comparison
-3. **Design MCP**: Stitch `get_screen` or Figma `get_design_context`
+3. **Design MCP**: Paper `get_screenshot`, Stitch `get_screen`, or Figma `get_design_context`
 4. **Last resort**: ask user to provide screenshot or describe expected appearance
 
 ### 2) Capture implementation
@@ -60,6 +60,26 @@ Read both reference and implementation images. Compare on these axes:
 | **Images** | Placeholder or actual? Right aspect ratio? |
 | **Responsive** | Does the layout adapt appropriately? |
 
+### 3b) Style spot-check (paper sources only)
+
+This step is **additive** — it runs only when `assets/section-{name}.styles.json` exists (i.e., the source was paper). For all other sources, skip silently and proceed to step 4.
+
+1. Read `docs/plans/<active-plan>/assets/section-{name}.styles.json`
+2. For each key property (typography, colors, spacing, border-radius), find the implemented value:
+   - **Tailwind class** (`p-6`, `text-lg`, `bg-slate-900`) — resolve to its real value via the project's Tailwind config (`tailwind.config.js` or `@theme` block in `resources/css/app.css`). For example, `p-6` → `padding: 1.5rem` → `24px`.
+   - **Arbitrary value** (`p-[23px]`) — capture the literal between brackets.
+3. Compare design value vs implemented value. Produce a per-section report block:
+
+```
+### Style Spot-Check
+✓ padding:    design=24px, impl=p-6 (24px)
+✗ font-size:  design=18px, impl=text-base (16px)  — DRIFT
+✓ color:      design=#0F172A, impl=bg-slate-900 (#0F172A)
+⚠ gap:        design=32px, impl=gap-[31px] — arbitrary value, near-match
+```
+
+4. **Non-fatal**: drift here does NOT block verification. The drift items are surfaced as warnings inside the final report (step 4) under a `### Style Drift` subsection. The user decides whether to adjust.
+
 ### 4) Report findings
 
 Output a structured report:
@@ -80,6 +100,10 @@ Output a structured report:
 
 ### Issues Found
 - {specific issue with fix suggestion}
+
+### Style Drift
+{omit this section if source was not paper, or no drift found.
+ Otherwise list the ✗ and ⚠ lines from the spot-check.}
 
 ### Recommendation
 {proceed / fix before continuing}
