@@ -28,6 +28,9 @@ function detectMCPServers(config) {
     if (nameLower.includes('figma') || cmdStr.includes('figma')) {
       result.figma = { name, configured: true };
     }
+    if (nameLower === 'paper' || nameLower.includes('paper.design') || cmdStr.includes('paper-design') || cmdStr.includes('paper.design')) {
+      result.paper = { name, configured: true };
+    }
     if (nameLower.includes('playwright') || cmdStr.includes('playwright')) {
       result.playwright = { name, configured: true };
     }
@@ -89,6 +92,7 @@ if (existsSync(plansDir)) {
 
 const result = {
   designTools: {
+    paper: tools.paper || { configured: false },
     stitch: tools.stitch || { configured: false },
     figma: tools.figma || { configured: false },
   },
