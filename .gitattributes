@@ -1,0 +1,29 @@
+# Shell scripts must always use LF line endings, even on Windows checkouts.
+# Git Bash / WSL / macOS / Linux break on `bash\r` shebangs with CRLF.
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Node ESM scripts — same reason
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.js text eol=lf
+
+# Config files loaded by POSIX tooling
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Markdown and documentation — LF for consistency across platforms
+*.md text eol=lf
+
+# Windows-specific batch files keep CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary assets — never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
