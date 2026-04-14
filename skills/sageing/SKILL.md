@@ -47,7 +47,7 @@ Skills are **activities** — gerund naming communicates process, not command.
 | **Plan Generator**         | `/plan-generator`         | Converts approved architecture into executable plan files            |
 | **Architecting**           | `/architecting`           | Compatibility wrapper for architecture-discovery + plan-generator    |
 | **Modeling**               | `/modeling`               | Content architecture analysis (static vs dynamic)                    |
-| **Designing**              | `/designing`              | Design tool integration (Stitch/Figma/offline assets)                |
+| **Designing**              | `/designing`              | Design tool integration (Paper/Stitch/Figma/offline assets) — routes by URL |
 | **Building**               | `/building`               | Plan-driven implementation with auto-verification                    |
 | **Verifying**              | `/verifying`              | Visual comparison with design reference                              |
 | **Reviewing**              | `/reviewing`              | Convention audit + design alignment check                            |
@@ -111,7 +111,7 @@ title: "Feature Name"
 date: YYYY-MM-DD
 status: in-progress | completed | abandoned
 strategy: interactive | autonomous | mixed
-design-tool: stitch | figma | offline | none
+design-tool: paper | stitch | figma | offline | none
 components:
   - name: Hero
     status: pending
@@ -122,14 +122,19 @@ components:
 
 ## Design Tool Integration
 
-The plugin detects and uses design tools via MCP servers:
+The plugin routes to a design tool based on the URL the user provides:
 
-| Tool                | MCP                        | Usage                                               |
-| ------------------- | -------------------------- | --------------------------------------------------- |
-| **Stitch** (Google) | `mcp__stitch__*`           | `list_screens` → `get_screen` → extract per section |
-| **Figma**           | `mcp__figma__*`            | List files → get frames → extract layers/text       |
-| **Playwright**      | `mcp__playwright__*`       | Capture implementation screenshots for verification |
-| **Chrome**          | `mcp__Claude_in_Chrome__*` | Alternative screenshot capture                      |
+| Tool                  | URL pattern                  | MCP                        | Usage                                                                                                           |
+| --------------------- | ---------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Paper** (preferred) | `paper.design/*`             | `mcp__paper__*`            | `get_basic_info` → `get_tree_summary` → `get_node_info` → `get_screenshot` + `get_computed_styles` + `get_jsx`  |
+| **Stitch** (Google)   | `stitch.withgoogle.com/*`    | `mcp__stitch__*`           | `list_screens` → `get_screen` → extract per section                                                             |
+| **Figma**             | `figma.com/*`                | `mcp__figma__*`            | List files → get frames → extract layers/text                                                                   |
+| **Playwright**        | n/a                          | `mcp__playwright__*`       | Capture implementation screenshots for verification                                                             |
+| **Chrome**            | n/a                          | `mcp__Claude_in_Chrome__*` | Alternative screenshot capture                                                                                  |
+
+Routing is by URL, not by which MCP happens to be configured. If the user sends a `paper.design` link and the paper MCP is not installed, `/designing` stops with a setup instruction rather than silently falling back.
+
+When using Paper as source, `/designing` persists three artifacts per section in `assets/`: `.png` (screenshot), `.styles.json` (computed styles, consumed by `/verifying` for style spot-check), and `.reference.jsx` (structural reference — never copied as code, since Sage uses Blade not React).
 
 When no design MCP is available, skills work with local assets in `docs/plans/<plan>/assets/`.
 

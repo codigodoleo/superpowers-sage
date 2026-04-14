@@ -1,12 +1,12 @@
 ---
 name: superpowers-sage:designing
-description: Design tool integration for Sage projects; detects and uses Stitch or Figma MCPs to extract layout, content, and visual references. Also works with local screenshot assets. Use when you need to consult or capture design references.
+description: Design tool integration for Sage projects; routes to Paper, Stitch, or Figma MCPs (or local assets) based on the URL/source the user provides. Paper enriches extraction with screenshots, computed styles, and JSX structural references. Use when you need to consult or capture design references.
 user-invocable: true
 ---
 
 # Designing — Design Tool Integration
 
-Detect and use design tools (Stitch MCP, Figma MCP, or local assets) to extract layout, content, and visual references for implementation.
+Route to the right design tool based on the URL the user provides — Paper (preferred), Stitch, Figma, or local assets — to extract layout, content, and visual references for implementation.
 
 ## When to use
 - Starting implementation of a visual design
@@ -20,17 +20,42 @@ Detect and use design tools (Stitch MCP, Figma MCP, or local assets) to extract 
 
 ## Procedure
 
-### 0) Detect available design tools
+### 0) Determine source from user input (URL-based routing)
 
-Use ToolSearch to discover which MCPs are available:
+Routing is driven by what the user provided, not by which MCPs happen to be configured.
 
-1. Search for `mcp__stitch__` — if found, Stitch is available
-2. Search for `mcp__figma__` — if found, Figma is available
-3. Check `docs/plans/<active-plan>/assets/` for local reference images
+1. **URL match** — inspect the user's input for a design URL:
+   - `paper.design/*` or `*.paper.design/*` → **paper** branch (use `mcp__paper__*`)
+   - `figma.com/*` → **figma** branch (use `mcp__figma__*` / `mcp__claude_ai_Figma__*`)
+   - `stitch.withgoogle.com/*` (or other known stitch hosts) → **stitch** branch (use `mcp__stitch__*`)
+2. **Local fallback** — if no URL but `docs/plans/<active-plan>/assets/section-*.png` exists → **offline** branch
+3. **Ask** — if neither URL nor local assets are present, ask the user for one
 
-If both Stitch and Figma are detected, ask the user which contains this project's layout.
+**MCP gate:** once the branch is known, ToolSearch the corresponding `mcp__<tool>__*` namespace. If the MCP is NOT configured, stop with this message:
+
+```
+⛔ You sent a {paper|figma|stitch} link but the `{tool}` MCP is not configured.
+
+Configure it and re-run, or send a link from another source.
+```
+
+Do NOT silently fall back to a different MCP.
 
 ### 1) Extract design data (per section, never full design at once)
+
+#### Paper workflow (preferred when source is paper.design):
+1. `mcp__paper__get_basic_info` — get document metadata
+2. `mcp__paper__get_tree_summary` — locate the target section node
+3. `mcp__paper__get_node_info` on the section — capture structure, text, hierarchy
+4. `mcp__paper__get_screenshot` — save as `assets/section-{name}.png`
+5. `mcp__paper__get_computed_styles` — save as `assets/section-{name}.styles.json` (typography, colors, spacing — exact values; consumed by `verifying` for the style spot-check)
+6. `mcp__paper__get_jsx` — save as `assets/section-{name}.reference.jsx` with this header comment as the FIRST lines of the file:
+   ```
+   // REFERÊNCIA ESTRUTURAL APENAS — NÃO COPIAR.
+   // Sage usa Blade, não React. Use isso só para entender
+   // hierarquia de componentes e nesting.
+   ```
+7. Produce the structured output (see step 2) — same schema as the other branches.
 
 #### Stitch workflow:
 1. `mcp__stitch__list_projects` — find the project
@@ -70,7 +95,7 @@ For each section extracted, output:
 If there's an active plan in `docs/plans/`:
 - Save extracted data as structured notes in `assets/section-{name}.md`
 - If screenshots are available, note their paths
-- Update `plan.md` frontmatter with `design-tool: stitch|figma|offline`
+- Update `plan.md` frontmatter with `design-tool: paper|stitch|figma|offline`
 
 ## Key Principles
 - **Granular extraction** — always per-section, never full design at once (prevents context overflow)

@@ -114,7 +114,12 @@ claude --plugin-dir ~/.ai-plugins/superpowers-sage
 
 These MCP integrations unlock the `/designing` and `/verifying` skills. Configure once per machine independent of which AI assistant you use:
 
+`/designing` routes by the URL the user provides — `paper.design/*` → Paper MCP, `figma.com/*` → Figma, Stitch host → Stitch. Paper is the preferred source when available: it exposes screenshots, computed styles, and structural JSX, which `/verifying` uses for an extra style spot-check.
+
 ```bash
+# Paper.design (preferred) — screenshots + computed styles + JSX per section
+# See https://paper.design for MCP install instructions
+
 # Stitch (Google) — extract screens and sections from designs
 claude mcp add stitch -- npx -y @anthropic/stitch-mcp
 
@@ -161,7 +166,7 @@ Skills are **activities** — gerund naming communicates what's happening, not w
 | `/plan-generator` | Converts approved architecture spec into executable plan files and dependency graph |
 | `/architecting` | Compatibility wrapper: runs architecture-discovery then plan-generator |
 | `/modeling` | Content architecture: classify static vs dynamic, recommend Poet/ACF |
-| `/designing` | Design tool integration: Stitch, Figma, or local asset extraction |
+| `/designing` | Design tool integration: Paper (preferred), Stitch, Figma, or local asset extraction — routed by URL |
 | `/building` | Plan-driven implementation with auto-verification after each component |
 | `/verifying` | Visual comparison: screenshots vs design reference |
 | `/reviewing` | Convention audit + design alignment check |

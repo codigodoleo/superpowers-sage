@@ -68,12 +68,14 @@ if command -v node >/dev/null 2>&1; then
   DESIGN_TOOLS=$(node "${PLUGIN_ROOT}/scripts/detect-design-tools.mjs" --path "$(pwd)" 2>/dev/null || true)
 fi
 
+PAPER="no"
 STITCH="no"
 FIGMA="no"
 PLAYWRIGHT="no"
 CHROME="no"
 
 if [ -n "$DESIGN_TOOLS" ]; then
+  echo "$DESIGN_TOOLS" | grep -q '"paper".*"configured": true' 2>/dev/null && PAPER="yes"
   echo "$DESIGN_TOOLS" | grep -q '"stitch".*"configured": true' 2>/dev/null && STITCH="yes"
   echo "$DESIGN_TOOLS" | grep -q '"figma".*"configured": true' 2>/dev/null && FIGMA="yes"
   echo "$DESIGN_TOOLS" | grep -q '"playwright".*"configured": true' 2>/dev/null && PLAYWRIGHT="yes"
@@ -137,6 +139,9 @@ if [ -n "$MISSING_SKILLS" ]; then
   SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n\n**Missing base skills:**${MISSING_SKILLS}\nInstall with: \`claude plugin install obra/superpowers\`"
 fi
 
+if [ "$PAPER" = "no" ]; then
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Paper.design MCP (preferred): see https://paper.design for install instructions"
+fi
 if [ "$STITCH" = "no" ]; then
   SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Stitch MCP: \`claude mcp add stitch -- npx -y @anthropic/stitch-mcp\`"
 fi
@@ -170,7 +175,7 @@ SUMMARY="${SUMMARY}\n\nLando detected: ${LANDO_YML}"
 SUMMARY="${SUMMARY}\n\nDetected Sage themes:${THEMES}"
 [ -n "$ACORN_VER" ] && [ "$ACORN_VER" != "unknown" ] && THEMES_EXTRA=" (Acorn v${ACORN_VER}, Livewire: ${LIVEWIRE})"
 SUMMARY="${SUMMARY}${THEMES_EXTRA:-}"
-SUMMARY="${SUMMARY}\n\nDesign Tools: Stitch: ${STITCH} | Figma: ${FIGMA} | Playwright: ${PLAYWRIGHT} | Chrome: ${CHROME}"
+SUMMARY="${SUMMARY}\n\nDesign Tools: Paper: ${PAPER} | Stitch: ${STITCH} | Figma: ${FIGMA} | Playwright: ${PLAYWRIGHT} | Chrome: ${CHROME}"
 
 if [ -n "$ACTIVE_PLAN" ]; then
   SUMMARY="${SUMMARY}\n\nActive Plan: ${ACTIVE_PLAN}/plan.md (${PLAN_TITLE}). Assets: ${PLAN_ASSETS}"

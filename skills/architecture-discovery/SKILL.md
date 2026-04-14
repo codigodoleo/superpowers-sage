@@ -74,6 +74,7 @@ Use these operational templates when visual mode is active.
   "created_at": "YYYY-MM-DDTHH:MM:SSZ",
   "spec_path": "docs/superpowers/specs/YYYY-MM-DD-<topic>-architecture.md",
   "tools": {
+    "paper": false,
     "figma": false,
     "playwright": false
   }

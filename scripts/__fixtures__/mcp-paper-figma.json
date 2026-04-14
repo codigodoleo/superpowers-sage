@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "paper": {
+      "command": "npx",
+      "args": ["-y", "@paper-design/mcp"]
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp"]
+    }
+  }
+}
