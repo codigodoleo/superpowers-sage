@@ -1,7 +1,7 @@
 {
   "name": "superpowers-sage",
   "description": "Modern WordPress development with Sage, Acorn & Lando. Workflow skills: /architecture-discovery, /plan-generator, /building, /designing, /verifying (+ /architecting compatibility alias), with design tool integration, content modeling, visual verification, and comprehensive hooks.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "skills": "./skills/",
   "agents": "./agents/",
   "hooks": "./hooks/hooks.json",
