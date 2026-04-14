@@ -28,7 +28,7 @@ function detectMCPServers(config) {
     if (nameLower.includes('figma') || cmdStr.includes('figma')) {
       result.figma = { name, configured: true };
     }
-    if (nameLower === 'paper' || nameLower.includes('paper.design') || cmdStr.includes('paper-design') || cmdStr.includes('paper.design')) {
+    if (nameLower.includes('paper') || cmdStr.includes('paper')) {
       result.paper = { name, configured: true };
     }
     if (nameLower.includes('playwright') || cmdStr.includes('playwright')) {
