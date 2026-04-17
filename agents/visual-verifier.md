@@ -37,8 +37,23 @@ Do NOT attempt fallback screenshots. Do NOT ask the user for a screenshot. Stop 
 
 ### Step 1 — Load reference
 
-1. Read `spec` file from disk — extract all Typography, Colours, Spacing, Layout, States tables
-2. Read `ref` image from disk with the Read tool (Claude sees images natively)
+Attempt to obtain a live reference from Pencil before falling back to the saved image.
+
+1. ToolSearch for `mcp__pencil__open_document` — is Pencil MCP available?
+2. **If Pencil is available:**
+   a. Read `{spec}` file — look for a `pencil-node-id` value in the **Pencil Nodes** table
+      (column: Node ID, first row). Also look for the source `filePath` in the spec header line
+      `> Source: {filePath}`.
+   b. If both `filePath` and `nodeId` are found:
+      `open_document(filePath)` → `get_screenshot(nodeId)`
+      Use the returned screenshot as the reference image.
+      Label this reference: **LIVE — Pencil**
+   c. If `filePath` or `nodeId` is missing: fall through to step 3.
+3. **Fallback — use saved image:**
+   Read `{ref}` file from disk with the Read tool.
+   Label this reference: **CACHED — saved {date from filename or file mtime}**
+4. Record the reference label. Include it in the report header:
+   `**Reference:** LIVE (Pencil) | CACHED (YYYY-MM-DD)`
 
 ### Step 2 — Check for arbitrary Tailwind values (BEFORE screenshot)
 
@@ -86,6 +101,7 @@ Compare the implementation screenshot against the `ref` image on these axes:
 ## Verification: {Section Name}
 
 **Status:** MATCH | DRIFT | MISSING | FAIL_ARBITRARY_VALUES
+**Reference:** LIVE (Pencil) | CACHED (YYYY-MM-DD)
 
 ### Comparison
 | Axis | Status | Notes |
