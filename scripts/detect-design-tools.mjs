@@ -75,10 +75,11 @@ if (existsSync(designDir)) {
     null;
   const pageFiles = penFiles.filter(f => !f.endsWith('.lib.pen'));
   tools.pencil = {
+    configured: false,
     ...tools.pencil,
     hasFiles: penFiles.length > 0,
-    libFile: libFile ? join('design', libFile) : null,
-    pageFiles: pageFiles.map(f => join('design', f)),
+    libFile: libFile ? `design/${libFile}` : null,
+    pageFiles: pageFiles.map(f => `design/${f}`),
   };
 }
 
