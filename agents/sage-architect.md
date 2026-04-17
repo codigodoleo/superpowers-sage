@@ -36,7 +36,16 @@ Always prefer these approaches:
 ## Your Workflow
 
 1. Read the project state (composer.json, existing blocks, providers, routes)
-2. If design tools are available (check via ToolSearch for `mcp__paper__*`, `mcp__stitch__*`, or `mcp__figma__*`), use them to understand the visual design. If the user provided a design URL, use the matching MCP (paper.design → paper, figma.com → figma, stitch host → stitch).
+2. If design tools are available, check via ToolSearch for each:
+   - `mcp__paper__*` → Paper workflow
+   - `mcp__stitch__*` → Stitch workflow
+   - `mcp__figma__*` → Figma workflow
+   - `mcp__pencil__open_document` → Pencil workflow:
+     → If found, read `design/component-map.md` if present.
+     → Reference Pencil component IDs in ADR component tables using this format:
+       `{ComponentName} (Pencil: {nodeId}) → {BladeTag}`
+       e.g. `EyebrowRow (Pencil: 2phBq) → <x-eyebrow-row>`
+   If the user provided a design URL, use the matching MCP (paper.design → paper, figma.com → figma, stitch host → stitch).
 2b. If `design-extractor` has run in PANORAMIC mode, read `assets/design-tokens.md` and use its
     `@theme` declarations as the authoritative token set for ALL component recommendations.
     Never propose arbitrary `[#hex]` values — reference the token names from `design-tokens.md`.
