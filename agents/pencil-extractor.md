@@ -37,6 +37,9 @@ Restart the session after installing.
 - `sectionName` (SURGICAL, optional): name of the section — used to resolve `sectionId` if not provided
 - `planPath` (optional): path to the active plan directory — used for saving assets
 
+If `planPath` is not provided, save all output files to `design/extracted/` (relative to the
+project root). Create the directory if it does not exist.
+
 ## `.pen` File Convention
 
 ```
@@ -87,12 +90,17 @@ Extract global design tokens from the design system library file.
 
 4. **Take an overview screenshot**
 
-   `get_editor_state()` → collect top-level node IDs
+   `get_editor_state()` → from the response, read the `children` array of the document root
+   and take the `id` of the first entry as `firstNodeId`.
    `get_screenshot(firstNodeId)` → save as `{planPath}/assets/overview-ref.png`
    (Pencil requires a nodeId — full-document screenshot is unavailable; the first frame
    provides a representative visual reference.)
 
 5. **Write `design-tokens.md`**
+
+   Infer `{Project Name}` from the `.lib.pen` filename: strip the `.lib.pen` suffix and
+   title-case the result (e.g., `design-system.lib.pen` → "Design System"). If the parent
+   directory has a descriptive name, prefer that.
 
    Save to `{planPath}/assets/design-tokens.md`:
 
@@ -100,7 +108,7 @@ Extract global design tokens from the design system library file.
    ## Design Tokens — {Project Name}
 
    > Source: `{libFilePath}` (Pencil MCP)
-   > Extracted: {date}
+   > Extracted: {date}  ← format as YYYY-MM-DD
 
    ### Colour Palette
 
@@ -148,10 +156,16 @@ Extract a precise implementation spec for a single page section.
 2. **Resolve the target section**
 
    - If `sectionId` provided: use directly.
-   - If `sectionName` provided: `batch_get` with no nodeIds, `readDepth: 1`
-     → find the node whose `name` matches `sectionName` (case-insensitive)
-     → use its `id` as `sectionId`.
+   - If `sectionName` provided: `get_editor_state()` → collect the list of top-level node IDs
+     → `batch_get(topLevelNodeIds, readDepth: 1)` → find the node whose `name` matches
+     `sectionName` (case-insensitive) → use its `id` as `sectionId`.
+     If multiple nodes match, list all with their IDs and ask the caller to specify `sectionId`.
    - If neither: list available top-level sections and ask the caller to specify.
+
+> **File naming:** Convert `sectionName` to a filesystem-safe slug before using it in file
+> names: lowercase, replace spaces and special characters (including `—`, `–`, `/`) with
+> hyphens, strip accented characters. Example: `"S02 — Hero"` → `s02-hero`,
+> `"Para Arquitetos"` → `para-arquitetos`.
 
 3. **Extract section data**
 
@@ -180,7 +194,7 @@ Extract a precise implementation spec for a single page section.
    ## Design Spec: {Section Name}
 
    > Source: `{filePath}` → node `{sectionId}` (Pencil MCP)
-   > Extracted: {date}
+   > Extracted: {date}  ← format as YYYY-MM-DD
 
    ### Typography
 
@@ -254,6 +268,9 @@ Map the Pencil component library to suggested Blade component names.
 
    `open_document(libFilePath)` → `get_editor_state()`
    → from the "Reusable Components" section of the editor state, collect all component IDs and names.
+   If no "Reusable Components" section is present in `get_editor_state()`, fall back to:
+   `batch_get(documentRootId, readDepth: 1)` → enumerate all top-level nodes → treat nodes
+   with names matching component conventions (CamelCase, Btn/*, etc.) as components.
 
 3. **Extract each component**
 
@@ -277,14 +294,15 @@ Map the Pencil component library to suggested Blade component names.
 
    Save to both:
    - `{planPath}/assets/component-map.md` (plan-scoped)
-   - `design/component-map.md` (persistent project reference — do NOT overwrite if it
-     exists and is more recent than 7 days; warn the user instead)
+   - `design/component-map.md` (persistent project reference —
+     if it already exists, read its `> Generated: {date}` line and compare to today (YYYY-MM-DD).
+     If less than 7 days old, warn the caller and skip overwriting.)
 
    ````markdown
    # Pencil → Blade Component Map
 
    > Source: `{libFilePath}` (Pencil MCP)
-   > Generated: {date}
+   > Generated: {date}  ← format as YYYY-MM-DD
    > ⚠️ This file is generated. Do not edit manually — re-run COMPONENT_MAP mode to refresh.
 
    | Pencil ID | Pencil Name | Suggested Blade tag | Key properties |
