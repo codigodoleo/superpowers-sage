@@ -16,12 +16,16 @@ On start, check for a design reference in this order (or use whichever matches t
 1. Paper MCP — ToolSearch for `mcp__paper__get_node_info`
 2. Figma MCP — ToolSearch for `mcp__claude_ai_Figma__get_design_context`
 3. Stitch MCP — ToolSearch for `mcp__stitch__get_screen`
-4. Local reference images — Glob for `docs/plans/*/assets/section-*.png`
+4. Pencil MCP — ToolSearch for `mcp__pencil__open_document`
+   → If found: delegate entirely to the `pencil-extractor` agent.
+   → Pass: `mode` (PANORAMIC | SURGICAL | COMPONENT_MAP), `filePath`, `sectionId` or `sectionName`, `planPath`.
+   → Do not perform any Pencil extraction directly — pencil-extractor owns all Pencil logic.
+5. Local reference images — Glob for `docs/plans/*/assets/section-*.png`
 
 If none are found:
 ```
 ⛔ BLOCKED — No design reference available.
-Required: a connected Figma or Stitch MCP, or local reference images at:
+Required: a connected Paper, Figma, Stitch, or Pencil MCP, or local reference images at:
   docs/plans/<plan>/assets/section-<name>.png
 Provide one of the above and re-run.
 ```
