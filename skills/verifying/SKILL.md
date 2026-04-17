@@ -32,18 +32,37 @@ Do NOT proceed to reference source detection.
 ### 1) Determine reference source
 
 Priority order:
-1. **Spec file**: `docs/plans/<active-plan>/assets/section-*-spec.md` — read "Verification Inputs" block to get url, selector, and ref path
+
+0. **Live design MCP (Priority 0 — preferred when MCP is configured):**
+   - Figma: `get_design_context` + `get_metadata`
+   - Paper: `get_computed_styles` + `get_node_info`
+   - Pencil: `batch_get(resolveVariables: true)` + `batch_get(readDepth: 4)`
+   - Stitch: `get_screen`
+   Use when the design MCP is active in the session — live reference is always more accurate than cached assets.
+1. **Spec file**: `docs/plans/<active-plan>/assets/section-*-spec.md` — read “Verification Inputs” block to get url, selector, and ref path
 2. **Plan assets**: `docs/plans/<active-plan>/assets/section-*.png` — reference image for comparison
-3. **Design MCP**: Paper `get_screenshot`, Stitch `get_screen`, or Figma `get_design_context`
-4. **Last resort**: ask user to provide screenshot or describe expected appearance
+3. **Last resort**: ask user to provide screenshot or describe expected appearance
+
+### 1b) Node geometry (multi-column / offset components)
+
+When the reference source is a design MCP **and** the component contains a grid with 2+ columns, offset positioning, or nested containers, fetch node geometry before capturing the implementation screenshot:
+
+- **Figma**: call `get_metadata` — returns `x`, `y`, `width`, `height` for each direct child
+- **Paper**: call `get_node_info` — returns width + computed sizes for selected node
+- **Pencil**: call `batch_get(readDepth: 4)` — returns layout children with dimensions
+- **Stitch**: column count and widths visible in the `get_screen` response
+
+Use these values to confirm column widths (e.g., a 60/40 split) before comparing screenshots. Skipping this step on multi-column layouts is a common source of false MATCH verdicts.
 
 ### 2) Capture implementation
 
 1. Read `Verification Inputs` block from the spec file — extract `url`, `selector`, `ref`
-2. Navigate Playwright to `url`: `mcp__plugin_playwright_playwright__browser_navigate`
-3. Take screenshot scoped to `selector`:
+2. Read canonical viewport width from `plan.md` frontmatter (`viewport-width` field, default `1440` if absent)
+3. Set viewport: `mcp__plugin_playwright_playwright__browser_resize` to `{viewport-width} x 900` before navigating
+4. Navigate Playwright to `url`: `mcp__plugin_playwright_playwright__browser_navigate`
+5. Take screenshot scoped to `selector`:
    `mcp__plugin_playwright_playwright__browser_take_screenshot`
-4. If `selector` fails (element not found), take full-page screenshot and note the difference
+6. If `selector` fails (element not found), take full-page screenshot and note the difference
 
 ### 3) Compare visually
 

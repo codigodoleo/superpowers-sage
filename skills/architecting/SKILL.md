@@ -24,6 +24,32 @@ Do not implement code in this skill. If implementation is requested, complete th
 
 ## Procedure
 
+### 0) Design system gate
+
+Before starting architecture discovery, check whether the visual foundation exists:
+
+1. Does `resources/css/design-tokens.css` exist **and** contain real tokens (not a placeholder)?
+2. Does a kitchensink route/view exist (e.g., `resources/views/kitchensink.blade.php` or `/kitchensink` is accessible)?
+
+**If both are present:** proceed to Step 1 normally.
+
+**If either is missing or unvalidated:**
+
+```
+⚠ Design system foundation not found.
+
+Architecture for multi-block features should follow a validated design system.
+Tokens, UI atoms, and layout components must exist before defining block schemas.
+
+Recommendation: run /sage-design-system first.
+  → It will create design-tokens.css, ui/ + layout/ Blade components, and validate with a kitchensink page.
+  → Return to /architecting after the kitchensink screenshot is confirmed.
+
+Proceed anyway? (only if this feature has no visual blocks / is purely backend)
+```
+
+Wait for explicit user confirmation before skipping the design system gate.
+
 ### 1) Run architecture discovery
 
 - Invoke `superpowers-sage:architecture-discovery` with the same arguments.

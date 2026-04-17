@@ -2,33 +2,33 @@
   "hooks": {
     "sessionStart": [
       {
-        "command": "./hooks/session-start.sh"
+        "command": "bash \"./hooks/session-start.sh\""
       }
     ],
     "afterFileEdit": [
       {
-        "command": "./hooks/post-edit.sh"
+        "command": "bash \"./hooks/post-edit.sh\""
       }
     ],
     "preCompact": [
       {
-        "command": "./hooks/post-compact.sh"
+        "command": "bash \"./hooks/post-compact.sh\""
       }
     ],
     "beforeShellExecution": [
       {
-        "command": "./hooks/pre-commit.sh",
+        "command": "bash \"./hooks/pre-commit.sh\"",
         "matcher": "git commit"
       }
     ],
     "subagentStop": [
       {
-        "command": "./hooks/post-subagent.sh"
+        "command": "bash \"./hooks/post-subagent.sh\""
       }
     ],
     "stop": [
       {
-        "command": "./hooks/post-stop.sh"
+        "command": "bash \"./hooks/post-stop.sh\""
       }
     ]
   }

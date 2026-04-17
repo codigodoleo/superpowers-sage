@@ -47,7 +47,9 @@ Skills are **activities** — gerund naming communicates process, not command.
 | **Plan Generator**         | `/plan-generator`         | Converts approved architecture into executable plan files            |
 | **Architecting**           | `/architecting`           | Compatibility wrapper for architecture-discovery + plan-generator    |
 | **Modeling**               | `/modeling`               | Content architecture analysis (static vs dynamic)                    |
-| **Designing**              | `/designing`              | Design tool integration (Paper/Stitch/Figma/offline assets) — routes by URL |
+| **Designing**              | `/designing`              | Design tool integration (Paper/Stitch/Figma/Pencil/offline assets) — routes by URL or file |
+| **Design System**          | `/sage-design-system`     | Establish visual foundation: tokens → UI components → layout components → kitchensink |
+| **Block Architecting**     | `/sage-block-architecting`| CSS contract for each ACF block: scoped CSS, enqueue guard, `$styles`, block README |
 | **Building**               | `/building`               | Plan-driven implementation with auto-verification                    |
 | **Verifying**              | `/verifying`              | Visual comparison with design reference                              |
 | **Reviewing**              | `/reviewing`              | Convention audit + design alignment check                            |
@@ -56,9 +58,10 @@ Skills are **activities** — gerund naming communicates process, not command.
 ### Recommended workflow for new features
 
 ```
+/sage-design-system      →  (tokens, UI atoms, layout components, kitchensink validated)
 /architecture-discovery  →  (generates approved architecture spec)
 /plan-generator          →  (generates plan + assets)
-/building      →  (implements from plan, auto-verifies)
+/building      →  (implements from plan; auto-invokes /sage-block-architecting per ACF block)
 /reviewing     →  (convention audit + design alignment)
 ```
 
@@ -111,7 +114,7 @@ title: "Feature Name"
 date: YYYY-MM-DD
 status: in-progress | completed | abandoned
 strategy: interactive | autonomous | mixed
-design-tool: paper | stitch | figma | offline | none
+design-tool: paper | stitch | figma | pencil | offline | none
 components:
   - name: Hero
     status: pending
@@ -129,7 +132,8 @@ The plugin routes to a design tool based on the URL the user provides:
 | **Paper** (preferred) | `paper.design/*`             | `mcp__paper__*`            | `get_basic_info` → `get_tree_summary` → `get_node_info` → `get_screenshot` + `get_computed_styles` + `get_jsx`  |
 | **Stitch** (Google)   | `stitch.withgoogle.com/*`    | `mcp__stitch__*`           | `list_screens` → `get_screen` → extract per section                                                             |
 | **Figma**             | `figma.com/*`                | `mcp__figma__*`            | List files → get frames → extract layers/text                                                                   |
-| **Playwright**        | n/a                          | `mcp__playwright__*`       | Capture implementation screenshots for verification                                                             |
+| **Pencil**            | `*.pen` / `design/` folder   | `mcp__pencil__*`           | `open_document` → `get_variables` / `batch_get(resolveVariables: true)` → `get_screenshot`                     |
+| **Playwright MCP**    | n/a                          | `mcp__plugin_playwright_playwright__*` | Capture implementation screenshots for verification                               |
 | **Chrome**            | n/a                          | `mcp__Claude_in_Chrome__*` | Alternative screenshot capture                                                                                  |
 
 Routing is by URL, not by which MCP happens to be configured. If the user sends a `paper.design` link and the paper MCP is not installed, `/designing` stops with a setup instruction rather than silently falling back.
@@ -137,6 +141,22 @@ Routing is by URL, not by which MCP happens to be configured. If the user sends 
 When using Paper as source, `/designing` persists three artifacts per section in `assets/`: `.png` (screenshot), `.styles.json` (computed styles, consumed by `/verifying` for style spot-check), and `.reference.jsx` (structural reference — never copied as code, since Sage uses Blade not React).
 
 When no design MCP is available, skills work with local assets in `docs/plans/<plan>/assets/`.
+
+## Playwright MCP vs Playwright Test npm
+
+These are two completely different tools with similar names:
+
+| | Playwright MCP | Playwright Test npm |
+|---|---|---|
+| **What it is** | MCP server for browser automation via Claude | npm package for E2E testing |
+| **MCP namespace** | `mcp__plugin_playwright_playwright__*` | n/a |
+| **Primary use** | Capture implementation screenshots for visual comparison against design | Run automated E2E test suite |
+| **Installation** | `claude mcp add playwright -- npx -y @anthropic/playwright-mcp` | `npm install --save-dev @playwright/test` |
+| **Target URL** | `https://{project}.lndo.site` (Lando local) | Configurable in `playwright.config.ts` |
+| **Browser binary** | Managed by the MCP server | Must be installed via `npx playwright install` |
+| **Replacement for** | Neither — orthogonal tools. MCP is for visual verification; npm is for regression tests | |
+
+**Never substitute one for the other.** When `/verifying` requires a screenshot, use the Playwright MCP. When running `npm run test:e2e`, that is the Playwright Test suite.
 
 ## Reference Skills (Agent-Facing)
 

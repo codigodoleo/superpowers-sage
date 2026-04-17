@@ -40,6 +40,15 @@ Based on content model:
 
 ### 2) Implement components (per sub-plan)
 
+**Design system gate (runs once, before the component loop):**
+
+Check that the visual foundation exists:
+
+- `resources/css/design-tokens.css` — must exist and contain real tokens (not placeholder)
+- Route `/kitchensink` — must be accessible and visually validated (Playwright screenshot taken)
+
+If either is missing or unvalidated → **invoke `/sage-design-system` and pause** until the kitchensink screenshot confirms all tokens and UI atoms render correctly. Do NOT implement any block without a validated design system.
+
 For each component in order:
 
 #### 0) Dispatch design-extractor in SURGICAL mode
@@ -53,6 +62,19 @@ Before reading any cached assets, dispatch the `design-extractor` agent fresh fo
 This is always fresh — do NOT skip to use cached assets from context memory.
 The surgical extraction provides exact px values, SVG code, and Verification Inputs
 that the `visual-verifier` agent requires.
+
+**Fallback (no design-extractor agent available — Cursor IDE / single-agent mode):**
+
+If the subagent system is unavailable:
+
+1. Re-read `assets/section-<name>-spec.md` and `assets/section-<name>-ref.png` from disk
+2. Pull live design reference via the active MCP tool:
+   - Figma: `get_design_context` + `get_metadata` (node geometry)
+   - Paper: `get_computed_styles` + `get_node_info`
+   - Pencil: `batch_get(resolveVariables: true)` + `batch_get(readDepth: 4)`
+   - Stitch: `get_screen`
+3. Record `design-extractor: deferred` in the `plan.md` frontmatter
+4. Use the values extracted from step 2 as the source of truth
 
 #### a) Re-read design reference (ALWAYS)
 
@@ -108,6 +130,8 @@ Every colour, font, spacing value must be a token declared in `@theme`.
 <section class="bg-[#131313] text-[#e5e2e1] py-[96px]">
 ```
 
+**For ACF blocks:** After creating the PHP controller + Blade view, invoke `/sage-block-architecting` for this block before building. The block CSS contract (scoped `.b-{slug}` CSS, enqueue guard, `$styles`, block README) is that skill's responsibility — do not implement CSS or the enqueue pattern manually.
+
 #### e) Build and verify
 
 After implementing:
@@ -128,6 +152,7 @@ After implementing:
    git branch -d <component-branch>
    ```
 5. On `DRIFT` or `FAIL_ARBITRARY_VALUES`: fix in worktree → re-run `lando theme-build` → re-dispatch `visual-verifier` → merge on MATCH
+6. After merge: `git push` to sync the feature branch with the remote
 
 #### f) Strategy gate
 
@@ -149,8 +174,9 @@ After all components:
 
 1. Run `lando flush` to clear all caches
 2. Run `lando theme-build` for production build
-3. Suggest `/reviewing` for convention audit
-4. Suggest `finishing-a-development-branch` for merge/PR
+3. **Commit gate:** `git add -A && git commit -m "feat(blocks): <feature-name> — all components verified" && git push` — required before declaring the build phase complete
+4. Suggest `/reviewing` for convention audit
+5. Suggest `finishing-a-development-branch` for merge/PR
 
 ## Key Principles
 

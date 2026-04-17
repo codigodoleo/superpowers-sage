@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\""
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-edit.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-edit.sh\""
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-compact.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-compact.sh\""
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit.sh\""
           }
         ]
       }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-subagent.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-subagent.sh\""
           }
         ]
       }
@@ -58,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post-stop.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-stop.sh\""
           }
         ]
       }
