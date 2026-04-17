@@ -37,6 +37,9 @@ function detectMCPServers(config) {
     if (nameLower.includes('chrome') || nameLower.includes('browser') || cmdStr.includes('chrome') || cmdStr.includes('puppeteer')) {
       result.chrome = { name, configured: true };
     }
+    if (nameLower.includes('pencil') || cmdStr.includes('pencil')) {
+      result.pencil = { name, configured: true };
+    }
   }
 
   return result;
@@ -60,6 +63,23 @@ for (const src of sources) {
       Object.assign(tools, detectMCPServers(config));
     }
   }
+}
+
+// Pencil — scan design/ folder for .pen files
+const designDir = join(rootPath, 'design');
+if (existsSync(designDir)) {
+  const penFiles = readdirSync(designDir).filter(f => f.endsWith('.pen'));
+  const libFile =
+    penFiles.find(f => f.endsWith('.lib.pen') && f.includes('design-system')) ||
+    penFiles.find(f => f.endsWith('.lib.pen')) ||
+    null;
+  const pageFiles = penFiles.filter(f => !f.endsWith('.lib.pen'));
+  tools.pencil = {
+    ...tools.pencil,
+    hasFiles: penFiles.length > 0,
+    libFile: libFile ? join('design', libFile) : null,
+    pageFiles: pageFiles.map(f => join('design', f)),
+  };
 }
 
 // Check for active plan
@@ -95,6 +115,7 @@ const result = {
     paper: tools.paper || { configured: false },
     stitch: tools.stitch || { configured: false },
     figma: tools.figma || { configured: false },
+    pencil: tools.pencil || { configured: false },
   },
   verificationTools: {
     playwright: tools.playwright || { configured: false },
