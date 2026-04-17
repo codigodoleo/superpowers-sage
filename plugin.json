@@ -1,7 +1,7 @@
 {
   "name": "superpowers-sage",
   "description": "Modern WordPress development with Sage, Acorn & Lando. Workflow skills: /architecture-discovery, /plan-generator, /building, /designing, /verifying (+ /architecting compatibility alias), with design tool integration, content modeling, visual verification, and comprehensive hooks.",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "author": {
     "name": "codigodoleo",
     "url": "https://github.com/codigodoleo"
@@ -23,6 +23,7 @@
     "paper-design",
     "stitch",
     "figma",
+    "pencil",
     "design-tools",
     "visual-verification",
     "architecture",
