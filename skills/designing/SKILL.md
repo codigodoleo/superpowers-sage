@@ -28,8 +28,13 @@ Routing is driven by what the user provided, not by which MCPs happen to be conf
    - `paper.design/*` or `*.paper.design/*` → **paper** branch (use `mcp__paper__*`)
    - `figma.com/*` → **figma** branch (use `mcp__figma__*` / `mcp__claude_ai_Figma__*`)
    - `stitch.withgoogle.com/*` (or other known stitch hosts) → **stitch** branch (use `mcp__stitch__*`)
-2. **Local fallback** — if no URL but `docs/plans/<active-plan>/assets/section-*.png` exists → **offline** branch
-3. **Ask** — if neither URL nor local assets are present, ask the user for one
+2. **Path match** — inspect user input for a `.pen` reference:
+   - Input ends in `.pen` OR input starts with `design/` → **pencil** branch
+   - No input provided AND `design/` exists in the project root with `.pen` files:
+     list the available `.pen` page files (exclude `*.lib.pen`) and ask the user
+     which page to extract before proceeding.
+3. **Local fallback** — if no URL but `docs/plans/<active-plan>/assets/section-*.png` exists → **offline** branch
+4. **Ask** — if neither URL nor local assets are present, ask the user for one
 
 **MCP gate:** once the branch is known, ToolSearch the corresponding `mcp__<tool>__*` namespace. If the MCP is NOT configured, stop with this message:
 
@@ -40,6 +45,16 @@ Configure it and re-run, or send a link from another source.
 ```
 
 Do NOT silently fall back to a different MCP.
+
+**Pencil MCP gate:** For the pencil branch, ToolSearch `mcp__pencil__open_document`.
+If NOT configured:
+
+```
+⛔ .pen file detected but the Pencil MCP is not configured.
+
+Install: claude mcp add pencil -- npx -y @anthropic/pencil-mcp
+Restart the session after installing.
+```
 
 ### 1) Extract design data (per section, never full design at once)
 
@@ -67,6 +82,15 @@ Do NOT silently fall back to a different MCP.
 1. `mcp__figma__get_file` — load the file structure
 2. Navigate frames to find sections
 3. Extract text layers, colors, component structure per section
+
+#### Pencil workflow:
+1. `open_document(filePath)` — open the `.pen` file the user indicated
+2. `get_editor_state()` — confirm top-level nodes and document is active
+3. `batch_get` with no nodeIds, `readDepth: 1` — map all available sections
+4. For each section to extract: delegate to `pencil-extractor` in SURGICAL mode,
+   passing `filePath`, `sectionId`, and `planPath`
+5. After all sections: optionally invoke `pencil-extractor` in COMPONENT_MAP mode
+   to produce `design/component-map.md`
 
 #### Offline workflow:
 1. Read images from `docs/plans/<plan>/assets/section-*.png`
