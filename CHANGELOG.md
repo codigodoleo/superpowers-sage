@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.6.0...superpowers-sage-v1.7.0) (2026-04-18)
+
+
+### Features
+
+* **lang:** enforce mandatory en-US for all artifacts and code ([#14](https://github.com/codigodoleo/superpowers-sage/issues/14)) ([610ccaa](https://github.com/codigodoleo/superpowers-sage/commit/610ccaa7f6a173997127ab0182d241c71180ceab))
+
+
+### Bug Fixes
+
+* **hooks:** quote paths and wrap with bash for Windows/VS Code ([#12](https://github.com/codigodoleo/superpowers-sage/issues/12)) ([4ef95d4](https://github.com/codigodoleo/superpowers-sage/commit/4ef95d41c94e5bcb6ef77e2fd1f73a8c9a69f020))
+
 ## [1.6.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.5.0...superpowers-sage-v1.6.0) (2026-04-17)
 
 
