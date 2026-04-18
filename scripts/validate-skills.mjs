@@ -13,11 +13,12 @@ function log(icon, msg) {
 }
 
 function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  // Accept both LF and CRLF line endings (Windows checkouts via Git Bash)
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
   const fm = {};
-  for (const line of match[1].split("\n")) {
-    const m = line.match(/^(\w[\w-]*):\s*(.+)/);
+  for (const line of match[1].split(/\r?\n/)) {
+    const m = line.match(/^(\w[\w-]*):\s*(.+?)\s*$/);
     if (m) fm[m[1]] = m[2].replace(/^["']|["']$/g, "");
   }
   return fm;

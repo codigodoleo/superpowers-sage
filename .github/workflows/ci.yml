@@ -32,3 +32,9 @@ jobs:
 
       - name: Run detect-design-tools tests
         run: node scripts/test-detect-design-tools.mjs
+
+      - name: Run detect-sage-project tests
+        run: node scripts/test-detect-sage-project.mjs
+
+      - name: Run validate-skills tests
+        run: node scripts/test-validate-skills.mjs

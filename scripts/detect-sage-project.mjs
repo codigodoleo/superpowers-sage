@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { join, resolve, relative } from 'path';
+import { join, resolve, relative, dirname, sep } from 'path';
 
 const args = process.argv.slice(2);
 const pathFlag = args.indexOf('--path');
@@ -84,7 +84,8 @@ function detectProject(composerPath) {
   const hasAcorn = getConstraint(composer, 'roots/acorn');
   if (!hasAcorn) return null;
 
-  const dir = composerPath.replace(/\/composer\.json$/, '');
+  // Cross-platform: use path.dirname instead of a forward-slash regex (Windows uses backslashes).
+  const dir = dirname(composerPath);
   const lockPath = join(dir, 'composer.lock');
   const hasLock = existsSync(lockPath);
 
@@ -115,8 +116,11 @@ function detectProject(composerPath) {
   const hasSage = getConstraint(composer, 'roots/sage');
   const phpConstraint = composer?.require?.php ?? composer?.config?.platform?.php ?? null;
 
+  // Normalize to forward slashes for cross-platform consumers (JSON output).
+  const relPath = relative(rootPath, dir).split(sep).join('/') || '.';
+
   return {
-    path: relative(rootPath, dir) || '.',
+    path: relPath,
     type: hasSage ? 'sage-theme' : 'acorn-standalone',
     acorn: getVersion('roots/acorn') ?? hasAcorn,
     sage: hasSage ? (getVersion('roots/sage') ?? hasSage) : null,
