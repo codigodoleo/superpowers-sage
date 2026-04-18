@@ -308,3 +308,105 @@ No manual cache-busting is needed -- hashed filenames ensure browsers always loa
 - Arbitrary values bypass the design system → inconsistency accumulates
 - The `sage-reviewer` agent will flag any `[#...]`, `[rgba...]`, `[px...]`, `[em...]` class as a **Critical** issue
 - The `visual-verifier` agent will block a MATCH result if arbitrary values are found in the Blade file
+
+---
+
+## Tailwind v4 pitfalls — validated traps
+
+### Pitfall 1 — Unlayered type selectors win over utilities
+
+When you declare typography unlayered in `app.css`:
+
+```css
+/* app.css — unlayered, high specificity */
+h2 {
+  font-size: var(--text-h2);  /* 48px */
+  font-weight: 500;
+}
+```
+
+And try to override via utility in Blade:
+
+```blade
+<h2 class="text-h1">Larger heading</h2>  {{-- renders at 48px — utility LOSES --}}
+```
+
+**Why:** unlayered rules have cascade priority over utilities declared in
+`@layer utilities`. The type selector `h2 { font-size: ... }` wins.
+
+**Fix — use unlayered modifier classes** (same cascade context as the base):
+
+```css
+/* app.css — unlayered modifiers */
+h2.hero     { font-size: var(--text-h1); }         /* 52px */
+h2.compact  { font-size: var(--text-h2-compact); } /* 44px */
+h3.lg       { font-size: var(--text-h3-lg); }
+```
+
+```blade
+<h2 class="hero">Larger heading</h2>  {{-- renders at 52px ✅ --}}
+```
+
+**Alternative:** wrap base typography in `@layer base` — then utilities in
+`@layer utilities` win. Don't mix approaches within the same project.
+
+### Pitfall 2 — `max-w-sm` silently resolves to `--spacing-sm` when `--container-sm` missing
+
+Tailwind v4's `max-w-<key>` resolves tokens in this order:
+
+1. `--container-<key>` if declared
+2. `--spacing-<key>` if declared (silent fallback!)
+3. Tailwind's built-in defaults
+
+If you declared `--spacing-sm: 8px` but no `--container-sm`, `max-w-sm` resolves
+to `8px` — not the expected `24rem` default, because user tokens shadow defaults.
+
+**Symptom:** a section that should be `max-width: 384px` renders as `max-width: 8px`
+and collapses to a thin column.
+
+**Fix:** always pair `--spacing-<key>` with a matching `--container-<key>` when
+both semantic uses are intended:
+
+```css
+@theme {
+  --spacing-sm: 8px;       /* for padding/margin */
+  --container-sm: 24rem;   /* for max-w */
+
+  /* Or introduce a block-specific container */
+  --container-narrow: 360px;
+}
+```
+
+```blade
+<div class="max-w-narrow">...</div>  {{-- 360px, unambiguous --}}
+```
+
+**Detect preemptively:** any `max-w-*` class in a Blade file where `--container-*`
+is not in `app.css` — grep:
+
+```bash
+grep -rE 'max-w-[a-z]+' resources/views/ | while read line; do
+  token=$(echo "$line" | grep -oE 'max-w-[a-z]+' | head -1 | sed 's/max-w-//')
+  grep -q "\-\-container-${token}" resources/css/app.css || echo "MISSING --container-${token}: $line"
+done
+```
+
+### Pitfall 3 — `@import "../app.css"` in block CSS duplicates all tokens
+
+Block CSS files needing access to `@theme` tokens must use `@reference`, not `@import`:
+
+```css
+/* ❌ Wrong — duplicates entire app.css into every block bundle */
+@import "../app.css";
+
+.b-block { color: var(--color-text); }
+
+
+/* ✅ Correct — grants token access at build time, does not emit duplicates */
+@reference "../app.css";
+
+.b-block { color: var(--color-text); }
+```
+
+`@import` copies the full stylesheet at build time. With selective block enqueue,
+every block would ship a full app.css copy — defeating the optimization.

@@ -8,6 +8,26 @@ user-invocable: false
 
 Acorn commands are artisan-style CLI commands running inside WordPress context with full access to the Laravel container (services, Eloquent, config) **and** all WordPress functions (`get_posts()`, `wp_insert_post()`, etc.).
 
+## When to use
+
+- Scheduled data imports or scraping (cron-driven)
+- One-off maintenance operations that touch the database and need Laravel services
+- Developer tooling: seeding fixtures, resetting caches, recomputing derived data
+- Long-running jobs that shouldn't run in a request cycle
+
+## When NOT to use
+
+- Simple WP-CLI operations already covered by `wp post`, `wp user`, `wp option` — use `wp-cli-ops` instead
+- Routing / HTTP endpoints — use `acorn-routes` for request-based flows
+- Background jobs with retries and failure tracking — use `acorn-queues` (Laravel queues) for durable processing
+- Quick ad-hoc queries — `lando wp shell` or `lando wp eval` is faster for exploration
+
+## Prerequisites
+
+- Acorn installed and bootstrapped in the theme
+- `ConsoleServiceProvider` registered (default in Acorn skeleton)
+- Lando running (`lando start`) — commands execute inside the container
+
 ## Creating a Command
 
 ```bash

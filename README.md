@@ -182,6 +182,27 @@ After installing, open your Sage project and run:
 
 This analyzes your project, detects installed packages, design tools, and active plans, then suggests next steps.
 
+### Which skill do I use?
+
+Quick decision tree for common tasks:
+
+| If you want to... | Run |
+|---|---|
+| Analyze a new project | `/onboarding` |
+| Start a new feature from scratch | `/architecture-discovery` → `/plan-generator` → `/building` |
+| Set up design tokens + UI atoms | `/sage-design-system` |
+| Build ACF blocks from a plan | `/building` (auto-invokes `/block-scaffolding` per block) |
+| Add a single new ACF block outside a plan | `/block-scaffolding` |
+| Evolve an existing block (drift, coverage, new variants) | `/block-refactoring` |
+| Capture design references from Paper/Figma/Stitch/Pencil | `/designing` |
+| Verify implementation matches design | `/verifying` |
+| Review code before PR | `/reviewing` |
+| Diagnose a Sage/Acorn/Lando issue | `/debugging` |
+| Model content (CPT vs ACF vs Options) | `/modeling` |
+| Install a WordPress plugin | `/install-plugin` |
+
+Gerund naming means skills describe the **activity**, not the shortcut — if you're "building," you run `/building`.
+
 ## Workflow Skills
 
 Skills are **activities** — gerund naming communicates what's happening, not what to type.

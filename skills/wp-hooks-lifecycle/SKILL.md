@@ -219,3 +219,95 @@ dd($wp_filter['the_content']);
 - If a hook fires in unexpected order, dump `$wp_filter['hook_name']` to see all registered callbacks and their priorities.
 - If hooks added in a ServiceProvider are not firing, verify the provider is listed in `config/app.php` under `providers`.
 - For complex hook interaction debugging, enable `WP_DEBUG_LOG` and use `error_log()` with timestamps at each hook point to trace execution flow.
+
+---
+
+## WordPress filters that bite modern CSS frameworks
+
+### `wptexturize` corrupts Tailwind arbitrary variants
+
+WordPress applies "smart quote" transformations to block content via `wptexturize`
+on `the_content`. The filter is aggressive and rewrites sequences like `0"` into
+`0″` (U+2033 PRIME), treating them as inch/arc-second notation — **inside HTML
+attributes it has no business touching**.
+
+**Observed failure:** a Blade view with the Tailwind v4 arbitrary variant
+`<div class="[&>p:last-child]:mb-0">` rendered as `<div class="[&>p:last-child]:mb-0″>`.
+The unterminated attribute consumed the rest of the page markup as a giant `class`
+value, collapsing all siblings into a single malformed element.
+
+**Symptoms:**
+- Block rendering DOM collapses — Playwright shows block siblings absorbed as children
+- DevTools shows class attribute containing page HTML up to the next quote
+- Only affects content fields processed through `the_content`
+
+**Fix: disable `wptexturize` globally in `ThemeServiceProvider::boot()`:**
+
+```php
+public function boot(): void
+{
+    parent::boot();
+
+    // wptexturize rewrites [&>p:last-child]:mb-0" into mb-0″ (U+2033),
+    // corrupting Tailwind v4 arbitrary variants inside class attributes.
+    add_filter('run_wptexturize', '__return_false');
+}
+```
+
+**When to keep it:** if your content uses manual primes/inch notation in prose
+(rare in modern web). In that case disable per-block with `remove_filter` scoped
+to the rendering context.
+
+**Detect preemptively:** search the theme for arbitrary variants ending in a digit
+inside an attribute:
+
+```bash
+grep -rE '\[[^]]*[0-9]"' resources/views/
+```
+
+Any match is a candidate for `wptexturize` corruption.
+
+### `wpautop` inserts `<p>` around block content
+
+`wpautop` wraps non-paragraph content in `<p>` tags. For ACF blocks rendered via
+`the_content`, this can produce invalid nesting like `<p><div>...</div></p>`
+(browsers auto-close the `<p>` before the `<div>`, orphaning the closing `</p>`).
+
+**Fix:** strip `wpautop` from ACF block output:
+
+```php
+add_filter('the_content', function ($content) {
+    if (has_block('acf/')) {
+        remove_filter('the_content', 'wpautop');
+    }
+    return $content;
+}, 9);
+```
+
+### `wp_kses_post` strips unexpected tags
+
+WYSIWYG content saved via ACF text areas runs through `wp_kses_post` on save,
+which strips tags not in `$allowedposttags`. Custom elements like `<block-hero>`
+will be stripped if an editor pastes them into a text field.
+
+**Fix:** this is usually desirable for editor-entered content. If you need to
+allow custom elements, extend `$allowedposttags` via `wp_kses_allowed_html` filter,
+scoped to the specific context.
+
+### `the_content` filter order — common pitfalls
+
+Default priority order on `the_content`:
+
+| Priority | Filter | Effect |
+|---|---|---|
+| 6 | `run_shortcode` | Parses shortcodes |
+| 8 | `autoembed` | Replaces URLs with oEmbed |
+| 10 | `wpautop` | Wraps in `<p>` |
+| 10 | `shortcode_unautop` | Removes `<p>` wrapping shortcodes |
+| 10 | `prepend_attachment` | Adds attachment markup |
+| 11 | `capital_P_dangit` | Capitalizes "WordPress" |
+| 20 | `convert_smilies` | Replaces text smilies with images |
+
+Block rendering happens at priority 9 via `do_blocks`. If you add a filter that
+mutates block HTML, run at priority >= 11 to see post-block output; priority < 9
+to see raw block markup.

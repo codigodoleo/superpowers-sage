@@ -6,6 +6,27 @@ user-invocable: false
 
 # Acorn Routes
 
+## When to use
+
+- Application endpoints not mapped to WordPress content (forms, APIs, dashboards, webhooks)
+- REST-style JSON endpoints where you want Laravel middleware, DI, and controller organization
+- Frontend routes that render Blade views with Laravel Livewire
+- Endpoints that need middleware chains (auth, rate-limit, CSRF)
+- Route model binding with Eloquent models
+
+## When NOT to use
+
+- Permalink-based content routing (posts, pages, archives) — WordPress handles this natively via template hierarchy
+- Gutenberg-internal REST endpoints — those MUST stay on `register_rest_route()` for block editor compatibility
+- Admin-area menus and settings pages — use `add_menu_page()` / `add_submenu_page()`
+- URLs expected to participate in canonical redirects and SEO plugin hooks — WP rewrite rules are better wired
+
+## Prerequisites
+
+- Acorn installed in the theme
+- `RouteServiceProvider` registered in `config/app.php`
+- `routes/web.php` and/or `routes/api.php` present in the theme
+
 ## How Routing Works in Acorn
 
 Acorn brings Laravel's full routing system into WordPress. Routes are defined in `routes/web.php` and `routes/api.php` inside your Sage theme, loaded by a `RouteServiceProvider`, and dispatched through Laravel's router.

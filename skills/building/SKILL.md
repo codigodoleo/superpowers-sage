@@ -97,27 +97,51 @@ Auto-discover which reference skills are relevant:
 - Routes → read `@acorn-routes`
 - Tailwind/CSS → read `@sage-lando` references/frontend-stack.md
 
-#### d) Create worktree and implement
+#### d) Isolation strategy — decide: worktree vs branch-commit
 
-Before writing any code, create an isolated worktree for this component:
+Isolation approach depends on the dev environment:
+
+| Environment | Isolation | Why |
+|---|---|---|
+| **Lando** (default for Sage) | **Branch + atomic commit per component** | Lando mounts `/app` to a fixed path in `.lando.yml`. Worktrees live at sibling paths and require re-mounting the container for each worktree — high friction, Lando container already knows only one path. |
+| **docker-compose / vanilla** | **Worktree per component** | Container mount is flexible; worktrees at `.worktrees/<component>/` are cheap and safe. |
+| **Bare-metal / local PHP** | **Worktree per component** | No container constraints. |
+| Explicit user override (`--no-worktree` or plan frontmatter `isolation: branch-only`) | Honor the override | |
+
+Detection rule: if `.lando.yml` exists at repo root → use branch-commit strategy unless the user explicitly opts into worktrees.
+
+##### Branch + atomic commit (Lando path)
 
 ```bash
-# Read branch from plan.md frontmatter
+# Start on the feature branch recorded in plan.md
+FEATURE_BRANCH=$(grep '^branch:' docs/plans/<active-plan>/plan.md | awk '{print $2}')
+git checkout "$FEATURE_BRANCH"
+
+# Implement this component's files in place. Commit atomically when done.
+# ... edit code ...
+
+git add -A
+git commit -m "feat({slug}): implement component per sub-plan"
+```
+
+Each component becomes one (or a few) well-scoped commit(s) on the feature branch. Roll back individually by reverting the commit. Lando keeps working without reconfiguration.
+
+##### Worktree (docker-compose / bare-metal path)
+
+```bash
 FEATURE_BRANCH=$(grep '^branch:' docs/plans/<active-plan>/plan.md | awk '{print $2}')
 COMPONENT_BRANCH="${FEATURE_BRANCH}-<component-name>"
 
 git worktree add .worktrees/<component-name> -b $COMPONENT_BRANCH $FEATURE_BRANCH
 ```
 
-Example: if feature branch is `feat/onepage-blocks-2026-03-23` and component is `hero`:
+Example: feature branch `feat/onepage-blocks-2026-03-23`, component `hero`:
 
 ```bash
 git worktree add .worktrees/hero -b feat/onepage-blocks-2026-03-23-hero feat/onepage-blocks-2026-03-23
 ```
 
-**Implement inside the worktree.** The worktree mirrors the full repo root.
-Theme files are at `.worktrees/<component>/content/themes/<theme>/`.
-Example: `.worktrees/hero/content/themes/leolabs/resources/views/blocks/hero.blade.php`
+**Implement inside the worktree.** The worktree mirrors the full repo root. Theme files are at `.worktrees/<component>/content/themes/<theme>/`.
 
 **ZERO ARBITRARY TAILWIND VALUES.**
 Every colour, font, spacing value must be a token declared in `@theme`.
@@ -145,14 +169,18 @@ After implementing:
    - `spec`: `docs/plans/<plan>/assets/section-<name>-spec.md`
    - `ref`: `docs/plans/<plan>/assets/section-<name>-ref.png`
 4. On `MATCH`:
+
+   **Branch-commit strategy (Lando):** already on the feature branch — nothing to merge. Proceed.
+
+   **Worktree strategy:**
    ```bash
    git checkout <feature-branch>
    git merge <component-branch>
    git worktree remove .worktrees/<component-name>
    git branch -d <component-branch>
    ```
-5. On `DRIFT` or `FAIL_ARBITRARY_VALUES`: fix in worktree → re-run `lando theme-build` → re-dispatch `visual-verifier` → merge on MATCH
-6. After merge: `git push` to sync the feature branch with the remote
+5. On `DRIFT` or `FAIL_ARBITRARY_VALUES`: fix in place → re-run `lando theme-build` → re-dispatch `visual-verifier` → commit/merge on MATCH
+6. After commit/merge: `git push` to sync the feature branch with the remote
 
 #### f) Strategy gate
 
