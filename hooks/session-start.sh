@@ -131,25 +131,48 @@ if [ -d "$PLANS_DIR" ]; then
 fi
 
 #############################################
-# 6) Build missing tools instructions        #
+# 6) First-run detection + MCP checklist     #
 #############################################
 
+FIRST_RUN=""
+STATE_DIR=".superpowers-sage"
+if [ ! -d "$STATE_DIR" ]; then
+  mkdir -p "$STATE_DIR" 2>/dev/null || true
+  FIRST_RUN="yes"
+fi
+
 SETUP_INSTRUCTIONS=""
+
+if [ "$FIRST_RUN" = "yes" ]; then
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n\n🎉 **First run detected!** Here is your recommended MCP setup for this Sage project:\n"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n| MCP | Purpose | Required | Install |"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n|---|---|---|---|"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n| Playwright | Visual verification (screenshots, DOM probes) | **Required** | \`claude mcp add playwright -- npx -y @anthropic/playwright-mcp\` |"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n| Paper | Preferred design tool (paper.design URLs) | Optional | https://paper.design |"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n| Figma | Alternative design tool (figma.com URLs) | Optional | \`claude mcp add figma -- npx -y figma-developer-mcp --figma-api-key=YOUR_KEY\` |"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n| Stitch | Google Stitch design tool | Optional | \`claude mcp add stitch -- npx -y @anthropic/stitch-mcp\` |"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n| Pencil | .pen design file support | Optional | see pencil MCP docs |"
+  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n\nAt minimum install Playwright — the \`/verifying\` and \`/building\` skills require it."
+fi
+
 if [ -n "$MISSING_SKILLS" ]; then
   SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n\n**Missing base skills:**${MISSING_SKILLS}\nInstall with: \`claude plugin install obra/superpowers\`"
 fi
 
-if [ "$PAPER" = "no" ]; then
-  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Paper.design MCP (preferred): see https://paper.design for install instructions"
-fi
-if [ "$STITCH" = "no" ]; then
-  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Stitch MCP: \`claude mcp add stitch -- npx -y @anthropic/stitch-mcp\`"
-fi
-if [ "$FIGMA" = "no" ]; then
-  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Figma MCP: \`claude mcp add figma -- npx -y figma-developer-mcp --figma-api-key=YOUR_KEY\`"
-fi
-if [ "$PLAYWRIGHT" = "no" ]; then
-  SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Playwright MCP: \`claude mcp add playwright -- npx -y @anthropic/playwright-mcp\`"
+# Ongoing checklist (suppressed on first run to avoid duplication)
+if [ "$FIRST_RUN" != "yes" ]; then
+  if [ "$PAPER" = "no" ]; then
+    SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Paper.design MCP (preferred): see https://paper.design for install instructions"
+  fi
+  if [ "$STITCH" = "no" ]; then
+    SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Stitch MCP: \`claude mcp add stitch -- npx -y @anthropic/stitch-mcp\`"
+  fi
+  if [ "$FIGMA" = "no" ]; then
+    SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Figma MCP: \`claude mcp add figma -- npx -y figma-developer-mcp --figma-api-key=YOUR_KEY\`"
+  fi
+  if [ "$PLAYWRIGHT" = "no" ]; then
+    SETUP_INSTRUCTIONS="${SETUP_INSTRUCTIONS}\n- Playwright MCP: \`claude mcp add playwright -- npx -y @anthropic/playwright-mcp\`"
+  fi
 fi
 
 #############################################

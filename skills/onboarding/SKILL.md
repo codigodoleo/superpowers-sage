@@ -69,9 +69,24 @@ Install:
 After installing, restart this session and run /onboarding again.
 ```
 
-### 2) Check for active plans
+### 2) Check for active plans (with git cross-validation)
 
-Look for `docs/plans/*/plan.md` files with `status: in-progress`. If found, report the active plan path and component status.
+Look for `docs/plans/*/plan.md` files with `status: in-progress`. For each:
+
+1. Read the `branch:` field from frontmatter (if present)
+2. Cross-check against git:
+   - Run `git branch --merged main` — if the plan's branch appears, the work was merged; plan frontmatter should be `status: completed`, not `in-progress`
+   - Run `gh pr list --state=merged --head <branch>` — if a merged PR exists for the branch, same conclusion
+3. If the plan claims `in-progress` but git says the branch is merged: flag this as **stale plan** and offer to update frontmatter:
+
+   ```
+   ⚠️  Plan "{title}" at {path} claims status: in-progress, but branch {branch}
+       was merged to main in commit {sha}. Update to status: completed?  [y/N]
+   ```
+
+4. For branches claimed as `merged` in any reported context, always verify with `git branch --merged main` before saying so. Never report a merge without git confirmation.
+
+Report active plans that survive this cross-check with accurate status.
 
 ### 3) Present structured overview
 
