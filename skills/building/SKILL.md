@@ -51,17 +51,37 @@ If either is missing or unvalidated → **invoke `/sage-design-system` and pause
 
 For each component in order:
 
-#### 0) Dispatch design-extractor in SURGICAL mode
+#### 0) Pre-fetch design reference, THEN dispatch design-extractor
 
-Before reading any cached assets, dispatch the `design-extractor` agent fresh for this component:
+**CRITICAL:** subagents do NOT inherit MCP tools from the calling session. Dispatching
+`design-extractor` without first persisting design data to disk produces fabricated specs
+with `VERIFY` placeholders and estimated values.
 
-- Mode: SURGICAL
-- Target: this specific component section only
-- Output: `assets/section-<name>-spec.md` and `assets/section-<name>-ref.png`
+**Inversion pattern — always pre-fetch in THIS thread before dispatching:**
 
-This is always fresh — do NOT skip to use cached assets from context memory.
-The surgical extraction provides exact px values, SVG code, and Verification Inputs
-that the `visual-verifier` agent requires.
+1. With the MCP tool available in this session, capture reference data to disk:
+
+   | Tool | Commands | Output |
+   |---|---|---|
+   | Pencil | `batch_get(resolveVariables:true, readDepth:4)` + `get_screenshot` | `assets/section-<name>.nodes.json` + `section-<name>-ref.png` |
+   | Figma | `get_design_context` + `get_screenshot` (with nodeId) | `assets/section-<name>.nodes.json` + `section-<name>-ref.png` |
+   | Paper | `get_node_info` + `get_computed_styles` + `get_screenshot` + `get_jsx` | `assets/section-<name>.nodes.json` + `section-<name>.styles.json` + `section-<name>-ref.png` + `section-<name>.reference.jsx` |
+   | Stitch | `get_screen` | `assets/section-<name>-ref.png` |
+
+2. Confirm all expected files exist on disk (`ls docs/plans/<plan>/assets/`).
+
+3. NOW dispatch the `design-extractor` agent:
+   - Mode: SURGICAL
+   - Target: this specific component section only
+   - Pass the pre-captured paths in the prompt
+   - Output: `assets/section-<name>-spec.md`
+
+The subagent reads the pre-captured files as source of truth — the MCP call was already
+made here. The subagent's only job is to structure the data into the spec file.
+
+**Verify the output is not fabricated:** open the spec file and check for `VERIFY` markers
+or suspiciously round numbers. If found, the extraction failed — re-dispatch with clearer
+path references.
 
 **Fallback (no design-extractor agent available — Cursor IDE / single-agent mode):**
 
@@ -163,11 +183,21 @@ After implementing:
 1. `lando flush` — clears Acorn/Blade/OPcache (required after PHP changes)
 2. `lando theme-build` — compiles Tailwind + JS
    - If exit non-zero: **stop, report build failure. Do NOT proceed to verification.**
-3. Dispatch `visual-verifier` agent with inputs from `assets/section-<name>-spec.md`:
+3. **Pre-capture live screenshot** in THIS thread (Playwright MCP lives here, not in the subagent):
+   - Navigate to the URL from the spec's `Verification Inputs` block
+   - Take a screenshot with the canonical viewport width
+   - Save to `docs/plans/<plan>/assets/section-<name>-live.png`
+
+   Then dispatch `visual-verifier` agent with:
    - `url`: read from spec `Verification Inputs` block
    - `selector`: read from spec `Verification Inputs` block
    - `spec`: `docs/plans/<plan>/assets/section-<name>-spec.md`
    - `ref`: `docs/plans/<plan>/assets/section-<name>-ref.png`
+   - `live`: `docs/plans/<plan>/assets/section-<name>-live.png`
+
+   The subagent reads both images via the Read tool and compares visually. If the subagent
+   somehow has Playwright MCP it can also re-capture, but the pre-captured image is the
+   fallback when it doesn't.
 4. On `MATCH`:
 
    **Branch-commit strategy (Lando):** already on the feature branch — nothing to merge. Proceed.
@@ -202,9 +232,61 @@ After all components:
 
 1. Run `lando flush` to clear all caches
 2. Run `lando theme-build` for production build
-3. **Commit gate:** `git add -A && git commit -m "feat(blocks): <feature-name> — all components verified" && git push` — required before declaring the build phase complete
-4. Suggest `/reviewing` for convention audit
-5. Suggest `finishing-a-development-branch` for merge/PR
+3. **Design-system changelog check:** if any file under `resources/views/components/*.blade.php` or the `@theme` block in `resources/css/app.css` was touched this session, append an entry to `docs/design-system-changelog.md` (see section 5 below).
+4. **Commit gate:** `git add -A && git commit -m "feat(blocks): <feature-name> — all components verified" && git push` — required before declaring the build phase complete
+5. Suggest `/reviewing` for convention audit
+6. Suggest `finishing-a-development-branch` for merge/PR
+
+### 5) Design-system changelog auto-entry
+
+When building touches design-system-level files (atoms, tokens, base typography, layout components), append an entry to `docs/design-system-changelog.md`. Create the file if absent with this structure:
+
+```markdown
+# Design System Changelog
+
+Chronological record of changes to the shared visual contract. Automatically appended by /building on completion.
+
+## YYYY-MM-DD — <PR title or commit short summary>
+
+### Atoms
+- `<x-component>` **added prop `tone`** — default, backward-compatible
+- `<x-button>` **added variant `secondary-dark`** — text-link on dark bg
+
+### Tokens
+- `--text-h2-compact: 44px` (new)
+- `--container-narrow: 360px` (new)
+
+### Modifier classes
+- `h2.hero`, `h2.compact` (new, unlayered, override type selector)
+
+### Breaking changes
+- _(none)_
+```
+
+**Detection rule:** if `git diff --name-only <session-start>..HEAD` includes:
+- `resources/views/components/**/*.blade.php` → inspect for new props, removed props, variant additions
+- `resources/css/app.css` (@theme block) → inspect for new/changed/removed tokens
+- `resources/css/blocks/**/*.css` → skip (block-scoped, not shared contract)
+
+Generate the entry by diffing the files; don't ask the user to hand-write it.
+
+### 6) Milestones auto-save (post-merge)
+
+When `finishing-a-development-branch` completes (PR merged), append to `docs/milestones.md`:
+
+```markdown
+# Milestones
+
+## YYYY-MM-DD — v<version> (PR #<number>)
+
+- **Scope:** <1-line PR title>
+- **Components delivered:** <list>
+- **Architectural patterns validated:** <list>
+- **Decisions recorded in:** <spec path>
+- **Known follow-ups:** <list or "none">
+```
+
+This survives context compaction and gives future sessions a fast recap of what shipped. Do NOT rely on memory files alone — milestones are commit history with meaning.
 
 ## Key Principles
 

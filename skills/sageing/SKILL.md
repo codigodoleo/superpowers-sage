@@ -56,6 +56,7 @@ Skills are **activities** — gerund naming communicates process, not command.
 | **Design System**          | `/sage-design-system`     | Establish visual foundation: tokens → UI components → layout components → kitchensink |
 | **Block Scaffolding**      | `/block-scaffolding`      | Scaffold new ACF block with custom element, 4-layer CSS contract, selective CSS+JS enqueue, block README |
 | **Block Refactoring**      | `/block-refactoring`      | Evolve existing block: design drift, CSS coverage, variation expansion, v1→v2 migration |
+| **Migrating**              | `/migrating`              | Safe destructive data migrations: snapshot → dry-run → approval → apply → verify → idempotency |
 | **Building**               | `/building`               | Plan-driven implementation with auto-verification                    |
 | **Verifying**              | `/verifying`              | Visual comparison with design reference                              |
 | **Reviewing**              | `/reviewing`              | Convention audit + design alignment check                            |
