@@ -6,6 +6,28 @@ user-invocable: false
 
 # Redis with Acorn in WordPress
 
+## When to use
+
+- Object cache for WordPress (`wp_cache_*`) backed by Redis instead of ephemeral in-process cache
+- Laravel cache / session / queue driver inside theme code
+- Cross-request rate limiting, lock coordination, or atomic counters
+- High-traffic sites where `wp_options` autoload pressure needs relief
+- Queue backend for `acorn-queues` when jobs need durable storage beyond sync driver
+
+## When NOT to use
+
+- Small dev-only sites with no performance pressure — array/file cache is fine
+- Shared hosting without Redis — use `file` or `database` cache driver instead
+- As a database — Redis is cache; persistent data belongs in MySQL
+- When `wp_cache_*` calls are rare and localized — flushing coordination overhead may exceed benefit
+
+## Prerequisites
+
+- Lando config includes a `redis` service (setup shown below)
+- `predis/predis` or phpredis extension available
+- `wp-redis` or `object-cache.php` drop-in installed for WordPress object cache integration
+- `REDIS_HOST` / `REDIS_PORT` set in `.env`
+
 ## Redis in the Stack
 
 Lando provides Redis as a service. Acorn connects to it through Laravel's Redis integration (`illuminate/redis`). Three primary uses:

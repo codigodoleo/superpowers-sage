@@ -548,3 +548,74 @@ lando wp eval 'acf_setup_meta(["field_hero_badge_label" => "Test"], 0, true); va
 
 `get_field()` returns `null` even though the block is on the page and has data in its attributes.
 Check the browser DevTools → block markup → `data-*` attributes to see what keys are stored.
+
+---
+
+## Gotchas — validated traps
+
+### `Builder::setLocation()` returns `LocationBuilder`, NOT `$this`
+
+Field classes that chain `setLocation()` into the `Builder::make()` assignment produce
+broken field groups with MD5-hash keys (`group_d41d8cd98f00b204...`).
+
+```php
+// ❌ Wrong — chain-assign. $fields becomes a LocationBuilder, build() outputs wrong shape.
+$fields = Builder::make('depoimento_fields')
+    ->setLocation('post_type', '==', 'depoimento');
+
+return $fields->build();
+
+
+// ✅ Correct — two statements. $fields stays as FieldsBuilder.
+$fields = Builder::make('depoimento_fields');
+$fields->setLocation('post_type', '==', 'depoimento');
+
+return $fields->build();
+```
+
+**Sanity check** after generating a field class:
+
+```bash
+lando wp eval 'var_dump(acf_get_field_group("group_<your-field-group-name>"));'
+# If result shows `group_d41d8cd98f...` (MD5 empty hash), the field group is broken.
+# Split setLocation into a separate statement.
+```
+
+### `assets()` never reaches `<head>` on the frontend
+
+ACF Composer's `public function assets(array $block)` registers
+`enqueue_block_assets` **inside** `render()`, which fires during `the_content` —
+after `wp_head()` has already executed. CSS/JS enqueued there never reaches `<head>`
+on the frontend.
+
+**Rule:** `assets()` must remain empty. Enqueue block CSS/JS from
+`ThemeServiceProvider::boot()` via `wp_enqueue_scripts` priority 20, gated on
+`has_block('acf/{slug}')`. See `block-scaffolding` skill Phase 3 for the canonical
+enqueue pattern.
+
+Source: `vendor/log1x/acf-composer/src/Block.php` lines 797–803.
+
+### `$styles` format changed in WP 6.x
+
+| Wrong (old format) | Correct (WP 6.x+) |
+|---|---|
+| `public $styles = ['light', 'dark'];` | `[['label' => 'Light', 'name' => 'light', 'isDefault' => true], ['label' => 'Dark', 'name' => 'dark']]` |
+| `['label' => '...', 'value' => 'light']` | `['label' => '...', 'name' => 'light']` — key is `name`, not `value` |
+
+`register_block_style()` silently ignores entries with the legacy format,
+producing a block with no selectable variations.
+
+### `wp_enqueue_style` dependencies must be `[]`
+
+Block CSS compiled by Vite is self-contained — it does not depend on a theme
+stylesheet to resolve tokens. Declaring `['theme']` as a dependency causes
+WordPress to skip the block CSS when the theme stylesheet is not loaded
+(e.g. admin pages with a custom enqueue order).
+
+```php
+// ✅ Correct
+wp_enqueue_style("block-{$slug}", $asset->uri(), [], $asset->version());
+
+// ❌ Wrong — breaks enqueue when 'theme' isn't loaded
+wp_enqueue_style("block-{$slug}", $asset->uri(), ['theme'], $asset->version());
+```

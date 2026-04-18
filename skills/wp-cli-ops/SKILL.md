@@ -276,3 +276,94 @@ lando wp site health
 - For database corruption beyond simple import/export, consult a DBA or restore from a known-good backup
 - If search-replace produces unexpected results after dry-run looked clean, restore from backup immediately and investigate serialized data structures
 - For deploy script failures in staging or production, halt the deployment, restore from backup, and debug in the Lando local environment first
+
+---
+
+## Preflight checks for destructive operations
+
+### `wp_update_post` rejects posts with invalid `_wp_page_template` meta
+
+If a post was created under a prior theme that defined page templates, it may carry a
+stale `_wp_page_template` meta value pointing to a template that no longer exists in
+the current theme. WordPress validates template existence on `wp_update_post` and
+rejects the operation with "Invalid page template."
+
+**Symptoms:**
+- Migration scripts fail on random posts with "Modelo de página inválido" / "Invalid page template"
+- `wp post update` returns without updating; content unchanged
+- Error only surfaces in migrations, not in the admin (admin uses a different code path)
+
+**Preflight — always run before bulk `wp_update_post`:**
+
+```bash
+# List all posts with a non-default template meta
+lando wp post meta list --all --meta-key=_wp_page_template --format=json | jq '.[].post_id'
+
+# For each post about to be updated, check whether the template file exists
+POST_ID=8
+TEMPLATE=$(lando wp post meta get "$POST_ID" _wp_page_template)
+if [ -n "$TEMPLATE" ] && [ ! -f "wp-content/themes/$(lando wp option get stylesheet)/${TEMPLATE}" ]; then
+  echo "⚠️  Post $POST_ID has orphan template: $TEMPLATE"
+fi
+```
+
+**Fix options:**
+
+```bash
+# Clear the orphan meta entirely
+lando wp post meta delete "$POST_ID" _wp_page_template
+
+# OR set to 'default'
+lando wp post meta update "$POST_ID" _wp_page_template 'default'
+```
+
+Only after clearing should `wp_update_post` proceed safely.
+
+### `wp post update` with `--post_content` strips backslashes
+
+WordPress runs content through `wp_slash()` internally on save. If your content
+contains literal backslashes (regex patterns, LaTeX, Windows paths in prose), they
+are stripped.
+
+**Fix:** escape backslashes in the content before passing to WP-CLI:
+
+```bash
+# ❌ Wrong — single backslash disappears
+lando wp post update 5 --post_content='\nLine one\nLine two'
+
+# ✅ Correct — double-escape for wp_slash passthrough
+lando wp post update 5 --post_content='\nLine one\nLine two'
+```
+
+Or pipe content via stdin:
+
+```bash
+cat content.html | lando wp post update 5 --post_content=-
+```
+
+### Serialized option updates with `wp option update`
+
+Options stored as serialized PHP arrays (`wp_options.option_value`) must be passed
+through `--format=json` to survive serialization round-trips:
+
+```bash
+# ✅ Correct — JSON parsed then PHP-serialized by WP
+lando wp option update my_option '{"key":"value"}' --format=json
+
+# ❌ Wrong — stored as literal string, breaks on read
+lando wp option update my_option '{"key":"value"}'
+```
+
+### Revision-aware updates
+
+Every `wp_update_post` creates a revision. For bulk migrations that loop over hundreds
+of posts, this inflates the revisions table fast.
+
+**Disable revisions during migration:**
+
+```bash
+lando wp eval 'remove_action("post_updated", "wp_save_post_revision"); /* run migration */; add_action("post_updated", "wp_save_post_revision", 10, 1);'
+```
+
+Or set `define('WP_POST_REVISIONS', false)` temporarily in `wp-config.php` and restore
+after.

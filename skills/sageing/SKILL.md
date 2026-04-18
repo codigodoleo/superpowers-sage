@@ -29,32 +29,17 @@ This plugin provides Sage/Acorn-aware workflow skills for modern WordPress devel
 
 ## Runner Selection (Lando)
 
-All commands run inside Lando containers. Use the custom tooling defined in `.lando.yml`:
+All commands run inside Lando containers. **Never run `composer`, `php`, `node`, or `npm` on the host** — always use the `lando` wrappers defined in `.lando.yml`.
+
+Quick reference (3 most-used):
 
 ```
-# Theme-level commands (run inside wp-content/themes/{theme}/)
-lando theme-composer require log1x/acf-composer
-lando theme-yarn add -D tailwindcss
-
-# Acorn commands
-lando acorn <command>
-
-# WordPress CLI
-lando wp <command>
-
-# Vite dev server
-lando vite
-
-# Direct PHP/Composer at project root
-lando composer <command>
-lando php <command>
-
-# Cache management
-lando flush               # Clear all caches (Blade, OPcache, Acorn)
-lando theme-build         # Production build (Vite)
+lando flush            # Clear Acorn + Blade + OPcache — after every PHP change
+lando theme-build      # Vite production build — after every CSS/JS change
+lando acorn <cmd>      # Artisan-style commands (make:block, queue:work, route:list)
 ```
 
-**Never run `composer` or `php` on the host.** Always use `lando` wrappers to ensure correct PHP version, extensions, and paths.
+**Full Lando command reference:** see `@sage-lando` → "Canonical Lando Command Reference" section. All tables for theme tooling, Acorn, ACF Composer, WP-CLI, and cache management are there — do not duplicate across other skills.
 
 ## Workflow Skills (Gerunds)
 

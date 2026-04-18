@@ -6,6 +6,27 @@ user-invocable: false
 
 # Middleware & Authentication
 
+## When to use
+
+- Protecting Acorn routes with authentication (JWT, API tokens, custom guards)
+- Request preprocessing: rate limiting, CSRF validation, locale detection
+- Response postprocessing: adding headers, logging, caching
+- Role / capability checks before a controller runs
+- Route-specific authorization groups
+
+## When NOT to use
+
+- Filtering native WordPress admin pages or `register_rest_route()` endpoints — middleware does NOT run there; use `add_action('admin_init')` / `rest_pre_dispatch` instead
+- Template-hierarchy front-end pages (pages, archives, single posts) — use `template_redirect` action
+- Business logic that should live in a service class
+- Authentication for REST endpoints that bypass Acorn routes — extend `wp-rest-api` skill guidance instead
+
+## Prerequisites
+
+- Acorn installed with a working `routes/web.php` or `routes/api.php`
+- `RouteServiceProvider` booted
+- For JWT: `firebase/php-jwt` installed via `lando theme-composer require`
+
 ## What Middleware Does in Acorn
 
 Middleware filters HTTP requests before they reach route controllers -- the same pipeline concept as Laravel. Each middleware inspects or transforms the request, then either passes it forward or returns a response early.

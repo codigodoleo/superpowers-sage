@@ -8,6 +8,26 @@ user-invocable: false
 
 Acorn uses Laravel's logging system inside WordPress. Logs are configured per-theme in `config/logging.php` and coexist with WordPress's native `debug.log`.
 
+## When to use
+
+- Structured logging with log levels (emergency, alert, critical, error, warning, notice, info, debug)
+- Multiple log channels (daily rotating, single file, syslog, Sentry, custom)
+- Exception reporting with context and stack traces
+- Environment-aware logging (more verbose in dev, error-only in production)
+- Integration with external monitoring (Sentry, Papertrail, Loggly)
+
+## When NOT to use
+
+- Simple `error_log()` calls for local debugging — still valid for quick traces
+- WordPress-specific debug output (`WP_DEBUG_LOG = true`) — native WordPress debug log is complementary, not redundant
+- Performance-critical paths where per-call overhead of the logger matters — prefer conditional `WP_DEBUG` gating
+
+## Prerequisites
+
+- Acorn installed and bootstrapped
+- `config/logging.php` published (step shown below)
+- `storage/logs/` writable by the web server user
+
 ## Configuration
 
 Publish the logging config if it doesn't exist:
