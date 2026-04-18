@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.7.1...superpowers-sage-v2.0.0) (2026-04-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **blocks:** block architecture shifts from class-scoped (.b-{slug}) to tag-scoped custom elements (<block-{slug}>). All existing v1 blocks must be migrated via /block-refactoring.
+
+### Features
+
+* **agents,skills:** Wave 4 architecture features ([#24](https://github.com/codigodoleo/superpowers-sage/issues/24)) ([8de9dac](https://github.com/codigodoleo/superpowers-sage/commit/8de9dacc3d077a6949b4643d808bed9475f0bf30))
+* **blocks:** adopt custom element pattern for all ACF blocks ([#20](https://github.com/codigodoleo/superpowers-sage/issues/20)) ([e124ac3](https://github.com/codigodoleo/superpowers-sage/commit/e124ac381b7a85c43eecce13ede9e83699603d11))
+* **skills,ci,hooks:** Wave 3 automation helpers ([#23](https://github.com/codigodoleo/superpowers-sage/issues/23)) ([6a2930c](https://github.com/codigodoleo/superpowers-sage/commit/6a2930cc639709bef273707c84da2b8137c5a4ac))
+* **skills:** add acf-block-refactor skill ([#17](https://github.com/codigodoleo/superpowers-sage/issues/17)) ([905feb7](https://github.com/codigodoleo/superpowers-sage/commit/905feb7d62dc48f4a9355bd7eb7547bd05a77a61))
+
+
+### Bug Fixes
+
+* **release:** sync version across 5 manifests and track in release-please ([#21](https://github.com/codigodoleo/superpowers-sage/issues/21)) ([0d389c9](https://github.com/codigodoleo/superpowers-sage/commit/0d389c926c0adddbad57ef55f11195303f10dcd0))
+
+
+### Documentation
+
+* **skills:** expand knowledge base with validated traps and gotchas ([#22](https://github.com/codigodoleo/superpowers-sage/issues/22)) ([1bc88d1](https://github.com/codigodoleo/superpowers-sage/commit/1bc88d19ac2fb959a1ed36d25c6078eb1fa600da))
+
 ## [1.7.1](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.7.0...superpowers-sage-v1.7.1) (2026-04-18)
 
 
