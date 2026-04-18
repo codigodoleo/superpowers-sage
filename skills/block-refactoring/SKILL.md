@@ -1,11 +1,11 @@
 ---
-name: superpowers-sage:acf-block-refactor
+name: superpowers-sage:block-refactoring
 description: Refactor an existing ACF block to the per-block CSS pattern with theme variations via native WP $styles. Separates CSS responsibility, eliminates unused styles, adds light/neutral/dark variants, and double-checks implementation against the latest design reference.
 user-invocable: true
 argument-hint: "<BlockClassName or block-slug>"
 ---
 
-# ACF Block Refactor
+# Block Refactoring — Per-block CSS + Theme Variations
 
 Applies the validated per-block CSS pattern to any ACF Composer block: visual logic separated
 into a dedicated CSS file, theme variations via native `$styles`, selective CSS enqueue (loaded

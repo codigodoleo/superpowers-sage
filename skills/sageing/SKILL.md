@@ -74,6 +74,7 @@ Skills are **activities** — gerund naming communicates process, not command.
 | **Verifying**              | `/verifying`              | Visual comparison with design reference                              |
 | **Reviewing**              | `/reviewing`              | Convention audit + design alignment check                            |
 | **Debugging**              | `/debugging`              | Sage-aware troubleshooting with cache knowledge                      |
+| **Block Refactoring**      | `/block-refactoring`      | Per-block CSS + theme variations ($styles) + visual double-check     |
 
 ### Recommended workflow for new features
 
