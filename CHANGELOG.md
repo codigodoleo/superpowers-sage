@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.7.0...superpowers-sage-v1.7.1) (2026-04-18)
+
+
+### Bug Fixes
+
+* **lang:** explicitly enforce en-US for file names and branch names ([#15](https://github.com/codigodoleo/superpowers-sage/issues/15)) ([f4b7f60](https://github.com/codigodoleo/superpowers-sage/commit/f4b7f60f8e95f014ff7cd7f41097f7698c4068f9))
+
 ## [1.7.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.6.0...superpowers-sage-v1.7.0) (2026-04-18)
 
 
