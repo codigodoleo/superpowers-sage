@@ -32,6 +32,60 @@ Accept one of:
 
 Reject if spec approval is missing.
 
+### 1b) Handoff payload validation (preflight)
+
+Before generating any plan files, validate the architecture spec against its claimed sources. This catches handoff payload drift — where the spec claims field names, types, or shapes that don't match reality.
+
+**For each source referenced in the spec (e.g. `bkp_main:app/Fields/Foo.php`, legacy ACF JSON exports, external APIs):**
+
+1. If it's a git ref (`bkp_main:<path>`, `legacy:<ref>:<path>`):
+   ```bash
+   git show <ref>:<path> 2>/dev/null
+   ```
+   Read the actual file. Grep for `Builder::make`, `->addX(`, field names, class names.
+   Compare against what the spec claims. If mismatch:
+   ```
+   ⛔ HANDOFF VALIDATION FAILED
+   Spec claims field 'cta' on block PropostaValor.
+   git show bkp_main:app/Fields/PropostaValor.php shows:
+     ['cta_primario', 'cta_secundario'] (no 'cta').
+   Reject the spec and request correction from architecture-discovery.
+   ```
+
+2. If it's an external API or DB schema:
+   - Request the caller provide a sample response or schema file on disk
+   - Read and cross-reference the spec's claimed field names/types
+
+3. If the spec references content models (`content-model.md`):
+   - Verify each CPT and ACF field group mentioned is classified
+   - Flag unclassified content
+
+**Never accept a spec silently.** Every claim about a legacy source MUST be verified against that source. Data loss from trusting stale handoff payloads is a documented failure mode (3 prevented incidents in production — see feedback from interioresdecora.com.br).
+
+### 1c) AD-2 byte-for-byte port preset (when porting legacy schemas)
+
+If the spec's "chosen approach" is "zero-migration port from legacy schema", automatically emit an **AD-2 byte-for-byte gate** in the plan:
+
+```markdown
+## AD-2 — Byte-for-byte gate (blocking)
+
+Before any code is written for a component that ports a legacy schema, run:
+
+\`\`\`bash
+# Compare legacy source with intended new file
+git show <legacy-ref>:<legacy-path> > /tmp/legacy-current.php
+diff -u /tmp/legacy-current.php <intended-new-path> | head -100
+\`\`\`
+
+The output must be EMPTY (except for namespace/import differences). Any field
+name, type, or Builder chain that differs → BLOCK the commit and re-align.
+
+This gate has prevented field key divergence (MD5 hash regressions) and post_content
+re-hydration failures in real-world ports. Do not skip.
+```
+
+This block is emitted once per ported component, not per plan.
+
 ### 2) Parse architecture into implementation units
 
 Extract:

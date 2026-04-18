@@ -176,6 +176,43 @@ For each approach include:
 
 Ask user to choose or request refinements.
 
+#### 6b) AD-2 preset — "zero-migration port from legacy schema"
+
+When the scope involves porting ACF field groups, CPTs, or blocks from a legacy
+codebase (bkp_main, another branch, another site) AND the existing `post_content`
+or `wp_postmeta` data must remain readable without a data migration, use the
+**AD-2 byte-for-byte preset**. This preset was validated in production and
+prevented 3 data-loss incidents in real projects.
+
+**Emit this block in the architecture spec under "Chosen Approach":**
+
+```markdown
+### AD-2 — Byte-for-byte port from legacy schema
+
+All ACF Builder chains in ported classes MUST match the legacy source byte-for-byte
+(except namespace/import lines). Rationale:
+
+- ACF generates `field_{group}_{name}` keys deterministically from the Builder chain
+- Any deviation (reordering `->addX()` calls, renaming fields, splitting Builders)
+  produces new field keys
+- Existing `post_content` and `wp_postmeta` rows reference old keys; mismatched
+  keys = fields rehydrate as null = data appears lost
+
+**Enforcement:** plan-generator emits an AD-2 gate per component (blocking pre-commit
+diff against the legacy source). Building runs the diff BEFORE writing each class.
+
+**Expected legacy sources:** <list sources here, e.g. `bkp_main:app/Fields/*.php`>
+
+**Exceptions:** <namespace changes, import aliasing — all other divergence is a
+Critical violation>
+```
+
+**When to use:** the spec's context mentions porting from legacy AND preserving
+data is required.
+
+**When NOT to use:** greenfield design with no legacy schema, OR explicit data
+migration planned (DB-level field_key rewrite script).
+
 ### 7) Build decision graph and execution strategy
 
 Produce execution strategy by dependency class:

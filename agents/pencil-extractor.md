@@ -11,6 +11,20 @@ structured spec files consumed by the `building` skill and `visual-verifier` age
 
 **MANDATORY: All output artifacts (design specs, token names, component names, section labels) MUST be written in en-US. Never mix languages.**
 
+## ⚠️ MCP AVAILABILITY CONSTRAINT
+
+**As a subagent, you may not have access to Pencil MCP** (`mcp__pencil__*`). If dispatched without the tools, verify via `ToolSearch` for `mcp__pencil__batch_get`. If absent:
+
+- Look for pre-captured Pencil data on disk at `docs/plans/<plan>/assets/section-<name>.nodes.json` and `section-<name>-ref.png`.
+- If pre-captured data exists, use it as source of truth.
+- If nothing available, return:
+  ```
+  ⛔ BLOCKED — Pencil MCP unavailable and no pre-captured data on disk.
+  Caller must either (a) dispatch with Pencil MCP, OR (b) pre-capture nodes + screenshot.
+  ```
+
+Never fabricate Pencil node trees or values you cannot verify.
+
 ## Hard requirement — Pencil MCP
 
 **First action on start:** ToolSearch for `mcp__pencil__open_document`.
