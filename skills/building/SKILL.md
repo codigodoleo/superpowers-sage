@@ -130,7 +130,7 @@ Every colour, font, spacing value must be a token declared in `@theme`.
 <section class="bg-[#131313] text-[#e5e2e1] py-[96px]">
 ```
 
-**For ACF blocks:** After creating the PHP controller + Blade view, invoke `/sage-block-architecting` for this block before building. The block CSS contract (scoped `.b-{slug}` CSS, enqueue guard, `$styles`, block README) is that skill's responsibility — do not implement CSS or the enqueue pattern manually.
+**For ACF blocks:** After running `lando acorn acf:block {Name} --localize`, invoke `/block-scaffolding` for this block before proceeding. The custom element contract (tag-selector CSS scoped to `block-{slug}`, JS class extending `BaseCustomElement`, selective CSS+JS enqueue, `$spacing`/`$supports`/`$styles`, block README) is that skill's responsibility — do not implement manually.
 
 #### e) Build and verify
 

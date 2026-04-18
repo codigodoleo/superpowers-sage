@@ -69,12 +69,12 @@ Skills are **activities** — gerund naming communicates process, not command.
 | **Modeling**               | `/modeling`               | Content architecture analysis (static vs dynamic)                    |
 | **Designing**              | `/designing`              | Design tool integration (Paper/Stitch/Figma/Pencil/offline assets) — routes by URL or file |
 | **Design System**          | `/sage-design-system`     | Establish visual foundation: tokens → UI components → layout components → kitchensink |
-| **Block Architecting**     | `/sage-block-architecting`| CSS contract for each ACF block: scoped CSS, enqueue guard, `$styles`, block README |
+| **Block Scaffolding**      | `/block-scaffolding`      | Scaffold new ACF block with custom element, 4-layer CSS contract, selective CSS+JS enqueue, block README |
+| **Block Refactoring**      | `/block-refactoring`      | Evolve existing block: design drift, CSS coverage, variation expansion, v1→v2 migration |
 | **Building**               | `/building`               | Plan-driven implementation with auto-verification                    |
 | **Verifying**              | `/verifying`              | Visual comparison with design reference                              |
 | **Reviewing**              | `/reviewing`              | Convention audit + design alignment check                            |
 | **Debugging**              | `/debugging`              | Sage-aware troubleshooting with cache knowledge                      |
-| **Block Refactoring**      | `/block-refactoring`      | Per-block CSS + theme variations ($styles) + visual double-check     |
 
 ### Recommended workflow for new features
 
@@ -82,7 +82,7 @@ Skills are **activities** — gerund naming communicates process, not command.
 /sage-design-system      →  (tokens, UI atoms, layout components, kitchensink validated)
 /architecture-discovery  →  (generates approved architecture spec)
 /plan-generator          →  (generates plan + assets)
-/building      →  (implements from plan; auto-invokes /sage-block-architecting per ACF block)
+/building      →  (implements from plan; auto-invokes /block-scaffolding per ACF block)
 /reviewing     →  (convention audit + design alignment)
 ```
 
