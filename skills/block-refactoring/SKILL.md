@@ -1,258 +1,328 @@
 ---
 name: superpowers-sage:block-refactoring
-description: Refactor an existing ACF block to the per-block CSS pattern with theme variations via native WP $styles. Separates CSS responsibility, eliminates unused styles, adds light/neutral/dark variants, and double-checks implementation against the latest design reference.
+description: Evolve an existing ACF block — detect design drift vs latest reference, reduce unused CSS, expand variations leveraging new design tokens, detect implementation gaps, and migrate legacy v1 blocks to the v2 custom element pattern. Uses block-scaffolding as pattern reference.
 user-invocable: true
 argument-hint: "<BlockClassName or block-slug>"
 ---
 
-# Block Refactoring — Per-block CSS + Theme Variations
+# Block Refactoring — Evolution of Existing Blocks
 
-Applies the validated per-block CSS pattern to any ACF Composer block: visual logic separated
-into a dedicated CSS file, theme variations via native `$styles`, selective CSS enqueue (loaded
-only when the block is present on the page), and a final visual double-check against the design reference.
+Analyze and improve an existing block after its first implementation. Four axes of
+evolution: design drift detection, CSS coverage analysis, variation expansion, and
+gap/migration detection.
+
+**Announce at start:** "I'm using the block-refactoring skill to evolve the block."
 
 ## When to use
 
-- Newly created ACF block that needs light/neutral/dark variations
-- Legacy block with hardcoded Tailwind classes that needs to be refactored
-- Any block where CSS should be conditionally loaded (not bundled globally)
+- Block shipped in a previous PR and design has evolved since
+- CSS bundle includes rules/tokens that are no longer used
+- New design tokens exist in `app.css`/`design-tokens.md` that the block could leverage
+- Legacy block still uses v1 pattern (`.b-{slug}` class, dual selector, no custom element)
+- You suspect implementation diverged from design reference during initial build
+
+## When NOT to use
+
+- **Creating a new block from scratch** → use `/block-scaffolding` instead
+- **Project-wide convention audit** → use `/reviewing`
+- **Non-block UI component** → Blade components are not ACF blocks
 
 ## Input
 
 $ARGUMENTS
 
-Resolve to block slug and class name before proceeding. If not provided, ask.
+Resolve to `{ClassName}` and `{slug}`. If not provided, ask.
+
+---
+
+## The 4 evolution axes
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  AXIS 1 · Design drift detection                             │
+│  Compare implementation vs LATEST design reference.          │
+│  Detect: geometry, spacing, typography, color divergence.    │
+├──────────────────────────────────────────────────────────────┤
+│  AXIS 2 · CSS coverage analysis                              │
+│  Identify declared custom properties, selectors, variations  │
+│  that no element in the view actually uses.                  │
+├──────────────────────────────────────────────────────────────┤
+│  AXIS 3 · Variation expansion                                │
+│  Find new design tokens introduced after the block was       │
+│  built. Propose additional variations that exploit them.     │
+├──────────────────────────────────────────────────────────────┤
+│  AXIS 4 · Gap / migration detection                          │
+│  Find implementation divergences from the canonical pattern: │
+│  v1 legacy (.b-{slug}), missing wrapper, missing $spacing,   │
+│  arbitrary values, mixed-language terms, hardcoded tokens.   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+Refactoring NEVER rebuilds from scratch. For a full re-scaffold, delegate to
+`/block-scaffolding` as a fallback.
 
 ---
 
 ## Procedure
 
-### 0) Resolve block identity
+### Phase 0 — Resolve block identity and locate files
 
 From the argument, identify:
 - `{ClassName}` — e.g. `HeroSection`
 - `{slug}` — e.g. `hero-section`
-- 4 target files:
+- 5 target files (one may be absent on legacy blocks):
   - `app/Blocks/{ClassName}.php`
   - `resources/views/blocks/{slug}.blade.php`
   - `resources/css/blocks/{slug}.css`
-  - `resources/css/editor.css`
+  - `resources/js/blocks/{slug}.js` (may not exist — legacy)
+  - `resources/css/editor.css` (check for `@import './blocks/{slug}.css'`)
 
-Read the current state of all 4 files before making any changes.
+Read all present files.
 
-### 1) Read available design tokens
+### Phase 1 — Classify current pattern version
 
-Read `resources/css/app.css` (or `@theme` block) to extract:
-- All `--color-*` tokens
-- All semantic typography classes (`display`, `leading`, `eyebrow`, etc.)
+Inspect the view file and the CSS file:
 
-Read `docs/plans/*/assets/design-tokens.md` if it exists — use those tokens as authoritative source.
+| Signal | Version |
+|---|---|
+| View has `<block-{slug}>` custom element | **v2** |
+| View uses `$attributes->merge()` on a `<section class="b-{slug}">` | **v1** |
+| CSS scoped to `block-{slug}` tag selector | **v2** |
+| CSS scoped to `.b-{slug}` class selector | **v1** |
+| CSS has dual selector `&.is-style-*, .is-style-* &` | **v1** |
+| CSS has single selector `.is-style-* block-{slug}` | **v2** |
+| JS file at `resources/js/blocks/{slug}.js` | **v2** |
 
-### 2) Create `resources/css/blocks/{slug}.css`
+Mark the block's current version (`v1` / `v2` / `mixed`) before proceeding.
 
-**H01** — Create (or replace) the block CSS file:
+---
+
+### AXIS 1 — Design drift detection
+
+**Prerequisites:** a design reference must be available. Check in order:
+1. MCP design tool with the project's file open (Pencil / Paper / Figma / Stitch)
+2. `docs/plans/*/assets/section-{slug}-ref.png` on disk
+3. `docs/plans/*/assets/section-{slug}-spec.md` on disk
+
+If none available, report `drift: NOT_VERIFIED` and skip to Axis 2.
+
+**Execution:**
+1. Dispatch `visual-verifier` agent with:
+   - `url`: current environment's URL for a page rendering the block
+   - `selector`: `block-{slug}` (v2) or `.b-{slug}` (v1)
+   - `ref`: the reference path found above
+   - `spec`: spec file path if available
+2. Collect: MATCH | DRIFT | MISSING | FAIL_ARBITRARY_VALUES
+3. If DRIFT: capture the exact divergences (typography size, color hex, spacing px) for
+   Phase 6 report
+
+---
+
+### AXIS 2 — CSS coverage analysis
+
+**Read** `resources/css/blocks/{slug}.css` and inventory:
+- Every `--block-*` custom property declared (in root or variation blocks)
+- Every CSS rule (selectors inside `block-{slug}` or `.b-{slug}`)
+
+**Read** the view and inventory:
+- Every class referenced on DOM elements
+- Every `var(--block-*)` reference in arbitrary values or style attributes
+- Every `<x-ui.*>` component rendered (they have their own CSS, not the block's)
+
+**Report unused items:**
+
+| Item | Status |
+|---|---|
+| `--block-btn-hover` declared but `var(--block-btn-hover)` never referenced | UNUSED — propose removal |
+| `.b-{slug}__icon-wrapper` selector but no `.b-{slug}__icon-wrapper` in view | UNUSED — propose removal |
+| `--block-divider` declared but view has `<hr class="border-[var(--block-divider)]">` | USED — keep |
+
+**Propose removals** in the Phase 6 report for user approval. Do NOT auto-delete.
+
+---
+
+### AXIS 3 — Variation expansion
+
+**Read** `resources/css/app.css` `@theme` block and `docs/plans/*/assets/design-tokens.md`
+to get the current token catalog.
+
+**Read** the block's `$styles` array in the controller and current CSS variation
+selectors.
+
+**Compare:**
+- Are there token families (e.g. `--color-warm-*`, `--color-brand-*`) that DIDN'T EXIST
+  when the block was built but now do?
+- Are there semantic roles (e.g. `--color-surface-accent`) that would make sense as a
+  new variation (e.g. `is-style-accent`)?
+
+**Propose new variations** with concrete CSS:
 
 ```css
-@reference "../app.css";
-
-.b-{slug} {
-  /* Light variation (default) */
-  --block-bg:        var(--color-bg-primary);
-  --block-text:      var(--color-text-primary);
-  --block-text-sub:  var(--color-text-muted);
-  --block-eyebrow:   var(--color-neutral);
-  --block-border:    var(--color-border-light);
-  --block-btn-bg:    var(--color-text-primary);
-  --block-btn-text:  var(--color-text-inverse);
-  --block-btn-hover: var(--color-bg-dark);
-
-  /* Neutral — applied as class on the root element (frontend) or parent wrapper (editor) */
-  &.is-style-neutral,
-  .is-style-neutral & {
-    --block-bg:     var(--color-bg-neutral);
-    --block-border: var(--color-border-medium);
-  }
-
-  /* Dark — same dual-selector pattern */
-  &.is-style-dark,
-  .is-style-dark & {
-    --block-bg:        var(--color-bg-dark);
-    --block-text:      var(--color-text-inverse);
-    --block-text-sub:  color-mix(in srgb, var(--color-text-inverse) 60%, transparent);
-    --block-border:    var(--color-border-dark);
-    --block-btn-bg:    var(--color-text-inverse);
-    --block-btn-text:  var(--color-text-primary);
-    --block-btn-hover: color-mix(in srgb, var(--color-text-inverse) 90%, transparent);
-  }
-
-  /* Root text color — children inherit via color:inherit */
-  color: var(--block-text);
-
-  @apply bg-[var(--block-bg)] overflow-hidden;
+/* Proposed new variation: Accent (leverages --color-surface-accent introduced 2026-04-14) */
+.is-style-accent block-{slug} {
+  --block-bg:   var(--color-surface-accent);
+  --block-text: var(--color-foreground-on-accent);
 }
 ```
 
-**Rules:**
-- Only declare custom properties this block actually uses
-- `@reference` grants Tailwind token access at build-time without duplicating CSS
-- Vite auto-discovers via glob in `vite.config.js` — no manual import needed
-- Do NOT put typography (font-size, font-weight, line-height) here — it belongs in `app.css` semantic classes
-
-### 3) Update `app/Blocks/{ClassName}.php`
-
-**H02** — Add `$styles` and empty `assets()`:
+AND the matching `$styles` entry:
 
 ```php
-public $styles = [
-    ['label' => 'Light',   'name' => 'light',   'isDefault' => true],
-    ['label' => 'Neutral', 'name' => 'neutral'],
-    ['label' => 'Dark',    'name' => 'dark'],
+['label' => 'Accent', 'name' => 'accent'],
+```
+
+User approves or rejects per proposal.
+
+---
+
+### AXIS 4 — Gap / migration detection
+
+Run these checks — every failure becomes a line item in Phase 6:
+
+#### G1. v1 → v2 migration (if Phase 1 classified as v1 or mixed)
+
+Propose the upgrade:
+1. Replace `<section {{ $attributes->merge(['class' => 'b-{slug}']) }}>` with:
+   ```blade
+   @unless ($block->preview)
+     <section {{ $attributes }}>
+   @endunless
+
+   <block-{slug} class="...">
+     ...
+   </block-{slug}>
+
+   @unless ($block->preview)
+     </section>
+   @endunless
+   ```
+2. Rewrite CSS: `.b-{slug}` → `block-{slug}` (tag selector), add `display: block`
+3. Simplify dual selectors to single: `.is-style-neutral block-{slug}`
+4. Create `resources/js/blocks/{slug}.js` with empty `init()`
+5. Ensure `resources/js/core/BaseCustomElement.js` exists — copy from plugin template if missing
+6. Update `ThemeServiceProvider::boot()` enqueue to include the JS path
+
+#### G2. Missing `$spacing` / `$supports` in controller
+
+```php
+public $spacing = ['padding' => null, 'margin' => null];
+public $supports = [
+    'align'      => ['wide', 'full'],
+    'color'      => ['background' => true, 'text' => true],
+    'typography' => ['fontSize' => false],
 ];
-
-/**
- * Assets enqueued when rendering the block.
- *
- * Intentionally empty. CSS is conditionally enqueued by ThemeServiceProvider::boot()
- * via has_block() + wp_enqueue_scripts (priority 20), because this method registers
- * enqueue_block_assets inside render() — which fires during the_content, after wp_head()
- * has already executed. See: vendor/log1x/acf-composer/src/Block.php
- */
-public function assets(array $block): void
-{
-    //
-}
 ```
 
-**Rules:**
-- `$styles` uses `name` (not `value`) — required by `register_block_style()` / WP 6.9+
-- `assets()` must remain EMPTY — timing issue: fires after `wp_head()`
-- CSS enqueue must happen in `ThemeServiceProvider::boot()` via `has_block()`
+#### G3. Arbitrary Tailwind values in view
 
-### 4) Update `resources/views/blocks/{slug}.blade.php`
+Grep for `\[#`, `\[rgba`, `\[px`, `\[em`, `\[[0-9]+px` in the view. Each is CRITICAL —
+replace with token reference or design-system class.
 
-**H03** — Replace hardcoded tokens with custom properties and `$attributes->merge()`:
+#### G4. Hardcoded tokens without custom property
 
-```blade
-<section {{ $attributes->merge(['class' => 'b-{slug} flex']) }}>
-  {{-- Typography via semantic classes from design system (app.css) --}}
-  {{-- Color inherits from `color: var(--block-text)` in block CSS — do not repeat in view --}}
-  <h1 class="display mb-[28px]">...</h1>
-  <p class="leading mb-[52px] text-[var(--block-text-sub)]">...</p>
+Look for `bg-bg-primary`, `text-text-primary`, `font-display`, etc. directly applied in
+the view. These should move to the block CSS as custom properties.
 
-  {{-- Eyebrow --}}
-  <span class="eyebrow text-[var(--block-eyebrow)]">...</span>
+#### G5. `$styles` using legacy format
 
-  {{-- Primary CTA --}}
-  <a class="bg-[var(--block-btn-bg)] text-[var(--block-btn-text)] hover:bg-[var(--block-btn-hover)]">...</a>
-</section>
-```
+`['light' => true, 'dark']` or `['value' => 'light']` → migrate to
+`[['label' => 'Light', 'name' => 'light', 'isDefault' => true]]`.
 
-**Rules:**
-- `$attributes->merge()` injects WP classes (`is-style-*`, `alignfull`, etc.) on the root element
-- `bg-[var(--block-bg)]` goes in the CSS via `@apply` — NOT in the view
-- Heading/body color NOT in view — inherits from `color: var(--block-text)` on root
-- Semantic classes (`display`, `leading`, `eyebrow`) come from `app.css`
-- Remove ALL hardcoded tokens: `bg-bg-primary`, `text-text-primary`, `font-display`, `text-[72px]`, etc.
+#### G6. `assets()` method with enqueue logic
 
-### 5) Update `resources/css/editor.css`
+`wp_enqueue_style()` inside `assets()` → move to `ThemeServiceProvider::boot()`.
 
-**H04** — Add `@import` for the block CSS:
+#### G7. Missing `--localize` strings
 
-```css
-@import './blocks/{slug}.css';
-```
+Look for static user-facing strings in the view not wrapped in `__()` / `esc_html__()`.
+If they exist, propose wrapping them.
 
-One `@import` per refactored block, in alphabetical order.
+#### G8. Mixed-language identifiers
 
-### 6) Verify selective CSS enqueue in ThemeServiceProvider
+Grep view, controller, CSS for non-English tokens in class names, variable names,
+comments. Each instance is CRITICAL (violates the language policy in `sageing`).
 
-Check that `app/Providers/ThemeServiceProvider.php` has a `has_block()` conditional for this block:
+---
 
-```php
-add_action('wp_enqueue_scripts', function () {
-    if (has_block('acf/{slug}')) {
-        wp_enqueue_style(
-            'block-{slug}',
-            Vite::asset('resources/css/blocks/{slug}.css'),
-            [],
-            null
-        );
-    }
-}, 20);
-```
+## Phase 6 — Report and propose
 
-If missing, add it. The `priority 20` ensures it runs after `wp_head()`.
-
-### 7) Build and cache flush
-
-```bash
-lando theme-build   # must exit 0 and list {slug}-*.css in output
-lando flush         # clear Acorn/Blade/OPcache
-```
-
-### 8) Double-check: implementation vs. design reference
-
-Compare the refactored block against the latest available design reference:
-
-**8a) Locate reference:**
-1. Check `docs/plans/*/assets/section-{slug}-ref.png` or `section-{slug}-spec.md`
-2. If no plan asset — check `docs/plans/*/assets/` for any overview reference
-3. If no reference at all — skip to step 8c and note in report
-
-**8b) Dispatch `visual-verifier`** with:
-- `url`: project's Lando URL (from `.lando.yml` proxy config)
-- `selector`: `[data-block="acf/{slug}"]`
-- `ref`: found reference image path
-- `spec`: found spec file path (if any)
-
-Collect: MATCH | DRIFT | MISSING | FAIL_ARBITRARY_VALUES
-
-**8c) Cross-check variation rendering:**
-Verify manually (or instruct user to verify) in browser:
-1. Light (default) — `--block-bg` resolves to `var(--color-bg-primary)`
-2. Apply `is-style-neutral` via DevTools — `--block-bg` resolves to `var(--color-bg-neutral)`
-3. Apply `is-style-dark` via DevTools — `--block-bg` resolves to `var(--color-bg-dark)`
-4. Confirm `<link href="*/{slug}-*.css">` in `<head>` — selective enqueue working
-
-### 9) Report
+Produce a structured report:
 
 ```markdown
-## ACF Block Refactor: {ClassName}
+## Block Refactoring: {ClassName}
 
-### Files Changed
-- [x] H01 `resources/css/blocks/{slug}.css` — created
-- [x] H02 `app/Blocks/{ClassName}.php` — $styles + empty assets()
-- [x] H03 `resources/views/blocks/{slug}.blade.php` — $attributes->merge() + var(--block-*)
-- [x] H04 `resources/css/editor.css` — @import added
-- [x] ThemeServiceProvider — has_block() enqueue verified
+### Current pattern version
+{v1 | v2 | mixed} — {brief justification}
 
-### Visual Double-Check
-- Reference: {path or "none found"}
-- Result: {MATCH | DRIFT | MISSING}
-- Drift details: {list or "none"}
+### Axis 1 — Design drift
+- Status: {MATCH | DRIFT | MISSING | NOT_VERIFIED}
+- Divergences: {list or "none"}
 
-### Variation Check
-- Light: {✅ / ⚠️}
-- Neutral: {✅ / ⚠️}
-- Dark: {✅ / ⚠️}
-- Selective enqueue: {✅ confirmed / ⚠️ not verified}
+### Axis 2 — CSS coverage
+- Unused custom properties: {list}
+- Unused selectors: {list}
+- Proposed removals: {list}
 
-### Remaining Issues
-{list or "none — ready to commit"}
+### Axis 3 — Variation expansion
+- New tokens available: {list}
+- Proposed new variations: {names + CSS blocks}
+
+### Axis 4 — Gaps / migration
+- G1 v1 → v2 migration: {needed | N/A}
+- G2 Missing $spacing/$supports: {yes | no}
+- G3 Arbitrary Tailwind values: {count + locations}
+- G4 Hardcoded tokens in view: {count + locations}
+- G5 Legacy $styles format: {yes | no}
+- G6 assets() enqueue logic: {yes | no}
+- G7 Missing localization: {count}
+- G8 Mixed-language identifiers: {count + locations}
+
+### Suggested action
+{"Ready to apply all proposals" | "Review proposals then re-run"}
 ```
 
 ---
 
-## Anti-drift reference
+## Phase 7 — Apply approved changes
 
-| Wrong | Correct |
-|---|---|
-| `$styles = ['light' => true, 'neutral', 'dark']` | `[['name' => 'light', 'isDefault' => true], ...]` |
-| `['label' => '...', 'value' => 'light']` | `['label' => '...', 'name' => 'light']` |
-| `assets()` with `wp_enqueue_style(...)` | `assets()` empty — timing issue fires after `wp_head()` |
-| `@import "../app.css"` in block CSS | `@reference "../app.css"` — `@import` duplicates all CSS |
-| `bg-bg-primary` hardcoded in view | `bg-[var(--block-bg)]` via CSS `@apply` |
-| Arbitrary token `bg-[#F4EFE8]` | Always use tokens: `var(--color-bg-primary)` |
-| `&.is-style-dark` only | `&.is-style-dark, .is-style-dark &` — Gutenberg applies `is-style-*` on parent wrapper in editor |
-| `h1 { font-size: 72px }` in block CSS | Semantic class `h1.display` in `app.css` — typography belongs to design system |
-| `font-display text-[72px] font-light` in view | `class="display"` — unlayered in `app.css`, wins WP admin specificity |
+After user approves proposals:
+
+1. Apply CSS coverage removals
+2. Apply variation expansions (CSS + `$styles`)
+3. Apply gap fixes (G1–G8 as approved)
+4. If G1 v1 → v2 migration was approved:
+   - Ensure `BaseCustomElement.js` exists in theme
+   - Rewrite view, CSS, create JS file, update provider
+   - If the full rewrite is too invasive, delegate to `/block-scaffolding` as fallback
+
+Then:
+
+```bash
+lando theme-build   # must exit 0
+lando flush         # clear caches
+```
+
+---
+
+## Phase 8 — Verification
+
+| Level | Source | What to validate | Required |
+|---|---|---|---|
+| A | Playwright MCP | `document.querySelector('block-{slug}').constructor.name === 'Block{PascalSlug}'` | If v2 |
+| B | Playwright MCP | Screenshot at canonical width; compare against reference | Yes |
+| C | Playwright MCP | All variations render as proposed | Yes (Full mode) |
+| D | Human | Approve changes before commit | First apply |
+
+Then commit:
+
+```
+git commit -m "refactor(blocks): {slug} — {summary of applied changes}"
+```
+
+---
+
+## Anti-drift — don't reintroduce
+
+See `/block-scaffolding` anti-drift table — same rules apply during refactor. Every
+proposal in Phase 6 should, after applied, produce code that would pass `/block-scaffolding`
+as if the block were being created today.
