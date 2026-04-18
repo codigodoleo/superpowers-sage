@@ -7,6 +7,24 @@ description: Meta-skill for Sage/Acorn projects; explains the gerund workflow ec
 
 This plugin provides Sage/Acorn-aware workflow skills for modern WordPress development with the Roots ecosystem, Lando, and design tool integration.
 
+## HARD RULE — Language Policy
+
+**All written artifacts MUST be in en-US.** This is mandatory and never negotiable.
+
+| Context | Language | Examples |
+|---|---|---|
+| Code (variables, functions, classes) | **en-US always** | `ProposalValue`, not `PropostaValor` |
+| Code comments | **en-US always** | `// Fetch highlighted projects` |
+| Documentation, plans, specs, ADRs | **en-US always** | "Eyebrow with lines", not "Eyebrow com linhas" |
+| Design guides, component maps | **en-US always** | `HighlightProjects`, not `ProjetosDestaque` |
+| Git commit messages | **en-US always** | `feat: add hero section` |
+| CHANGELOG, README | **en-US always** | |
+| User-facing prompts and conversation | **User's language** | Follow the language the user writes in |
+
+**Why:** Projects operate in collaborative, international environments. Mixed-language artifacts (half English class names, half Portuguese descriptions) are unprofessional and break searchability, consistency, and onboarding for new team members.
+
+**Enforcement:** If you catch yourself writing a non-English term in any artifact, stop and translate it. Agents and skills that generate artifacts must produce en-US output regardless of the user's conversation language.
+
 ## Runner Selection (Lando)
 
 All commands run inside Lando containers. Use the custom tooling defined in `.lando.yml`:
