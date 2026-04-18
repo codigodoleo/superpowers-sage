@@ -216,6 +216,40 @@ This plugin extends [obra/superpowers](https://github.com/obra/superpowers). Wor
 | `systematic-debugging`           | `/debugging` (core engine)                                |
 | `verification-before-completion` | `/verifying` (completion gate)                            |
 
+## Commit Message Hygiene
+
+Sage projects commonly use [commitlint](https://commitlint.js.org/) with Conventional Commits. Before running `git commit`, pre-validate the message against the project's config to avoid the hook-fail / retry cycle.
+
+### Pre-commit checklist (run mentally before invoking `git commit`)
+
+1. **Header ≤ 72 chars**: `{type}({scope}): {short summary}` — count the whole line including prefix.
+2. **Body separated by blank line**: blank line between header and body is required.
+3. **Footer separated by blank line**: blank line between body and any `BREAKING CHANGE:` / `Refs:` / `Co-Authored-By:` trailers.
+4. **Scope is a noun** in the current codebase vocabulary (`blocks`, `ci`, `docs`, `hooks`, `skills`, `manifest`, `release`, `lang`). Don't invent scopes.
+5. **Type from the allowed list**: `feat`, `fix`, `docs`, `chore`, `refactor`, `perf`, `test`, `ci`, `build`, `style`, `revert`.
+6. **Imperative mood**: "add" not "added" or "adds".
+
+### Detect the project's commitlint config
+
+Before the first commit, check:
+
+```bash
+cat .commitlintrc.js .commitlintrc.json .commitlintrc package.json 2>/dev/null | grep -A5 'commitlint'
+```
+
+Common custom rules to watch for:
+- `header-max-length` (default 72, sometimes 100)
+- `body-max-line-length` (usually 100)
+- `footer-leading-blank` (warning → error)
+- `subject-case` (lower-case vs allow-capital)
+
+Adjust the message to fit the project's specific rules before the commit.
+
+### If commit fails due to commitlint
+
+- **NEVER** retry with `--no-verify`; fix the message and commit again
+- Do not `--amend` the previous commit; create a new commit (the hook failure means the commit didn't happen)
+
 ## Philosophy
 
 - Acorn brings Laravel into WordPress — use Laravel patterns, not WordPress procedural code
