@@ -15,9 +15,11 @@ This plugin provides Sage/Acorn-aware workflow skills for modern WordPress devel
 |---|---|---|
 | Code (variables, functions, classes) | **en-US always** | `ProposalValue`, not `PropostaValor` |
 | Code comments | **en-US always** | `// Fetch highlighted projects` |
+| File and directory names | **en-US always** | `proposal-value-adr.md`, not `proposta-valor-adr.md` |
 | Documentation, plans, specs, ADRs | **en-US always** | "Eyebrow with lines", not "Eyebrow com linhas" |
 | Design guides, component maps | **en-US always** | `HighlightProjects`, not `ProjetosDestaque` |
 | Git commit messages | **en-US always** | `feat: add hero section` |
+| Git branch names | **en-US always** | `feat/hero-section`, not `feat/secao-hero` |
 | CHANGELOG, README | **en-US always** | |
 | User-facing prompts and conversation | **User's language** | Follow the language the user writes in |
 
