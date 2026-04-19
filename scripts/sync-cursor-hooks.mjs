@@ -24,6 +24,7 @@ const DST = resolve(ROOT, 'hooks', 'cursor-hooks.json');
 
 // Claude Code event -> Cursor event mapping
 const EVENT_MAP = {
+  UserPromptSubmit: 'userPromptSubmit',
   SessionStart: 'sessionStart',
   PostToolUse: {
     // PostToolUse with matcher 'Write|Edit' maps to Cursor's afterFileEdit

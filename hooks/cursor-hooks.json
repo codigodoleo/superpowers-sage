@@ -1,5 +1,10 @@
 {
   "hooks": {
+    "userPromptSubmit": [
+      {
+        "command": "bash \"./hooks/user-prompt-activate.sh\""
+      }
+    ],
     "sessionStart": [
       {
         "command": "bash \"./hooks/session-start.sh\""
