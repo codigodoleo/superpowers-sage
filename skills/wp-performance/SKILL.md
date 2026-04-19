@@ -126,6 +126,8 @@ lando wp option update <option_name> --autoload=no
 
 Target: total autoloaded size < 500KB.
 
+See [`references/autoload.md`](references/autoload.md) for audit workflow, common plugin culprits, and when to set `autoload=no`.
+
 #### Object Cache / Redis
 
 ```bash

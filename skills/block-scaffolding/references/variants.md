@@ -21,7 +21,7 @@ public $styles = [
 ## How the Class Lands in the DOM
 
 - **Editor:** WordPress adds `is-style-{name}` to the block wrapper div.
-- **Frontend:** ACF Composer passes block attributes (including `className` which contains `is-style-{name}`) through `get_block_wrapper_attributes()`, which lands on the `<section>` tag via `{{ $attributes }}`.
+- **Frontend:** ACF Composer passes block attributes (including `className` which contains `is-style-{name}`) through `get_block_wrapper_attributes()`, which lands on the `<section>` tag via `{!! $block_attrs !!}` in the block view.
 
 Both locations are an **ancestor** of `<block-{slug}>`, so the CSS selector
 `.is-style-dark block-{slug}` works identically in editor and frontend.
