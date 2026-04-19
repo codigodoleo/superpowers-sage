@@ -4,7 +4,7 @@
 
 **Goal:** Evolve `superpowers-sage` plugin across six sequential waves (~28 microplans) to reduce token baseline, increase determinism, and integrate with the official Roots/WP AI stack (Acorn AI + WP MCP Adapter).
 
-**Architecture:** Three parallel axes — (1) skills optimization via progressive disclosure, (2) deterministic layer via hooks/commands/CLAUDE.md, (3) AI-native integration with Acorn AI + WP MCP Adapter. MCP custom `sage-introspect` is a conditional fallback, not a primary dependency.
+**Architecture:** Three parallel axes — (1) skills optimization via progressive disclosure, (2) deterministic layer via hooks/commands/CLAUDE.md, (3) AI-native integration with Acorn AI + WP MCP Adapter.
 
 **Tech Stack:** Claude Code plugin format, bash hooks, Node scripts (`.mjs`), Lando for WordPress runtime, Composer for Acorn AI installation, Laravel AI SDK, WordPress 6.9 Abilities API.
 
@@ -16,12 +16,12 @@
 
 | Wave | Plan file | Microplans | Status |
 |---|---|---|---|
-| 1 — Foundation + token savings | [onda-1](2026-04-18-plugin-expansion-onda-1.md) | 6 | Ready (full TDD) |
-| 2 — Progressive disclosure | [onda-2](2026-04-18-plugin-expansion-onda-2.md) | 8 | Scoped (detail on activation) |
-| 3 — New deterministic capabilities | [onda-3](2026-04-18-plugin-expansion-onda-3.md) | 4 | Scoped |
-| 4 — Specialized subagents | [onda-4](2026-04-18-plugin-expansion-onda-4.md) | 3 | Scoped |
-| 5 — AI-native integration | [onda-5](2026-04-18-plugin-expansion-onda-5.md) | 5 | Scoped |
-| 6 — `sage-introspect` fallback | [onda-6](2026-04-18-plugin-expansion-onda-6.md) | 2 | Scoped, conditional |
+| 1 — Foundation + token savings | [onda-1](2026-04-18-plugin-expansion-onda-1.md) | 6 | Done — [validation](2026-04-18-onda-1-validation.md) |
+| 2 — Progressive disclosure | [onda-2](2026-04-18-plugin-expansion-onda-2.md) | 8 | Done |
+| 3 — New deterministic capabilities | [onda-3](2026-04-18-plugin-expansion-onda-3.md) | 6 | Done |
+| 4 — Specialized subagents | [onda-4](2026-04-18-plugin-expansion-onda-4.md) | 4 | Done |
+| 5 — AI-native integration | [onda-5](2026-04-18-plugin-expansion-onda-5.md) | 5 | Done |
+| 6 — Hardening from field feedback | [onda-6](2026-04-18-plugin-expansion-onda-6.md) | 5 | Ready (full TDD) |
 
 ---
 
@@ -78,12 +78,15 @@
 | 5.4 | Skill `abilities-authoring` | C | 5.2 |
 | 5.5 | Query-first integration in existing skills | B | 5.2, 5.3, 2.1–2.4 |
 
-### Onda 6 — `sage-introspect` fallback (conditional)
+### Onda 6 — Hardening from field feedback
 
 | ID | Title | Quality bar | Depends on |
 |---|---|---|---|
-| 6.1 | `sage-introspect` API design | B | 5.x deployed & measured |
-| 6.2 | Implementation + conditional activation | B | 6.1 |
+| 6.1 | `block-refactoring` Phase 0b — shared component inventory | B | 2.4 |
+| 6.2 | `block-refactoring` G7 → CRITICAL + Decision Log + localization reference | B | 6.1 |
+| 6.3 | `acorn-migration` — two-level key migration + second pass + WP-CLI positional args | B | 4.1 |
+| 6.4 | `sage-reviewer` — R-css-vars / R-component-reuse / R-nl2br checks | B | 4.x |
+| 6.5 | Gotchas corpus — `load_textdomain`, `wptexturize`, ACF Composer gotchas | B | 2.x |
 
 ---
 
@@ -108,8 +111,11 @@
 5.1 ──┬─▶ 5.2 ──┬─▶ 5.4
       └─▶ 5.3 ──┴─▶ 5.5 ◀── 2.1–2.4
 
-6.1 ◀── 5.x deployed & measured
+6.1 ◀── 2.4
 6.2 ◀── 6.1
+6.3 ◀── 4.1
+6.4 ◀── 4.x
+6.5 ◀── 2.x
 ```
 
 ---
@@ -126,6 +132,6 @@ Before moving to the next wave:
 
 ## How to consume this index
 
-- Each wave file (`onda-N.md`) follows the full writing-plans TDD format once it becomes active.
-- Wave 1 is detailed now (ready for execution). Waves 2–6 carry scoped scaffolding and will be expanded to full TDD when their prerequisites clear.
+- Waves 1–5 are Done. Wave 6 is ready for execution (full TDD).
+- Each wave file (`onda-N.md`) follows the full writing-plans TDD format.
 - When a wave is expanded, update its row in the table above from `Scoped` to `Ready (full TDD)` and link the filled-in plan file.
