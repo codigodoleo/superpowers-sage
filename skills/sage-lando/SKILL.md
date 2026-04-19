@@ -5,7 +5,7 @@ description: >
   lando info, lando acorn, Service Providers, View Composers, Blade components,
   ACF Composer blocks and fields, Poet CPT config/poet.php, AppServiceProvider,
   ViewServiceProvider, resources/views/, resources/css/app.css @theme Tailwind v4,
-  resources/js/app.js, web/app/themes/{theme-name}/, lando yarn dev, lando yarn build,
+  resources/js/app.js, content/themes/{theme}/, lando yarn dev, lando yarn build,
   Blade @extends @section @include @component, Bedrock directory structure,
   lando wp, composer require, lando composer
 user-invocable: false

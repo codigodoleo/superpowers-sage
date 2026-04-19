@@ -4,7 +4,7 @@ Deep reference for Lando command reference for Sage projects. Loaded on demand f
 
 Quick-reference table of all Lando commands used in Sage/Acorn development — organized by category.
 
-## Theme-level tooling (runs inside `wp-content/themes/{theme}/`)
+## Theme-level tooling (runs inside `content/themes/{theme}/`)
 
 | Command | Purpose |
 |---|---|
