@@ -37,11 +37,18 @@ function checkApiKeys(root) {
   });
 }
 
+function isLandoAvailable() {
+  const finder = process.platform === 'win32' ? 'where' : 'which';
+  const r = spawnSync(finder, ['lando'], { encoding: 'utf8', timeout: 5000 });
+  return r.status === 0 && (r.stdout ?? '').trim().length > 0;
+}
+
 function runLando(landoArgs, cwd) {
   const result = spawnSync('lando', landoArgs, {
     cwd,
     encoding: 'utf8',
     timeout: 15000,
+    shell: process.platform === 'win32',
   });
   if (result.error) return { ok: false, stdout: '', error: result.error.message };
   return { ok: result.status === 0, stdout: result.stdout?.trim() ?? '' };
@@ -69,8 +76,8 @@ const missing = [];
 const upgradePath = [];
 
 // 1. WP version
-const wpResult = runLando(['wp', 'core', 'version'], projectRoot);
-const landoAvailable = !(String(wpResult.error ?? '')).includes('ENOENT');
+const landoAvailable = isLandoAvailable();
+const wpResult = landoAvailable ? runLando(['wp', 'core', 'version'], projectRoot) : { ok: false, stdout: '' };
 const wpVersion = wpResult.ok ? wpResult.stdout : null;
 
 if (!landoAvailable) {
