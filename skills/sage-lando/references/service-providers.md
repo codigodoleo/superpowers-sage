@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Acorn Service Providers and dependency injection. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Service Providers & Dependency Injection
 

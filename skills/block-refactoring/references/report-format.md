@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/block-refactoring/SKILL.md -->
+Deep reference for block refactoring report format. Loaded on demand from `skills/block-refactoring/SKILL.md`.
 
 # Report Format
 

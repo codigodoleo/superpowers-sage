@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for WordPress Composer packages in Bedrock. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # WordPress Composer Packages
 

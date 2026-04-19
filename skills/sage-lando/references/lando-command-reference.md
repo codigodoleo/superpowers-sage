@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Lando command reference for Sage projects. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Lando Command Reference
 

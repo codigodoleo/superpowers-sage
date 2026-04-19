@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Lando setup for Sage/Bedrock projects. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Lando Setup
 

@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Acorn routing and custom post types. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Routing & Content Types
 

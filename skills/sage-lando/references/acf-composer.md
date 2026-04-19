@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for ACF Composer field groups and blocks. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # ACF Composer
 

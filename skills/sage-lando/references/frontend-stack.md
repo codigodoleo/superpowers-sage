@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Sage frontend stack (Vite, Tailwind, assets). Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Frontend Stack
 

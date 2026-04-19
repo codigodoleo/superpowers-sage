@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-design-system/SKILL.md -->
+Deep reference for Tailwind v4 design token setup in Sage. Loaded on demand from `skills/sage-design-system/SKILL.md`.
 
 # Tokens Setup
 

@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Blade templates in Sage. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Blade Templates
 

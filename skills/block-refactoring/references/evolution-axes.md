@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/block-refactoring/SKILL.md -->
+Deep reference for block refactoring evolution axes. Loaded on demand from `skills/block-refactoring/SKILL.md`.
 
 # Evolution Axes
 

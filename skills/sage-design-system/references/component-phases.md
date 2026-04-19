@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-design-system/SKILL.md -->
+Deep reference for component development phases in Sage. Loaded on demand from `skills/sage-design-system/SKILL.md`.
 
 # Component Phases
 

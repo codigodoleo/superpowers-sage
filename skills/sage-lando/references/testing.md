@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for testing Sage/Acorn projects. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Testing
 

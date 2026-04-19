@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sageing/SKILL.md -->
+Deep reference for MCP query patterns using discover-abilities and execute-ability. Loaded on demand from `skills/sageing/SKILL.md`.
 
 # MCP Query Patterns
 

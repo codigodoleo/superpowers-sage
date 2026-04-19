@@ -1,4 +1,4 @@
-<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+Deep reference for Sage/Lando troubleshooting. Loaded on demand from `skills/sage-lando/SKILL.md`.
 
 # Troubleshooting
 
