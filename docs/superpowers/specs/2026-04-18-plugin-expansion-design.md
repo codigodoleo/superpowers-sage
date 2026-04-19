@@ -46,7 +46,7 @@ O plugin passa a evoluir em três eixos paralelos:
 As 34 skills atuais são bons repositórios de conhecimento, mas empurram tudo via `SKILL.md`. Vão ganhar:
 
 - `references/` — docs profundas, lidas sob demanda (zero tokens até leitura).
-- `scripts/` — operações determinísticas (ex: `create-component.sh` chama `wp acorn make:livewire` via Lando, retorna paths).
+- `scripts/` — operações determinísticas (ex: `create-component.sh` chama `lando acorn make:livewire` via Lando, retorna paths).
 - `assets/` — templates reutilizáveis (stubs PHP, Blade, config).
 - Descrições YAML trigger-rich — precisão cirúrgica na ativação.
 - `SKILL.md` < 500 linhas obrigatório.
@@ -68,7 +68,7 @@ Integração com a stack oficial do Roots/WP para que o Claude consulte o estado
 - Detecção de AI-readiness (WP 6.9+, Acorn AI, MCP Adapter, chaves API).
 - Skill `/ai-setup` guia instalação quando falta algo.
 - Template `.mcp.json` projeto-local apontando para `lando wp mcp-adapter serve` via stdio.
-- Skill `abilities-authoring` ensina criar Abilities customizadas (`wp acorn make:ability`).
+- Skill `abilities-authoring` ensina criar Abilities customizadas (`lando acorn make:ability`).
 - Padrão "query-first" injetado nas skills Acorn-\* e WP-\*: antes de gerar código referenciando post types, rotas, componentes, **consultar MCP primeiro**.
 
 O MCP custom `sage-introspect` (previsto no estudo original) vira **fallback condicional** para projetos pré-WP 6.9 que não podem migrar.
@@ -105,7 +105,7 @@ Aplicar o mesmo padrão nas 27 skills restantes, agrupadas por família, e audit
 
 - **3.1** — Slash commands (`commands/sage-status.md`, `commands/acf-register.md`, `commands/livewire-new.md`).
 - **3.2** — Hook `UserPromptSubmit` — `hooks/user-prompt-activate.sh` analisa keyword e injeta skill resumida via `hookSpecificOutput.additionalContext`.
-- **3.3** — Hook `Stop` quality gate — `hooks/post-stop.sh` refatorado para rodar `lando phpcs` + `lando lint` e bloquear com `{"decision": "block"}` se falhar. Flag `SUPERPOWERS_SAGE_QUALITY_GATE=strict|warn|off`.
+- **3.3** — Hook `Stop` quality gate — `hooks/post-stop.sh` refatorado para rodar `lando lint` `lando phpcs` + `lando lint` e bloquear com `{"decision": "block"}` se falhar. Flag `SUPERPOWERS_SAGE_QUALITY_GATE=strict|warn|off`.
 - **3.4** — Hook `PreToolUse` protegido — `hooks/pre-write-protected.sh` lê stdin JSON, bloqueia paths sensíveis com exit code 2 e mensagem sugerindo alternativa (`ansible-vault edit`, Bedrock `.env` pattern).
 
 ### Onda 4 — Subagents especializados (3 microplanos)
@@ -140,9 +140,9 @@ Por ser o pilar novo com maior risco de infra, aprofundamos aqui.
 **Script:** `scripts/detect-ai-readiness.mjs`. Verifica em ordem:
 
 1. WP core ≥ 6.9 (via `lando wp core version`).
-2. `roots/acorn-ai` em `composer.json` (direto ou transitivo).
-3. `wordpress/mcp-adapter` em `composer.json` ou instalado como plugin ativo.
-4. `.env` com pelo menos uma chave de provider reconhecida (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`).
+2. `roots/acorn-ai` em `composer.json` do tema (direto ou transitivo).
+3. `wordpress/mcp-adapter` em `composer.json` do root ou instalado como plugin ativo.
+4. `.env` com pelo menos uma chave de provider reconhecida, caso não haja solicitar. (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`).
 5. `lando wp mcp-adapter list` executa e retorna pelo menos 1 server.
 
 **Saída (JSON):**
@@ -172,7 +172,8 @@ Por ser o pilar novo com maior risco de infra, aprofundamos aqui.
    - WP < 6.9 → exibe upgrade path Bedrock + `composer update`, não auto-aplica (risco alto).
    - Pacotes ausentes → `lando composer require roots/acorn-ai wordpress/mcp-adapter`.
    - Acorn config não publicado → `lando wp acorn vendor:publish --tag=acorn-ai`.
-   - API key ausente → pergunta ao usuário qual provider + chave, escreve em `.env` (com warning de `.gitignore`).
+   - API key ausente → pergunta ao usuário qual provider, escreve em `.env` e aguarda usuário preencher a chave (com warning de `.gitignore`).
+   - Advanced custom fields suporta AI, se instalado adicione o filter `add_filter( 'acf/settings/enable_acf_ai', '__return_true' );` e  
 3. Gera `.mcp.json` local do **projeto do usuário** (não do plugin) a partir do template.
 4. Valida handshake: executa `lando wp mcp-adapter list` e confirma pelo menos 1 server.
 5. Teste final: chama `discover-abilities` via MCP e confirma resposta válida.
@@ -215,12 +216,12 @@ Por ser o pilar novo com maior risco de infra, aprofundamos aqui.
 - Estrutura de uma Ability (`app/Abilities/*.php`).
 - Registro via `AbilitiesProvider`.
 - Schema JSON + `meta.mcp.public: true`.
-- `wp acorn make:ability <Name>` — fluxo determinístico.
+- `lando acorn make:ability <Name>` — fluxo determinístico.
 - Como as Abilities aparecem no MCP Adapter e são chamadas pelo Claude via `execute-ability`.
 
 **Scripts:**
 
-- `scripts/create-ability.sh` — wrapper de `lando wp acorn make:ability`.
+- `scripts/create-ability.sh` — wrapper de `lando acorn make:ability`.
 - `scripts/list-abilities.sh` — chama `discover-abilities` via MCP e lista em tabela.
 
 **Assets:**
@@ -228,6 +229,7 @@ Por ser o pilar novo com maior risco de infra, aprofundamos aqui.
 - `assets/ability-query-content.php.tpl` — ability para query de CPTs.
 - `assets/ability-crud.php.tpl` — CRUD ability base.
 - `assets/ability-search.php.tpl` — search ability.
+- `assets/ability-acf-block.php.tpl` — ACF Content block guttenberg code generate and insert into page if id specified.
 
 ### 5.5 — Integração "query-first" nas skills existentes
 
@@ -329,6 +331,7 @@ Onda 6 ── opcional ──▶ só ativa se métricas 5 indicarem fallback nec
 - [ ] Skills Acorn-\* e WP-\* linkam para `mcp-query-patterns.md`.
 - [ ] Compatibilidade cross-platform mantida (Claude Code + VS Code + Cursor).
 - [ ] Redução de baseline de tokens mensurada em sessão-padrão (≥ 30% alvo).
+- [ ] Suporte e utilização efetiva de https://www.advancedcustomfields.com/blog/acf-6-8-release-ai-ready-discoverable-content/ para construção e desenvolvimento de conteúdo utilizando campos acf.
 
 ## Próximo passo
 
