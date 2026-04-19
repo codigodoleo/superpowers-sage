@@ -1,6 +1,12 @@
 ---
 name: superpowers-sage:acorn-commands
-description: Custom Acorn CLI commands for WordPress automation; artisan-style commands for theme tasks, data imports, maintenance, and scheduled operations
+description: >
+  Acorn CLI commands for WordPress automation — lando acorn make:command,
+  artisan-style commands, Command::class, $signature, $description,
+  handle() method, command arguments and options, output formatting,
+  dependency injection in commands, calling other commands, AppServiceProvider
+  registration, wp acorn schedule:run, scheduled commands, data import scripts,
+  maintenance commands, theme automation tasks, lando acorn list
 user-invocable: false
 ---
 
@@ -34,6 +40,8 @@ Acorn commands are artisan-style CLI commands running inside WordPress context w
 lando acorn make:command ImportProducts
 # Generates app/Console/Commands/ImportProducts.php
 ```
+
+Scripts: [`scripts/create-command.sh`](scripts/create-command.sh)
 
 ## Command Anatomy
 
@@ -104,101 +112,9 @@ $this->call('import:products', ['source' => 'csv', '--dry-run' => true]); // Wit
 
 Commands in `app/Console/Commands/` are auto-discovered. For commands elsewhere, register in a ServiceProvider's `boot()`: `$this->commands([ImportProducts::class])`.
 
-## Scheduling
-
-Define in `config/console.php`:
-
-```php
-return [
-    'schedule' => function (Schedule $schedule) {
-        $schedule->command('cleanup:tokens')->dailyAt('03:00');
-        $schedule->command('import:products api --limit=500')->hourly();
-        $schedule->command('generate:sitemap')->weekly()->mondays()->at('05:00')->onOneServer();
-    },
-];
-```
-
-Requires cron: `* * * * * cd /path && lando acorn schedule:run >> /dev/null 2>&1`. For heavy work, dispatch a queued job instead (see `sage:acorn-queues`).
-
-## Practical Examples
-
-### Import Products (WordPress + Laravel)
-
-```php
-class ImportProducts extends Command
-{
-    protected $signature = 'import:products {source} {--file=} {--dry-run}';
-    protected $description = 'Import products as WordPress posts';
-    public function handle(ProductImporter $importer): int
-    {
-        $items = match ($this->argument('source')) {
-            'csv' => $importer->fromCsv($this->option('file')),
-            'api' => $importer->fromApi(),
-            default => $this->fail('Invalid source.'),
-        };
-        $created = $skipped = 0;
-        $this->withProgressBar($items, function (array $item) use (&$created, &$skipped) {
-            if (get_page_by_title($item['name'], OBJECT, 'product')) { $skipped++; return; }
-            if (! $this->option('dry-run')) {
-                wp_insert_post(['post_type' => 'product', 'post_title' => $item['name'],
-                    'post_status' => 'publish', 'meta_input' => ['_price' => $item['price']]]);
-            }
-            $created++;
-        });
-        $this->newLine();
-        $this->info("{$created} created, {$skipped} skipped.");
-        return self::SUCCESS;
-    }
-}
-```
-
-### Maintenance: Cleanup Expired Tokens
-
-```php
-class CleanupExpiredTokens extends Command
-{
-    protected $signature = 'cleanup:tokens {--days=30}';
-    protected $description = 'Delete expired authentication tokens';
-    public function handle(): int
-    {
-        $deleted = \App\Models\PersonalAccessToken::where('expires_at', '<', now()->subDays((int) $this->option('days')))->delete();
-        $this->info("Deleted {$deleted} expired tokens.");
-        return self::SUCCESS;
-    }
-}
-```
-
-### Generate Sitemap (WordPress data)
-
-```php
-class GenerateSitemap extends Command
-{
-    protected $signature = 'generate:sitemap {--output=public/sitemap.xml}';
-    protected $description = 'Generate XML sitemap from published content';
-    public function handle(): int
-    {
-        $posts = get_posts(['post_type' => ['post', 'page'], 'numberposts' => -1]);
-        $xml = new \SimpleXMLElement('<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
-        foreach ($posts as $post) {
-            $xml->addChild('url')->addChild('loc', get_permalink($post));
-        }
-        file_put_contents($this->option('output'), $xml->asXML());
-        $this->info('Sitemap: ' . count($posts) . ' URLs.');
-        return self::SUCCESS;
-    }
-}
-```
-
-## Running Commands
-
-```bash
-lando acorn import:products csv --file=data/products.csv
-lando acorn import:products api --dry-run --limit=10
-lando acorn cleanup:tokens --days=7
-lando acorn generate:sitemap
-lando acorn list                    # List all commands
-lando acorn help import:products    # Command help
-```
+See [`references/scheduling.md`](references/scheduling.md) for scheduling setup and `lando acorn schedule:run`.
+See [`references/practical-examples.md`](references/practical-examples.md) for import/maintenance/cache-warmup patterns.
+See [`references/troubleshooting.md`](references/troubleshooting.md) for command not found, DI failures, schedule issues.
 
 ## Verification
 
