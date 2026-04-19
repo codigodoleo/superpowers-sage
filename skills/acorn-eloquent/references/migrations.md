@@ -1,5 +1,7 @@
 # Migrations
 
+Database migration patterns for Acorn — creating, running, and rolling back schema changes for custom tables alongside WordPress.
+
 ## Creating Migrations
 
 ```bash

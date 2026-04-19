@@ -1,5 +1,7 @@
 # Factories and Seeders
 
+Model factory definitions and seeding for Acorn Eloquent — generating test data with `fake()` and `lando acorn db:seed`.
+
 ## Creating a Factory
 
 ```bash

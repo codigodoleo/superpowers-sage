@@ -1,5 +1,7 @@
 # Query Scopes
 
+Local and global query scopes, raw queries, and advanced filtering patterns for Eloquent models in Acorn.
+
 ## Local Scopes
 
 Local scopes are reusable, chainable query constraints defined on the model. Prefix the method name with `scope`:

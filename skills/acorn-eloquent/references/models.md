@@ -1,5 +1,7 @@
 # Models
 
+Eloquent model class configuration — table mapping, fillable fields, casts, and WP-aware defaults for custom and core tables.
+
 ## Creating a Model
 
 ```bash

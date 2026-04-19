@@ -1,5 +1,7 @@
 # Controllers
 
+Controller class structure, constructor injection, and resource/API/invokable controller full examples for Acorn routes.
+
 ## Base Controller
 
 Create a base controller before generating resource controllers:

@@ -232,25 +232,7 @@ See [`references/factories.md`](references/factories.md) for:
 
 ## Failure modes
 
-### Problem: Table not found (SQLSTATE[42S02])
-
-- **Cause:** Migration not run, or `$table` in the model does not match the migration table name.
-- **Fix:** Run `lando acorn migrate`. Verify `$table` includes the WP prefix and matches `Schema::create()`.
-
-### Problem: Mass assignment exception
-
-- **Cause:** The `$fillable` array does not include the attribute being passed to `create()` or `fill()`.
-- **Fix:** Add the missing attribute to `$fillable`. Never use `$guarded = []` as a workaround.
-
-### Problem: `created_at` / `updated_at` column not found
-
-- **Cause:** Model points to a WP core table that has no timestamp columns, but `$timestamps` is still `true`.
-- **Fix:** Set `public $timestamps = false` on the model.
-
-### Problem: Route model binding resolves wrong row
-
-- **Cause:** `$primaryKey` defaults to `id` but WP tables use `ID` (uppercase).
-- **Fix:** Set `protected $primaryKey = 'ID'` on models wrapping `wp_posts`, `wp_users`.
+See [`references/troubleshooting.md`](references/troubleshooting.md) for all failure modes and escalation paths.
 
 ## References
 
@@ -261,6 +243,8 @@ Deep content loaded on demand — zero tokens until needed.
 - **[relationships.md](references/relationships.md)** — `hasMany`, `belongsTo`, `belongsToMany`, WP-specific: Post → PostMeta, Term → TermMeta, polymorphic.
 - **[factories.md](references/factories.md)** — `HasFactory`, `definition()`, `fake()` reference, states, seeding with `lando acorn db:seed`.
 - **[query-scopes.md](references/query-scopes.md)** — Local scopes, global scopes, `withoutGlobalScope()`, conditional `->when()`, raw queries.
+- **[wp-tables.md](references/wp-tables.md)** — Integrating Eloquent models with WordPress core tables (`wp_posts`, `wp_postmeta`, etc.), read-only reporting, canonical patterns.
+- **[troubleshooting.md](references/troubleshooting.md)** — Common errors, debugging commands, escalation paths for persistent issues.
 
 ## Escalation
 

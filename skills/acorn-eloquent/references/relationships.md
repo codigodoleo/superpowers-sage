@@ -1,5 +1,7 @@
 # Relationships
 
+Eloquent relationship patterns for Acorn, including WP-specific Post→Meta and Term→Taxonomy associations.
+
 ## Quick Reference
 
 | Type | Methods | Use case |
