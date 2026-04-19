@@ -1,5 +1,5 @@
 ---
-name: wp-capabilities
+name: superpowers-sage:wp-capabilities
 description: >
   WordPress capabilities and roles — add_role, remove_role, add_cap, remove_cap,
   current_user_can, user_can, WP_Roles, custom capabilities, administrator editor

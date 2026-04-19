@@ -1,5 +1,5 @@
 ---
-name: wp-rest-api
+name: superpowers-sage:wp-rest-api
 description: >
   WordPress REST API — register_rest_route, WP_REST_Controller, WP_REST_Request,
   REST namespace, custom endpoints, Application Passwords, JWT REST authentication,

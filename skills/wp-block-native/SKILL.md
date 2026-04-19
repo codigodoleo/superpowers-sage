@@ -1,5 +1,5 @@
 ---
-name: wp-block-native
+name: superpowers-sage:wp-block-native
 description: >
   Native Gutenberg blocks without ACF — block.json, edit.js, save.js,
   register_block_type, @wordpress/scripts, block attributes, InnerBlocks,

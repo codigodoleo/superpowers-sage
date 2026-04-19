@@ -1,5 +1,5 @@
 ---
-name: wp-cli-ops
+name: superpowers-sage:wp-cli-ops
 description: >
   WP-CLI operations via Lando — lando wp db export, lando wp db import,
   lando wp search-replace, lando wp search-replace --dry-run, lando wp user create,

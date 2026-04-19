@@ -1,5 +1,5 @@
 ---
-name: wp-phpstan
+name: superpowers-sage:wp-phpstan
 description: >
   PHPStan static analysis in Sage/Acorn projects — lando composer phpstan,
   phpstan.neon configuration, PHPStan level 0-9, WordPress PHP stubs,

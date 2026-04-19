@@ -1,5 +1,5 @@
 ---
-name: wp-security
+name: superpowers-sage:wp-security
 description: >
   WordPress security hardening — nonce verification, wp_nonce_field,
   check_admin_referer, sanitize_text_field, sanitize_email, esc_html, esc_attr,

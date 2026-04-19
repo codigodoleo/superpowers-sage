@@ -1,5 +1,5 @@
 ---
-name: wp-hooks-lifecycle
+name: superpowers-sage:wp-hooks-lifecycle
 description: >
   WordPress hooks lifecycle — add_action, add_filter, do_action, apply_filters,
   remove_action, remove_filter, hook priority, plugins_loaded, init, wp_loaded,
