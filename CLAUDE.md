@@ -8,9 +8,10 @@ precedence over skill-local guidance unless a skill explicitly overrides.
 - All `wp`, `composer`, `artisan`, `yarn`, `npm` commands run via `lando <cmd>`.
   Never invoke these binaries directly on the host.
 - Sage projects use Bedrock. Custom code lives in `web/app/`, never in `web/wp/`.
-- The plugin itself is designed to work across Claude Code, VS Code Copilot,
-  and Cursor. When adding hooks, update both `hooks/hooks.json` and
-  `hooks/cursor-hooks.json` via `scripts/sync-cursor-hooks.mjs`.
+- The plugin supports Claude Code, VS Code Copilot, and Cursor.
+  When contributing to this plugin — adding or updating automation hooks —
+  keep both `hooks/hooks.json` and `hooks/cursor-hooks.json` in sync via
+  `scripts/sync-cursor-hooks.mjs`.
 
 ## Protected files (never edit directly)
 
@@ -53,5 +54,6 @@ alternative path.
 
 - Query the WordPress MCP Adapter (if available) via `discover-abilities`
   and `execute-ability` before generating code that references post types,
-  routes, fields, or Livewire components. See `skills/sageing/references/mcp-query-patterns.md`.
+  routes, fields, or Livewire components. Consult the `sageing` skill for
+  MCP query patterns when available.
 - If the AI stack is not installed, ask the user instead of guessing.
