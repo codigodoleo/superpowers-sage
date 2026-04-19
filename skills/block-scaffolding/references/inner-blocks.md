@@ -60,7 +60,8 @@ class SectionWrapper extends Block
 
 ```blade
 @unless ($block->preview)
-  <section {{ $attributes }}>
+  <?php $block_attrs = get_block_wrapper_attributes(); ?>
+  <section {!! $block_attrs !!}>
 @endunless
 
 <block-section-wrapper class="flex flex-col gap-8">

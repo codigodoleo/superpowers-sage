@@ -14,7 +14,8 @@ The `@unless ($block->preview)` pattern controls which wrapper exists in each co
 
 ```blade
 @unless ($block->preview)
-  <section {{ $attributes }}>   {{-- only on frontend --}}
+  <?php $block_attrs = get_block_wrapper_attributes(); ?>
+  <section {!! $block_attrs !!}>   {{-- only on frontend --}}
 @endunless
 
 <block-hero class="flex flex-col">
