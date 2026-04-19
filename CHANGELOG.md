@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.3.0...superpowers-sage-v2.4.0) (2026-04-19)
+
+
+### Features
+
+* **agents:** Wave 4 specialized subagents ([#32](https://github.com/codigodoleo/superpowers-sage/issues/32)) ([f7046fd](https://github.com/codigodoleo/superpowers-sage/commit/f7046fddf65ae3aaf2561ff7bd6e2935c7ba1006))
+
 ## [2.3.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.2.0...superpowers-sage-v2.3.0) (2026-04-19)
 
 
