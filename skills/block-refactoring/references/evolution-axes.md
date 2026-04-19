@@ -150,9 +150,31 @@ Look for `bg-bg-primary`, `text-text-primary`, `font-display`, etc. directly app
 
 `wp_enqueue_style()` inside `assets()` → move to `ThemeServiceProvider::boot()`.
 
-### G7. Missing `--localize` strings
+### G7. Missing localization — CRITICAL
 
-Look for static user-facing strings in the view not wrapped in `__()` / `esc_html__()`. If they exist, propose wrapping them.
+Grep the view for any user-facing string literals not wrapped in a localization function:
+
+```bash
+grep -n '"[A-Z][a-z]\|"[A-Z][A-Z]' resources/views/blocks/{slug}.blade.php
+```
+
+Also check for Portuguese/Spanish strings (mixed-language G8 overlap):
+```bash
+grep -n '"[A-Z][a-zãáâàéêíóôõúçñ]' resources/views/blocks/{slug}.blade.php
+```
+
+Every unlocalized string is **CRITICAL** — same severity as arbitrary Tailwind values.
+
+**Fix:** Replace bare strings with localization calls:
+```blade
+{{-- Before --}}
+<span>Saiba mais</span>
+
+{{-- After --}}
+<span>{{ esc_html__('Saiba mais', 'sage') }}</span>
+```
+
+If the project uses a non-`sage` text domain, check `functions.php` or `ThemeServiceProvider::boot()` for the registered domain. See `references/localization.md` for the full localization cycle.
 
 ### G8. Mixed-language identifiers
 

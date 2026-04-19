@@ -42,6 +42,12 @@ Produce this structured report in Phase 6:
 
 ### Suggested action
 {"Ready to apply all proposals" | "Review proposals then re-run"}
+
+### Decision Log
+
+| Proposal | Status | Reason if deferred |
+|---|---|---|
+| {proposal from Phase 6} | Applied / Deferred | {reason} |
 ````
 
 ## Applying Approved Changes (Phase 7)
