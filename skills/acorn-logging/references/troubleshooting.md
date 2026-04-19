@@ -8,7 +8,7 @@ Common errors when configuring and using Acorn's logging system in Lando/WordPre
 
 **Symptom:** `Log::info()` / `Log::error()` calls produce no output in any log file.
 **Cause:** `LOG_CHANNEL` is misconfigured or `config/logging.php` does not exist in the theme.
-**Fix:** Confirm `config/logging.php` is present in your theme directory. Run `lando acorn vendor:publish --tag=acorn-logging` if the file is missing. Set `LOG_CHANNEL=single` in `.env` for immediate output to `storage/logs/acorn.log`. Check `storage/logs/` exists and is writable.
+**Fix:** Confirm `config/logging.php` is present in your theme directory. Run `lando acorn vendor:publish --provider="Roots\Acorn\Providers\LoggingServiceProvider"` if the file is missing. Set `LOG_CHANNEL=single` in `.env` for immediate output to `storage/logs/acorn.log`. Check `storage/logs/` exists and is writable.
 
 ## Permission Errors on Log File
 

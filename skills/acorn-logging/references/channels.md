@@ -9,7 +9,7 @@ Custom Monolog channels, daily file rotation, Slack handler, and WordPress `debu
 Publish the logging config if it doesn't exist:
 
 ```
-lando acorn vendor:publish --tag=acorn-logging
+lando acorn vendor:publish --provider="Roots\Acorn\Providers\LoggingServiceProvider"
 ```
 
 The config lives at `config/logging.php` in your theme directory:
