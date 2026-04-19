@@ -1,6 +1,12 @@
 ---
 name: superpowers-sage:acorn-routes
-description: Routes, controllers, route model binding, middleware groups, and API endpoints using Acorn's Laravel routing inside WordPress
+description: >
+  Routes, controller, Acorn routes, web.php, route:list, Route::get, Route::post,
+  Route::resource, Route::apiResource, middleware, route model binding, API endpoint,
+  RouteServiceProvider, named routes, resource controller, single-action controller,
+  invokable controller, route group, route prefix, JSON response, rate limiting,
+  token auth, Accept application/json, route cache, WP rewrite conflicts — using
+  Acorn's Laravel routing inside WordPress/Sage/Bedrock
 user-invocable: false
 ---
 
@@ -8,18 +14,18 @@ user-invocable: false
 
 ## When to use
 
-- Application endpoints not mapped to WordPress content (forms, APIs, dashboards, webhooks)
-- REST-style JSON endpoints where you want Laravel middleware, DI, and controller organization
+- Custom endpoints not mapped to WordPress content (forms, APIs, dashboards, webhooks)
+- REST-style JSON endpoints with Laravel middleware, DI, and controller organization
 - Frontend routes that render Blade views with Laravel Livewire
 - Endpoints that need middleware chains (auth, rate-limit, CSRF)
 - Route model binding with Eloquent models
 
 ## When NOT to use
 
-- Permalink-based content routing (posts, pages, archives) — WordPress handles this natively via template hierarchy
-- Gutenberg-internal REST endpoints — those MUST stay on `register_rest_route()` for block editor compatibility
-- Admin-area menus and settings pages — use `add_menu_page()` / `add_submenu_page()`
-- URLs expected to participate in canonical redirects and SEO plugin hooks — WP rewrite rules are better wired
+- Permalink-based content routing (posts, pages, archives) — WordPress template hierarchy
+- Gutenberg REST endpoints — must stay on `register_rest_route()` for block editor
+- Admin menus and settings pages — use `add_menu_page()` / `add_submenu_page()`
+- URLs expected to participate in canonical redirects and SEO plugin hooks
 
 ## Prerequisites
 
@@ -27,17 +33,7 @@ user-invocable: false
 - `RouteServiceProvider` registered in `config/app.php`
 - `routes/web.php` and/or `routes/api.php` present in the theme
 
-## How Routing Works in Acorn
-
-Acorn brings Laravel's full routing system into WordPress. Routes are defined in `routes/web.php` and `routes/api.php` inside your Sage theme, loaded by a `RouteServiceProvider`, and dispatched through Laravel's router.
-
-Acorn routes coexist with WordPress's own routing and rewrite system. WordPress still handles permalink-based routing for posts, pages, archives, and taxonomies. Acorn routes handle custom application endpoints -- forms, API calls, dashboard pages, webhooks, and anything that doesn't map to WordPress content types.
-
-**Prefer Acorn routes over `register_rest_route()`.** The Laravel router gives you middleware, route model binding, dependency injection, and controller organization. The WordPress REST API is still available for Gutenberg internals, but application-level endpoints belong in Acorn routes.
-
 ## RouteServiceProvider Setup
-
-Create a `RouteServiceProvider` in your theme to load route files:
 
 ```php
 // app/Providers/RouteServiceProvider.php
@@ -62,7 +58,7 @@ class RouteServiceProvider extends ServiceProvider
 }
 ```
 
-Register the provider in `config/app.php`:
+Register in `config/app.php`:
 
 ```php
 'providers' => [
@@ -71,33 +67,23 @@ Register the provider in `config/app.php`:
 ],
 ```
 
-Create the route files:
+## Quick Start — Scripts
 
-```
-routes/
-  web.php
-  api.php
-```
+```bash
+# Create a standard controller (PascalCase name required)
+bash skills/acorn-routes/scripts/create-controller.sh HomeController
 
-Both files should return route definitions. Start with an empty scaffold:
+# Create a full resource controller (index/create/store/show/edit/update/destroy)
+bash skills/acorn-routes/scripts/create-controller.sh ProjectController --resource
 
-```php
-// routes/web.php
-<?php
+# Create an API controller (no create/edit HTML methods)
+bash skills/acorn-routes/scripts/create-controller.sh ProjectController --api
 
-use Illuminate\Support\Facades\Route;
-
-// Web routes here
+# Create a single-action invokable controller
+bash skills/acorn-routes/scripts/create-controller.sh ExportReportController --invokable
 ```
 
-```php
-// routes/api.php
-<?php
-
-use Illuminate\Support\Facades\Route;
-
-// API routes here
-```
+Script: [`scripts/create-controller.sh`](scripts/create-controller.sh)
 
 ## Route Definitions
 
@@ -107,14 +93,7 @@ use Illuminate\Support\Facades\Route;
 // routes/web.php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DashboardController;
 
-// Simple controller actions
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/dashboard/settings', [DashboardController::class, 'settings'])->name('dashboard.settings');
-Route::post('/dashboard/settings', [DashboardController::class, 'updateSettings'])->name('dashboard.settings.update');
-
-// All HTTP verbs
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
@@ -124,13 +103,10 @@ Route::delete('/account/{user}', [AccountController::class, 'destroy'])->name('a
 ### Resource Routes
 
 ```php
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\EventController;
-
-// Full resource (index, create, store, show, edit, update, destroy)
+// Full resource: index, create, store, show, edit, update, destroy
 Route::resource('projects', ProjectController::class);
 
-// Partial resource -- only the routes you need
+// Partial resource
 Route::resource('events', EventController::class)->only(['index', 'show']);
 Route::resource('comments', CommentController::class)->except(['destroy']);
 ```
@@ -138,70 +114,40 @@ Route::resource('comments', CommentController::class)->except(['destroy']);
 ### Route Groups
 
 ```php
-// Prefix + middleware group
 Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
-    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('admin.reports.show');
     Route::post('/reports/export', [ReportController::class, 'export'])->name('admin.reports.export');
-});
-
-// Named route group with shared prefix
-Route::name('client.')->prefix('client')->group(function () {
-    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');       // client.invoices.index
-    Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show'); // client.invoices.show
 });
 ```
 
 ### Named Routes
 
-Always name your routes. Use them in Blade templates and redirects instead of hardcoding URLs:
+Always name routes. Use `route()` helper in Blade and controllers — never hardcode URLs:
 
 ```php
-// In routes
-Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
 
 // In controllers
 return redirect()->route('projects.show', ['project' => $project->id]);
 
-// In Blade templates
-<a href="{{ route('projects.show', ['project' => $project->id]) }}">View Project</a>
+// In Blade
+<a href="{{ route('projects.show', $project) }}">View</a>
 ```
 
 ## Controllers
 
-Controllers live in `app/Http/Controllers/`. Create a base controller first:
+Controllers live in `app/Http/Controllers/`. See [`references/controllers.md`](references/controllers.md) for:
+- Base controller setup
+- Constructor injection patterns
+- `wp_set_current_user` note (use in middleware, not constructors)
+- Resource, API, and invokable controller full examples
+
+### Quick Example
 
 ```php
-// app/Http/Controllers/Controller.php
-namespace App\Http\Controllers;
-
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
-abstract class Controller extends BaseController
-{
-    use AuthorizesRequests, ValidatesRequests;
-}
-```
-
-### Standard Controller
-
-```php
-// app/Http/Controllers/ProjectController.php
-namespace App\Http\Controllers;
-
-use App\Models\Project;
-use App\Services\ProjectService;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
-
 class ProjectController extends Controller
 {
-    public function __construct(
-        protected ProjectService $projects,
-    ) {}
+    public function __construct(protected ProjectService $projects) {}
 
     public function index(): View
     {
@@ -209,464 +155,142 @@ class ProjectController extends Controller
             'projects' => $this->projects->getPublished(),
         ]);
     }
-
-    public function show(Project $project): View
-    {
-        return view('projects.show', [
-            'project' => $project,
-        ]);
-    }
-
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'status' => ['required', 'in:draft,published'],
-        ]);
-
-        $project = $this->projects->create($validated);
-
-        return redirect()
-            ->route('projects.show', $project)
-            ->with('success', 'Project created.');
-    }
 }
 ```
 
-### Single-Action Controllers
+## Assets
 
-For routes that do one thing, use an `__invoke` controller:
+Boilerplate templates with `{{PLACEHOLDER}}` tokens:
 
-```php
-// app/Http/Controllers/ExportReportController.php
-namespace App\Http\Controllers;
-
-use App\Services\ReportService;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-
-class ExportReportController extends Controller
-{
-    public function __invoke(
-        Request $request,
-        ReportService $reports,
-    ): StreamedResponse {
-        $format = $request->enum('format', \App\Enums\ExportFormat::class);
-
-        return $reports->export(
-            dateFrom: $request->date('from'),
-            dateTo: $request->date('to'),
-            format: $format,
-        );
-    }
-}
-```
-
-```php
-// In routes
-Route::post('/reports/export', ExportReportController::class)->name('reports.export');
-```
-
-### Dependency Injection
-
-The container auto-resolves type-hinted constructor parameters and method parameters. Inject services, the `Request`, or any registered binding:
-
-```php
-class SubscriptionController extends Controller
-{
-    public function __construct(
-        protected SubscriptionService $subscriptions,
-        protected NewsletterService $newsletter,
-    ) {}
-
-    public function subscribe(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'plan' => ['required', 'string'],
-        ]);
-
-        $this->subscriptions->create($validated);
-        $this->newsletter->addSubscriber($validated['email']);
-
-        return redirect()->route('subscribe.thanks');
-    }
-}
-```
+- **[controller-resource.php.tpl](assets/controller-resource.php.tpl)** — All 7 REST methods. Replace `{{CLASS_NAME}}`, `{{VIEW_PREFIX}}`, `{{ROUTE_PREFIX}}`.
+- **[controller-api.php.tpl](assets/controller-api.php.tpl)** — API controller (no create/edit). Replace `{{CLASS_NAME}}`.
 
 ## Route Model Binding
 
-Route model binding automatically resolves Eloquent models from route parameters. This works with Acorn's Eloquent integration (see `sage:acorn-eloquent` for model setup).
-
-### Implicit Binding
-
-When the route parameter name matches the controller's type-hinted variable name, Laravel resolves the model automatically:
+When the route parameter name matches the type-hinted variable, Laravel resolves the model automatically:
 
 ```php
-// Route
 Route::get('/projects/{project}', [ProjectController::class, 'show']);
 
-// Controller -- $project is resolved by ID automatically
-public function show(Project $project): View
-{
-    return view('projects.show', ['project' => $project]);
-}
+// Controller
+public function show(Project $project): View { /* $project auto-resolved */ }
 ```
 
-### Custom Keys
-
-Resolve by slug or another column instead of the primary key:
+Resolve by slug:
 
 ```php
-// Option 1: In the route definition
 Route::get('/projects/{project:slug}', [ProjectController::class, 'show']);
-
-// Option 2: In the model (applies globally)
-class Project extends Model
-{
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
-}
 ```
 
-### Scoped Bindings
-
-For nested resources, scope the child model to the parent:
-
-```php
-Route::get('/projects/{project}/tasks/{task:slug}', function (Project $project, Task $task) {
-    // $task is scoped to $project -- returns 404 if the task doesn't belong to the project
-    return view('tasks.show', compact('project', 'task'));
-})->scopeBindings();
-```
-
-### Missing Model Handling
-
-Customize the 404 behavior when a model isn't found:
-
-```php
-Route::get('/projects/{project}', [ProjectController::class, 'show'])
-    ->missing(fn () => redirect()->route('projects.index')->with('error', 'Project not found.'));
-```
+See [`references/route-model-binding.md`](references/route-model-binding.md) for:
+- Scoped bindings for nested resources
+- `resolveRouteBinding()` override
+- WordPress post ID binding
+- Missing model customization
 
 ## Middleware
 
-Apply middleware to individual routes or groups. For creating custom middleware classes, see `sage:acorn-middleware`.
-
-### Applying Middleware
-
 ```php
 // Single route
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware('auth')
-    ->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth');
 
-// Route group
+// Group
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/billing', [BillingController::class, 'index'])->name('billing');
-    Route::post('/billing/update', [BillingController::class, 'update'])->name('billing.update');
+    Route::resource('projects', ProjectController::class);
 });
 
-// Resource with middleware
-Route::resource('projects', ProjectController::class)
-    ->middleware('auth')
-    ->except(['index', 'show']);
+// With parameters
+Route::post('/admin/users', [UserController::class, 'store'])->middleware('role:admin');
 ```
 
-### Controller Middleware
+For creating custom middleware, see `superpowers-sage:acorn-middleware`.
 
-Apply middleware inside the controller constructor for fine-grained control:
-
-```php
-class ProjectController extends Controller
-{
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index', 'show']);
-        $this->middleware('throttle:60,1')->only(['store', 'update']);
-    }
-}
-```
-
-### Middleware Parameters
-
-```php
-Route::post('/admin/users', [UserController::class, 'store'])
-    ->middleware('role:admin');
-
-Route::put('/articles/{article}', [ArticleController::class, 'update'])
-    ->middleware('throttle:10,1'); // 10 requests per minute
-```
+See [`references/middleware-groups.md`](references/middleware-groups.md) for:
+- Named middleware aliases (Kernel setup)
+- `web` vs `api` groups
+- Middleware ordering rules
 
 ## API Routes
 
-API routes are defined in `routes/api.php`, automatically prefixed with `/api`, and use the `api` middleware group (stateless, no session).
-
-### Basic API Endpoints
-
 ```php
-// routes/api.php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\ProjectController;
-use App\Http\Controllers\Api\EventController;
+// routes/api.php — automatically prefixed /api, stateless
+Route::apiResource('projects', \App\Http\Controllers\Api\ProjectController::class);
 
-Route::apiResource('projects', ProjectController::class);
-
-Route::get('/events/upcoming', [EventController::class, 'upcoming'])->name('api.events.upcoming');
-Route::get('/events/{event}', [EventController::class, 'show'])->name('api.events.show');
-```
-
-### Versioned API
-
-```php
-// app/Providers/RouteServiceProvider.php
-public function boot(): void
-{
-    $this->routes(function () {
-        Route::middleware('web')
-            ->group($this->app->basePath('routes/web.php'));
-
-        Route::middleware('api')
-            ->prefix('api/v1')
-            ->group($this->app->basePath('routes/api.php'));
-    });
-}
-```
-
-Or handle multiple versions:
-
-```php
-public function boot(): void
-{
-    $this->routes(function () {
-        Route::middleware('web')
-            ->group($this->app->basePath('routes/web.php'));
-
-        Route::middleware('api')
-            ->prefix('api/v1')
-            ->name('api.v1.')
-            ->group($this->app->basePath('routes/api_v1.php'));
-
-        Route::middleware('api')
-            ->prefix('api/v2')
-            ->name('api.v2.')
-            ->group($this->app->basePath('routes/api_v2.php'));
-    });
-}
-```
-
-### API Controller
-
-```php
-// app/Http/Controllers/Api/ProjectController.php
-namespace App\Http\Controllers\Api;
-
-use App\Http\Controllers\Controller;
-use App\Models\Project;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-
-class ProjectController extends Controller
-{
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $projects = Project::query()
-            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->input('status')))
-            ->when($request->filled('search'), fn ($q) => $q->where('title', 'like', "%{$request->input('search')}%"))
-            ->orderByDesc('created_at')
-            ->paginate(perPage: $request->integer('per_page', 15));
-
-        return ProjectResource::collection($projects);
-    }
-
-    public function show(Project $project): ProjectResource
-    {
-        return new ProjectResource($project->load('tasks', 'team'));
-    }
-
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'status' => ['required', 'in:active,archived'],
-        ]);
-
-        $project = Project::create($validated);
-
-        return response()->json(
-            new ProjectResource($project),
-            status: 201,
-        );
-    }
-
-    public function update(Request $request, Project $project): ProjectResource
-    {
-        $validated = $request->validate([
-            'title' => ['sometimes', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'status' => ['sometimes', 'in:active,archived'],
-        ]);
-
-        $project->update($validated);
-
-        return new ProjectResource($project);
-    }
-
-    public function destroy(Project $project): JsonResponse
-    {
-        $project->delete();
-
-        return response()->json(status: 204);
-    }
-}
-```
-
-### API Resources
-
-Use API Resources to control JSON output shape:
-
-```php
-// app/Http/Resources/ProjectResource.php
-namespace App\Http\Resources;
-
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class ProjectResource extends JsonResource
-{
-    public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'slug' => $this->slug,
-            'description' => $this->description,
-            'status' => $this->status,
-            'tasks' => TaskResource::collection($this->whenLoaded('tasks')),
-            'team' => TeamResource::make($this->whenLoaded('team')),
-            'created_at' => $this->created_at->toIso8601String(),
-            'updated_at' => $this->updated_at->toIso8601String(),
-        ];
-    }
-}
-```
-
-### Webhook Endpoints
-
-For incoming webhooks from external services:
-
-```php
-// routes/api.php
 Route::post('/webhooks/stripe', [StripeWebhookController::class, 'handle'])
-    ->middleware('verify.stripe.signature')
-    ->name('api.webhooks.stripe');
-
-Route::post('/webhooks/github', [GithubWebhookController::class, 'handle'])
-    ->name('api.webhooks.github');
+    ->middleware('verify.stripe.signature');
 ```
+
+See [`references/api-endpoints.md`](references/api-endpoints.md) for:
+- Full API controller structure with `JsonResource`
+- `EnsureJsonResponse` middleware (`Accept: application/json`)
+- Rate limiting with custom `RateLimiter`
+- Token authentication middleware
+- Versioned API setup
 
 ## WordPress Coexistence
 
-Acorn routes and WordPress routes operate on different layers. Keep these rules in mind:
-
-- **Acorn routes take precedence** when they match a URL. If you define `Route::get('/about', ...)`, it will override any WordPress page at `/about/`. Be intentional about URL paths.
-- **Avoid collisions** with WordPress slugs. Prefix your Acorn routes (e.g., `/app/dashboard` or `/portal/settings`) to stay clear of WordPress content URLs.
-- **WordPress admin** (`/wp-admin/`) and **REST API** (`/wp-json/`) are unaffected by Acorn routes.
-- **Permalink flush** is not needed for Acorn routes. They bypass WordPress rewrite rules entirely.
-
-## Best Practices
-
-**Routes are declarations, not implementations.** A route file should read like a table of contents -- endpoint, HTTP verb, controller, name. All logic belongs in controllers and services.
-
-**Keep route files clean:**
-
-```php
-// Good -- route file is a clean manifest
-Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-Route::get('/projects/{project:slug}', [ProjectController::class, 'show'])->name('projects.show');
-Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store')->middleware('auth');
-```
-
-**Use controllers for everything.** Even simple endpoints benefit from a controller class -- they're testable, injectable, and discoverable.
-
-**Group related routes** to reduce middleware and prefix repetition:
-
-```php
-Route::prefix('portal')->name('portal.')->middleware('auth')->group(function () {
-    Route::get('/', [PortalController::class, 'index'])->name('index');
-    Route::resource('tickets', TicketController::class);
-    Route::post('/tickets/{ticket}/reply', [TicketReplyController::class, 'store'])->name('tickets.reply');
-});
-```
-
-## Anti-patterns
-
-**Business logic in route closures.** Closures cannot be serialized for route caching and encourage spaghetti code:
-
-```php
-// Bad -- logic in closure, uncacheable
-Route::post('/subscribe', function (Request $request) {
-    $email = $request->validate(['email' => 'required|email']);
-    $subscriber = Subscriber::create($email);
-    Mail::to($subscriber)->send(new WelcomeMail());
-    return redirect('/thanks');
-});
-
-// Good -- delegate to a controller
-Route::post('/subscribe', [SubscriptionController::class, 'store'])->name('subscribe');
-```
-
-**Database queries in routes.** Never query the database directly in route definitions.
-
-**Validation in routes.** Validation belongs in controllers (via `$request->validate()`) or in dedicated Form Request classes -- not in route files.
-
-**Unnamed routes.** Always name routes so you can reference them with `route()` instead of hardcoding paths. Unnamed routes break when URLs change.
-
-**Overlapping with WordPress URLs.** Do not define Acorn routes at paths that WordPress content already occupies (e.g., `/blog`, `/about`). Use a dedicated prefix like `/app`, `/portal`, or `/api`.
+- **Acorn routes take precedence** when they match a URL — they bypass WP rewrite rules entirely.
+- **Prefix Acorn routes** with `/app/`, `/portal/`, or `/api/` to avoid colliding with WP content URLs.
+- **WordPress admin** (`/wp-admin/`) and **WP REST API** (`/wp-json/`) are unaffected.
+- **No permalink flush needed** — Acorn routes are not registered in WP's rewrite table.
 
 ## Lando Commands
 
 ```bash
-# List all registered routes with methods, URIs, names, and middleware
+# List all routes with methods, URIs, controllers, names, middleware
 lando acorn route:list
 
-# Show routes matching a specific path
+# Filter by path segment
 lando acorn route:list --path=api
 
-# Show routes for a specific method
+# Filter by HTTP method
 lando acorn route:list --method=POST
 
-# Cache routes for production (faster boot, no closure routes allowed)
+# Cache routes for production (no closure routes allowed)
 lando acorn route:cache
 
-# Clear the route cache
+# Clear route cache (always do this during development)
 lando acorn route:clear
 ```
 
-**Route caching** (`lando acorn route:cache`) compiles all routes into a single file for faster registration. Use it in production. It requires that all routes use controller classes -- closures cannot be cached. Always run `lando acorn route:clear` during development to avoid stale caches.
+## Critical Rules
+
+1. **Always use `routes/web.php` or `routes/api.php`** — never define Acorn routes in `functions.php`.
+2. **Use `Route::middleware()` for auth/access control** — never `add_action('init')` or WP hooks on Acorn routes.
+3. **Check for WP rewrite conflicts** with `lando acorn route:list` before deploying.
+4. **Never use closures in route files** — they cannot be cached. Use controller classes.
+5. **Always name routes** — `->name('resource.action')` — so `route()` helper and redirects work.
+6. **Prefix Acorn routes** to avoid colliding with WordPress page slugs and content URLs.
+7. **`wp_set_current_user()` belongs in auth middleware**, not in controller constructors.
 
 ## Verification
 
-- Visit the route URL in a browser or with `curl` and confirm the expected response (HTML or JSON) is returned with the correct status code.
-- Run `lando acorn route:list` and verify the route appears with the correct HTTP method, URI, controller, name, and middleware.
-- Test named routes by calling `route('route.name')` in Tinker or a Blade template and confirming the generated URL is correct.
+- Visit the route URL and confirm expected response (HTML or JSON) with correct status code.
+- Run `lando acorn route:list` and verify the route has correct method, URI, controller, name, middleware.
+- Test named routes: `lando acorn tinker` → `route('route.name')` returns the expected URL.
 
 ## Failure modes
 
-### Problem: 404 Not Found on a defined route
-- **Cause:** Route not registered -- the `RouteServiceProvider` is not loading the route file, or the provider is not listed in `config/app.php`.
-- **Fix:** Confirm `RouteServiceProvider` is registered in `config/app.php` providers array. Run `lando acorn route:list` to verify the route exists. Clear any stale route cache with `lando acorn route:clear`.
+See [`references/troubleshooting.md`](references/troubleshooting.md) for:
+- 404 on a defined route
+- Route conflicts with WP rewrite rules
+- Middleware not firing
+- Route model binding not resolving
+- `current_user_can()` returning false in controllers
+- CSRF token mismatches
+- Route cache issues
 
-### Problem: Route conflicts with WordPress rewrites
-- **Cause:** The Acorn route path collides with a WordPress page slug or permalink (e.g., `/about` exists as both an Acorn route and a WP page).
-- **Fix:** Prefix Acorn routes with a dedicated namespace like `/app/`, `/portal/`, or `/api/` to avoid overlapping with WordPress content URLs. Never define Acorn routes at paths occupied by WordPress pages or posts.
+## References
+
+Deep content loaded on demand — zero tokens until needed.
+
+- **[controllers.md](references/controllers.md)** — Controller class structure, constructor injection, resource/API/invokable controllers, `wp_set_current_user` note for constructors.
+- **[route-model-binding.md](references/route-model-binding.md)** — Implicit and explicit binding, `resolveRouteBinding()`, WP post ID binding, scoped bindings.
+- **[middleware-groups.md](references/middleware-groups.md)** — Middleware assignment in routes, named middleware aliases, group wrapping, `web`/`api` groups, ordering.
+- **[api-endpoints.md](references/api-endpoints.md)** — JSON API responses, rate limiting, token auth, `Accept: application/json` detection, versioning.
+- **[troubleshooting.md](references/troubleshooting.md)** — 404 on Acorn routes, WP rewrite conflicts, middleware not firing, route cache, CSRF issues.
 
 ## Escalation
 
-- If the route needs to integrate with the WordPress REST API (`/wp-json/`), consult the `sage:wp-rest-api` skill for `register_rest_route()` patterns.
-- If route middleware is not behaving as expected, consult the `sage:acorn-middleware` skill for Kernel setup and middleware registration.
+- Route needs WordPress REST API (`/wp-json/`): use `register_rest_route()` — see `superpowers-sage:wp-rest-api`.
+- Middleware not behaving: see `superpowers-sage:acorn-middleware` for Kernel setup and JWT.
