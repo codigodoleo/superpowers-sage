@@ -16,7 +16,7 @@
 
 | Wave | Plan file | Microplans | Status |
 |---|---|---|---|
-| 1 — Foundation + token savings | [onda-1](2026-04-18-plugin-expansion-onda-1.md) | 6 | Ready (full TDD) |
+| 1 — Foundation + token savings | [onda-1](2026-04-18-plugin-expansion-onda-1.md) | 6 | Done — [validation](2026-04-18-onda-1-validation.md) |
 | 2 — Progressive disclosure | [onda-2](2026-04-18-plugin-expansion-onda-2.md) | 8 | Scoped (detail on activation) |
 | 3 — New deterministic capabilities | [onda-3](2026-04-18-plugin-expansion-onda-3.md) | 4 | Scoped |
 | 4 — Specialized subagents | [onda-4](2026-04-18-plugin-expansion-onda-4.md) | 3 | Scoped |
