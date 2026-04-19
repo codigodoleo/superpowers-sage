@@ -1,12 +1,12 @@
 ---
 name: wp-rest-api
 description: >
-  WordPress REST API — register_rest_route, WP_REST_Controller, REST namespace,
-  custom endpoints, Application Passwords, JWT REST authentication, permission_callback,
-  schema validation, WP_REST_Response, REST API versioning, rest_ensure_response,
-  coexistence with Acorn Routes, register_rest_route vs routes/web.php decision,
-  REST API debugging, wp rest-api namespace list, wp json discovery, CORS,
-  REST nonce, cookie auth, REST API disable, JSON schema validation
+  WordPress REST API — register_rest_route, WP_REST_Controller, WP_REST_Request,
+  REST namespace, custom endpoints, Application Passwords, JWT REST authentication,
+  permission_callback, schema validation, WP_REST_Response, REST API versioning,
+  rest_ensure_response, coexistence with Acorn Routes, register_rest_route vs
+  routes/web.php decision, REST API debugging, wp rest-api namespace list,
+  wp json discovery, CORS, REST nonce, cookie auth, REST API disable, JSON schema validation
 user-invocable: false
 ---
 

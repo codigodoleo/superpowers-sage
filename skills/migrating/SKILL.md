@@ -6,7 +6,8 @@ description: >
   migration hard gates, functions.php to Service Providers, shortcodes to Blade,
   CPT registration to Poet, field groups to ACF Composer,
   safe migration reversible steps, migration output artifacts,
-  legacy plugin to Acorn, wp-content to Bedrock structure
+  legacy plugin to Acorn, wp-content to Bedrock structure,
+  database migration, content migration
 user-invocable: true
 argument-hint: "<migration-name> [target-scope]"
 ---

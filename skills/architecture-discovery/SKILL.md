@@ -6,7 +6,8 @@ description: >
   Service Providers, identify architectural gaps, architecture decision records,
   ADR, component boundary map, data flow diagram, risk register,
   implementation sequencing, discovery session, understanding unknown codebases,
-  use before architecting or building new features, output contract
+  use before architecting or building new features, output contract,
+  discover-abilities
 user-invocable: true
 argument-hint: "[feature or scope description]"
 ---

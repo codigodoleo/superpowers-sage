@@ -1,11 +1,11 @@
 ---
 name: wp-hooks-lifecycle
 description: >
-  WordPress hooks lifecycle — add_action, add_filter, remove_action, remove_filter,
-  hook priority, plugins_loaded, init, wp_loaded, after_setup_theme,
-  the_content filter, wp_enqueue_scripts, admin_enqueue_scripts, hook execution order,
-  Acorn hook registration in AppServiceProvider, boot hooks, register hooks,
-  WordPress hook reference, Tailwind CSS filter conflicts, save_post,
+  WordPress hooks lifecycle — add_action, add_filter, do_action, apply_filters,
+  remove_action, remove_filter, hook priority, plugins_loaded, init, wp_loaded,
+  after_setup_theme, the_content filter, wp_enqueue_scripts, admin_enqueue_scripts,
+  hook execution order, Acorn hook registration in AppServiceProvider, boot hooks,
+  register hooks, WordPress hook reference, Tailwind CSS filter conflicts, save_post,
   transition_post_status, pre_get_posts, late hooks, early hooks
 user-invocable: false
 ---
