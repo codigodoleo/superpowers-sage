@@ -31,6 +31,21 @@ Log::error("User login failed for {$email} from {$request->ip()}");
 lando ssh -s appserver -c "tail -f /app/content/themes/{theme}/storage/logs/acorn.log"
 ```
 
+## Log Correlation IDs
+
+Attach a per-request trace ID so all log entries from a single request are correlated:
+
+```php
+// app/Providers/AppServiceProvider.php
+public function boot(): void
+{
+    $traceId = substr(md5(uniqid('', true)), 0, 8);
+    Log::withContext(['trace_id' => $traceId]);
+}
+```
+
+Every subsequent `Log::info()` / `Log::error()` in the same request will include `trace_id` in the context array, making it easy to filter log files by request.
+
 ## Exception Handling with Structured Context
 
 Create or edit `app/Exceptions/Handler.php` in your theme:

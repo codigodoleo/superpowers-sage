@@ -102,6 +102,8 @@ Cache::increment('page:views:' . $postId);
 
 Always prefer `Cache::remember()` over manual get-then-set. It is atomic and avoids race conditions.
 
+For tag-based group invalidation (e.g., invalidate all post caches on `save_post`), see [`cache-tags.md`](cache-tags.md).
+
 ## Best Practices
 
 1. **Use `Cache::remember()` by default** — avoids manual get/set boilerplate and handles race conditions.

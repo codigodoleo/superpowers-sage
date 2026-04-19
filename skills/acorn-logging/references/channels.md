@@ -92,6 +92,35 @@ Log::channel('payments')->error('Charge failed', [
 ]);
 ```
 
+## Slack Channel
+
+Send error-level logs to a Slack webhook:
+
+```php
+// config/logging.php
+'slack' => [
+    'driver'   => 'slack',
+    'url'      => env('LOG_SLACK_WEBHOOK_URL'),
+    'username' => 'Acorn Logger',
+    'emoji'    => ':boom:',
+    'level'    => env('LOG_LEVEL', 'error'),
+],
+```
+
+In `.env`:
+```
+LOG_SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+```
+
+Use in a stack channel to get both file and Slack:
+```php
+'stack' => [
+    'driver'   => 'stack',
+    'channels' => ['daily', 'slack'],
+    'level'    => 'error',
+],
+```
+
 ## Integration with WordPress Debug
 
 Acorn's logging is independent from WordPress's `WP_DEBUG_LOG`. Both can run simultaneously:
