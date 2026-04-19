@@ -101,6 +101,33 @@ If none available, report `drift: NOT_VERIFIED` and skip to Axis 2.
 
 For detailed axis procedures (CSS coverage, variation expansion, gap checks G1–G8), see [`references/evolution-axes.md`](references/evolution-axes.md).
 
+#### G9. Component reuse gap
+
+Grep the view for co-occurring `<x-eyebrow` and `<h2` inline — these should use
+`<x-section-header>` instead. Also grep for `<a` elements carrying button utility
+classes (e.g. `btn-`, `rounded-`, `px-`, `py-`, `font-`) — these should be
+`<x-button>`.
+
+Each instance where a shared component exists but is not used: flag as IMPROVEMENT.
+
+#### G10. CSS variable cascade not used
+
+Check the view for any of:
+- `match($tone)` expressions returning Tailwind class strings (e.g. `'bg-brand-500'`)
+- Props declared as `tone="light"` / `tone="dark"` driving color conditionally
+- Hardcoded color utility classes (`text-gray-*`, `bg-brand-*`, `text-white`) on
+  `h2`, `p`, or `span` elements
+
+Colors must cascade from `--block-*` custom properties in the block's CSS; the view
+must not select color via conditional logic. Each instance is CRITICAL.
+
+#### G11. nl2br on non-textarea fields
+
+For each `nl2br(esc_html($var))` call in the view, trace the variable back to its
+ACF field definition in `app/Blocks/{ClassName}.php`. If the field uses `addText()`
+(single-line text), `nl2br()` is a no-op at best and misleading at worst. Flag as
+IMPROVEMENT — remove `nl2br()` or change the field to `addTextarea()` / `addWysiwyg()`.
+
 ---
 
 ## Phase 6 — Report and propose

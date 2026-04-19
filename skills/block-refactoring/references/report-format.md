@@ -36,6 +36,9 @@ Produce this structured report in Phase 6:
 - G6 assets() enqueue logic: {yes | no}
 - G7 Missing localization: {count}
 - G8 Mixed-language identifiers: {count + locations}
+- G9 Component reuse gap: {count + locations}
+- G10 CSS variable cascade not used: {count + locations}
+- G11 nl2br on text fields: {count + locations}
 
 ### Suggested action
 {"Ready to apply all proposals" | "Review proposals then re-run"}
@@ -47,7 +50,7 @@ After user approves proposals:
 
 1. Apply CSS coverage removals
 2. Apply variation expansions (CSS + `$styles`)
-3. Apply gap fixes (G1–G8 as approved)
+3. Apply gap fixes (G1–G11 as approved)
 4. If G1 v1 → v2 migration was approved:
    - Ensure `BaseCustomElement.js` exists in theme
    - Rewrite view, CSS, create JS file, update provider

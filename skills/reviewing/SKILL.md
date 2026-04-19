@@ -47,6 +47,12 @@ If no scope specified, review all changed files (`git diff` against base branch)
 - [ ] No business logic in Blade views
 - [ ] Proper layout inheritance (`@extends`, `@section`, `@yield`)
 
+#### Block Views
+- [ ] **R-css-vars**: No `match($tone)` → Tailwind class strings; no `tone="*"` props driving color; no hardcoded color utilities on `h2`/`p`/`span` → G10 violation (CRITICAL)
+- [ ] **R-component-reuse**: No inline `<x-eyebrow>` + `<h2>` when `<x-section-header>` exists; no raw `<a>` with button utilities when `<x-button>` exists → G9 violation
+- [ ] **R-nl2br**: `nl2br()` only on `addTextarea()`/`addWysiwyg()` fields, not `addText()` → G11 violation
+- [ ] **R-arbitrary-btn**: No `text-[*px]` or `tracking-[*px]` in block/component views → CRITICAL
+
 #### Routes & Controllers
 - [ ] Clean route declarations (no logic in closures)
 - [ ] Thin controllers (delegate to services)

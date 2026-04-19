@@ -85,6 +85,20 @@ Produces:
 
 ---
 
+## Phase 0b — Shared component inventory
+
+Before writing the view, build a local registry of available shared components:
+
+1. Glob `resources/views/components/*.blade.php` — list all component files
+2. For each component, read its `@props` declaration
+3. Note the component API (prop names + defaults)
+
+**Rule:** if the block needs eyebrow + heading markup, use `<x-section-header>` (or
+the equivalent shared component) — do NOT emit `<x-eyebrow>` + `<h2>` inline.
+If no suitable component exists, use inline markup and note it for future extraction.
+
+---
+
 ## Phase 1 — Implement S1–S4
 
 ### S1 — `resources/css/blocks/{slug}.css`
@@ -122,7 +136,22 @@ block-{slug} {
 }
 ```
 
-**Minimal mode:** omit `.is-style-*` selectors.
+**Minimal mode:** omit `.is-style-*` selectors. Include the token declarations commented
+out so the developer has the vocabulary available without forcing unused properties:
+
+```css
+@reference "../app.css";
+
+block-{slug} {
+  display: block;
+  /* --block-bg:        var(--color-surface); */
+  /* --block-text:      var(--color-foreground); */
+  /* --block-text-sub:  var(--color-foreground-muted); */
+  /* --block-border:    var(--color-border); */
+  /* --block-btn-bg:    var(--color-foreground); */
+  /* --block-btn-text:  var(--color-foreground-on-inverse); */
+}
+```
 
 **CSS rules:**
 - `@reference` not `@import` — grants Tailwind token access without duplicating styles
