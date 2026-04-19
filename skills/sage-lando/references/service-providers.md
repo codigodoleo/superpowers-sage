@@ -1,4 +1,8 @@
+<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+
 # Service Providers & Dependency Injection
+
+How Acorn's Laravel IoC container works in WordPress — registering bindings, booting hooks, and injecting services via `AppServiceProvider` and `SageServiceProvider`.
 
 ## The Mental Model
 

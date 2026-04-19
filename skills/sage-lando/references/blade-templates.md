@@ -1,4 +1,8 @@
+<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+
 # Blade Templates
+
+Sage uses Laravel Blade as its templating engine — this reference covers view composers, Blade components, template hierarchy, directives, and layout patterns for Acorn-based themes.
 
 ## Composers vs Components — Decision Guide
 

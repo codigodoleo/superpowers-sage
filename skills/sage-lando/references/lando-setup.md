@@ -1,4 +1,8 @@
+<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+
 # Lando Setup
+
+Complete configuration reference for Lando in a Roots Bedrock + Sage project — `.lando.yml`, services, tooling, proxy, database, and environment setup.
 
 ## `.lando.yml` — Complete Reference
 

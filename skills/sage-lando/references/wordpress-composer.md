@@ -1,4 +1,8 @@
+<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+
 # WordPress Composer Packages
+
+Installing WordPress plugins and themes via Composer from `wp-packages.org`, WPackagist, or local `.zip` packages — never via `lando wp plugin install`.
 
 ## Overview
 

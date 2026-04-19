@@ -1,4 +1,8 @@
+<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+
 # Routing & Content Types
+
+Declarative registration of custom post types, taxonomies, and navigation in Sage via Poet (`config/poet.php`) and Navi.
 
 ## Poet (`log1x/poet`)
 

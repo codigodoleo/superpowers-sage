@@ -1,4 +1,8 @@
+<!-- Loaded on demand from skills/sage-lando/SKILL.md -->
+
 # ACF Composer
+
+`log1x/acf-composer` is the class-based ACF integration for Acorn — every block, field group, partial, options page, and widget is a PHP class auto-discovered and registered via the service container.
 
 ## Overview
 
