@@ -26,6 +26,11 @@
         "matcher": "git commit"
       }
     ],
+    "beforeFileEdit": [
+      {
+        "command": "bash \"./hooks/pre-write-protected.sh\""
+      }
+    ],
     "subagentStop": [
       {
         "command": "bash \"./hooks/post-subagent.sh\""

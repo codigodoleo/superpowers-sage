@@ -51,6 +51,15 @@
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-write-protected.sh\""
+          }
+        ]
       }
     ],
     "SubagentStop": [
