@@ -264,3 +264,30 @@ Register it in `config/app.php`:
 - You want to enable/disable a feature by toggling a provider
 
 For most themes, a single `ThemeServiceProvider` is sufficient.
+
+## Gotcha — `load_theme_textdomain()` Silently Fails in Acorn boot()
+
+In WP 6.9+, calling `load_theme_textdomain()` inside `ThemeServiceProvider::boot()` returns `true` but does **not** actually register the text domain. Strings remain untranslated with no warning or error.
+
+**Symptom:** `__('text', 'sage')` returns the original string unchanged even though `.mo` files exist.
+
+**Root cause:** `load_theme_textdomain()` internally calls `get_template_directory()` which in Acorn's boot context resolves before WordPress's theme setup is complete.
+
+**Fix:** Use `load_textdomain()` with an explicit path:
+
+```php
+public function boot(): void
+{
+    parent::boot();
+
+    load_textdomain(
+        'sage',
+        get_template_directory() . '/resources/lang/' . get_locale() . '.mo'
+    );
+}
+```
+
+**Sanity check:**
+```bash
+lando wp eval "echo load_textdomain('sage', get_template_directory() . '/resources/lang/pt_BR.mo') ? 'OK' : 'FAIL';"
+```

@@ -623,3 +623,37 @@ wp_enqueue_style("block-{$slug}", $asset->uri(), [], $asset->version());
 // ❌ Wrong — breaks enqueue when 'theme' isn't loaded
 wp_enqueue_style("block-{$slug}", $asset->uri(), ['theme'], $asset->version());
 ```
+
+### Localizing Block Metadata — `getName()` / `getDescription()` / `getStyles()`
+
+`$name` and `$description` are class properties evaluated at class-load time — they cannot contain localization calls like `__()` because the text domain may not be registered yet. To produce translatable block metadata, override the getter methods instead:
+
+```php
+class HeroSection extends Block
+{
+    public $name = 'Hero Section';  // Fallback (English) — still required
+    public $description = 'Full-width hero with background and CTA.';
+
+    public function getName(): string
+    {
+        return __('Hero Section', 'sage');
+    }
+
+    public function getDescription(): string
+    {
+        return __('Full-width hero with background and CTA.', 'sage');
+    }
+
+    public function getStyles(): array
+    {
+        return [
+            ['label' => __('Light', 'sage'), 'name' => 'light', 'isDefault' => true],
+            ['label' => __('Dark', 'sage'),  'name' => 'dark'],
+        ];
+    }
+}
+```
+
+**When to use:** any project where block names or style labels must appear translated in the Gutenberg block inserter or the editor sidebar.
+
+**Why `$styles` needs override too:** The `$styles` array is echoed into the block inserter UI — style labels appear in the "Styles" panel. If the project has a Spanish or Portuguese admin locale, style labels like "Light" / "Dark" should be translated.
