@@ -1,6 +1,12 @@
 ---
 name: wp-security
-description: "WordPress security patterns for Sage/Acorn — sanitize/escape, nonces, capabilities, SQL preparation, CSRF protection"
+description: >
+  WordPress security hardening — nonce verification, wp_nonce_field,
+  check_admin_referer, sanitize_text_field, sanitize_email, esc_html, esc_attr,
+  esc_url, wp_kses, SQL injection prevention, $wpdb->prepare(), capability checks,
+  current_user_can, authentication hardening, wp-config.php secrets,
+  security headers, file permissions, Bedrock .env secrets, disable XML-RPC,
+  brute force wp-login.php, CSRF protection
 user-invocable: false
 ---
 

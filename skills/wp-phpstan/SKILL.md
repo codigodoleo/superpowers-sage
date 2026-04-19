@@ -1,6 +1,11 @@
 ---
 name: wp-phpstan
-description: "Static analysis for Sage/Acorn — PHPStan with Larastan and WordPress stubs, baseline management, CI integration"
+description: >
+  PHPStan static analysis in Sage/Acorn projects — lando composer phpstan,
+  phpstan.neon configuration, PHPStan level 0-9, WordPress PHP stubs,
+  szepeviktor/phpstan-wordpress, baseline generation, CI phpstan,
+  suppress errors, type errors, return type mismatch, nullable types,
+  WordPress function stubs, WP_Post WP_Query WP_User types
 user-invocable: false
 ---
 

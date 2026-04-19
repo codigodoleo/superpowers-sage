@@ -1,6 +1,11 @@
 ---
 name: wp-capabilities
-description: "WordPress capabilities and authorization — user roles, custom capabilities, integration with JWT middleware and Acorn guards"
+description: >
+  WordPress capabilities and roles — add_role, remove_role, add_cap, remove_cap,
+  current_user_can, user_can, WP_Roles, custom capabilities, administrator editor
+  author contributor subscriber, capability mapping, meta capabilities,
+  map_meta_cap, register_post_type capabilities, custom post type capabilities,
+  WP_User roles and caps, ACF field group visibility by role
 user-invocable: false
 ---
 # WordPress Capabilities and Authorization
