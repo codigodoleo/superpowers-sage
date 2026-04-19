@@ -13,8 +13,12 @@ If post-verification anything is wrong, choose the lowest-impact tier that cover
 Fastest recovery. Works only if revisions were enabled during apply (default: yes).
 
 ```bash
-lando wp post list-revisions <ID>
-lando wp post revision-restore <REVISION-ID>
+# List revisions for a post
+lando wp post list --post_type=revision --post_parent=<POST-ID> --fields=ID,post_date,post_title
+
+# Restore a revision (get content and update the post)
+REVISION_CONTENT=$(lando wp post get <REVISION-ID> --field=post_content)
+lando wp post update <POST-ID> --post_content="$REVISION_CONTENT"
 ```
 
 **Use when:** a single post regressed and revisions are available.
@@ -45,7 +49,7 @@ Always have the Tier 3 snapshot. Tier 1 and 2 are faster; Tier 3 is the guarante
 
 | Failure Scope | Tier | Command |
 |---|---|---|
-| Single post regression, revisions enabled | 1 | `wp post revision-restore <ID>` |
+| Single post regression, revisions enabled | 1 | `wp post list --post_type=revision --post_parent=<ID>` then `wp post update` |
 | Postmeta-only failure, table snapshot available | 2 | `wp db import postmeta-before.sql` |
 | Multi-table or unclear scope | 3 | `wp db import full-before.sql` |
 | Snapshot missing or failed | STOP | Do not proceed with migration — restart from Phase 1 |

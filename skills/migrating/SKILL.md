@@ -79,7 +79,7 @@ Resolve to a migration name (used for snapshot filenames and logs) and target sc
 
 If post-verification anything is wrong, use the lowest-impact tier:
 
-- **Tier 1** — `lando wp post revision-restore <ID>` (single post, revisions enabled)
+- **Tier 1** — `lando wp post list --post_type=revision --post_parent=<ID>` then `lando wp post update <ID> --post_content="$(lando wp post get <REVISION-ID> --field=post_content)"` (single post, revisions enabled)
 - **Tier 2** — `lando wp db import /tmp/<migration>-postmeta-before.sql` (table-level)
 - **Tier 3** — `lando wp db import /tmp/<migration>-full-before.sql` (nuclear, last resort)
 
