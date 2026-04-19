@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.6.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.5.0...superpowers-sage-v2.6.0) (2026-04-19)
+
+
+### Features
+
+* **acorn-migration:** add Phase 4 — ACF two-level key migration + second pass + positional args ([30bc024](https://github.com/codigodoleo/superpowers-sage/commit/30bc02460098ad81132445fd87637e69e2b9ab7c))
+* **block-refactoring:** add Phase 0b shared component inventory before gap checks ([18a9723](https://github.com/codigodoleo/superpowers-sage/commit/18a972328fe4cf7ee7d2e929e701eb6a4ea8a84b))
+* **block-refactoring:** G7 -&gt; CRITICAL, add Decision Log to report, add localization reference ([945cf55](https://github.com/codigodoleo/superpowers-sage/commit/945cf55554a7d8faab1a6b9a6adc1c6c3986b27a))
+* **sage-lando:** add load_textdomain gotcha and ACF getName/getDescription/getStyles i18n pattern ([9591430](https://github.com/codigodoleo/superpowers-sage/commit/95914305586bfbe42c21dd61e6d2b2c86c6d00b1))
+* **sage-reviewer:** add R-css-vars, R-component-reuse, R-nl2br convention checks ([ff63de6](https://github.com/codigodoleo/superpowers-sage/commit/ff63de66ac4a0f8d9092e31af15007ce4d71b731))
+
+
+### Bug Fixes
+
+* **acorn-migration:** remove redundant NOT LIKE clause in Phase 4 PASS 1 query ([d377a48](https://github.com/codigodoleo/superpowers-sage/commit/d377a48e259c3fc85efb2d9f6430cb3daefe3597))
+* **skills:** add G9/G10/G11 gap checks to block-refactoring, block-scaffolding, sage-reviewer ([0c2d520](https://github.com/codigodoleo/superpowers-sage/commit/0c2d52038d9c2b9ab472994bf93eca2e2b20d605))
+
+
+### Documentation
+
+* **plans:** add plugin expansion wave plans (index + onda 1 full + 2-6 scoped) ([4d2a736](https://github.com/codigodoleo/superpowers-sage/commit/4d2a7365a3b155ab203ae8e3d6e4fe893dbdff67))
+* **plans:** mark Onda 6 Done in index ([3bdff96](https://github.com/codigodoleo/superpowers-sage/commit/3bdff96482bc616597e88d358599d492a02403b2))
+* **plans:** Onda 6 — hardening from field feedback; replace introspect with A/B groups ([dfa5c16](https://github.com/codigodoleo/superpowers-sage/commit/dfa5c16d5f64767a27392857d9af8cf29aaea659))
+* **specs:** fix lando prefix and typo in plugin expansion design ([4cdc08b](https://github.com/codigodoleo/superpowers-sage/commit/4cdc08b585bc97fc02d50cb4c061029bbc3d5be5))
+
 ## [2.5.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.4.0...superpowers-sage-v2.5.0) (2026-04-19)
 
 
