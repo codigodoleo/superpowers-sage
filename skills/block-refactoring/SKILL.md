@@ -62,6 +62,22 @@ From the argument, identify:
 
 Read all present files.
 
+### Phase 0b — Shared component inventory
+
+Glob `resources/views/components/*.blade.php` in the target project (if a path is known, otherwise skip this step).
+
+Build a component inventory table:
+
+| Component slug | File | Likely use |
+|---|---|---|
+| `section-header` | `section-header.blade.php` | `<x-eyebrow>` + `<h2>` pairing |
+| `button` | `button.blade.php` | `<a>` or `<button>` with utility classes |
+| `card` | `card.blade.php` | Repeated card structure |
+
+Keep this table in context — G9 in Axis 4 will reference it to report concrete component names instead of generic suggestions.
+
+If `resources/views/components/` does not exist or is empty, note "No shared components found" and proceed.
+
 ### Phase 1 — Classify current pattern version
 
 Inspect the view file and the CSS file:
@@ -108,7 +124,7 @@ Grep the view for co-occurring `<x-eyebrow` and `<h2` inline — these should us
 classes (e.g. `btn-`, `rounded-`, `px-`, `py-`, `font-`) — these should be
 `<x-button>`.
 
-Each instance where a shared component exists but is not used: flag as IMPROVEMENT.
+Each instance where a component from the Phase 0b inventory exists but is not used: flag as IMPROVEMENT, naming the component (e.g., "use `<x-section-header>` instead of inline `<x-eyebrow>` + `<h2>`").
 
 #### G10. CSS variable cascade not used
 
