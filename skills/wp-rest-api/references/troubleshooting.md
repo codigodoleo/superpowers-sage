@@ -20,8 +20,10 @@ Common REST errors: 401, CORS, rest_no_route, schema validation failures, 404 on
 ## Diagnosing 404 on Custom Namespace
 
 ```bash
-# List all registered namespaces
-lando wp rest-api namespace list
+# List registered REST API namespaces
+lando wp eval 'echo implode("\n", array_keys(rest_get_server()->get_namespaces()));'
+# Or via curl:
+# curl https://yoursite.lndo.site/wp-json/ | jq '.namespaces'
 
 # Discover all endpoints at a namespace
 curl https://mysite.lndo.site/wp-json/myapp/v1 | jq .
