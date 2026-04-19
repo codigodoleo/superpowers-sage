@@ -18,7 +18,7 @@
 |---|---|---|---|
 | 1 — Foundation + token savings | [onda-1](2026-04-18-plugin-expansion-onda-1.md) | 6 | Done — [validation](2026-04-18-onda-1-validation.md) |
 | 2 — Progressive disclosure | [onda-2](2026-04-18-plugin-expansion-onda-2.md) | 8 | PR #28 — in review |
-| 3 — New deterministic capabilities | [onda-3](2026-04-18-plugin-expansion-onda-3.md) | 4 | Ready (full TDD) |
+| 3 — New deterministic capabilities | [onda-3](2026-04-18-plugin-expansion-onda-3.md) | 6 | Done |
 | 4 — Specialized subagents | [onda-4](2026-04-18-plugin-expansion-onda-4.md) | 3 | Scoped |
 | 5 — AI-native integration | [onda-5](2026-04-18-plugin-expansion-onda-5.md) | 5 | Scoped |
 | 6 — `sage-introspect` fallback | [onda-6](2026-04-18-plugin-expansion-onda-6.md) | 2 | Scoped, conditional |
