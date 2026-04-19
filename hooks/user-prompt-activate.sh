@@ -34,6 +34,7 @@ KEYWORD_MAP=(
   "design token|@theme block|tailwind token:sage-design-system"
   "block refactor|block evolution|block migration:block-refactoring"
   "ai-setup|acorn ai|mcp adapter|discover-abilities|install mcp:ai-setup"
+  "abilities|make:ability|abilities-authoring|execute-ability|acorn ability|mcp endpoint|wp ability:abilities-authoring"
 )
 
 MATCHED_SKILL=""
