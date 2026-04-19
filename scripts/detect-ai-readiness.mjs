@@ -70,7 +70,7 @@ const upgradePath = [];
 
 // 1. WP version
 const wpResult = runLando(['wp', 'core', 'version'], projectRoot);
-const landoAvailable = !wpResult.error?.includes('ENOENT');
+const landoAvailable = !(String(wpResult.error ?? '')).includes('ENOENT');
 const wpVersion = wpResult.ok ? wpResult.stdout : null;
 
 if (!landoAvailable) {
@@ -124,3 +124,4 @@ const result = {
 };
 
 process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+process.exit(0);
