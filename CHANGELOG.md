@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.2.0...superpowers-sage-v2.3.0) (2026-04-19)
+
+
+### Features
+
+* **hooks,commands:** Wave 3 deterministic capabilities ([#30](https://github.com/codigodoleo/superpowers-sage/issues/30)) ([d3155cd](https://github.com/codigodoleo/superpowers-sage/commit/d3155cd8282d4dc9539bbbf22face7e1095f8bc9))
+
 ## [2.2.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.1.0...superpowers-sage-v2.2.0) (2026-04-19)
 
 

@@ -10,7 +10,7 @@
     {
       "name": "superpowers-sage",
       "description": "Sage + Acorn + Lando skills for AI-assisted WordPress development.",
-      "version": "2.2.0",
+      "version": "2.3.0",
       "source": {
         "source": "github",
         "repo": "codigodoleo/superpowers-sage",
