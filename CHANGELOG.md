@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.1.0...superpowers-sage-v2.2.0) (2026-04-19)
+
+
+### Features
+
+* **skills:** Onda 2 — progressive-disclosure for 26 skills + validator enforcement ([#28](https://github.com/codigodoleo/superpowers-sage/issues/28)) ([e623326](https://github.com/codigodoleo/superpowers-sage/commit/e6233261775025bb5d13aff4e7000ae04fcf5457))
+
 ## [2.1.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.0.0...superpowers-sage-v2.1.0) (2026-04-19)
 
 
