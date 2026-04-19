@@ -190,11 +190,95 @@ function testOver500LineWarning() {
 
     const { stdout, exit } = runValidator(tmp);
     assert(
-      `warning message contains "fat-skill/SKILL.md — ${actualLines} lines (>500 target)"`,
-      stdout.includes(`fat-skill/SKILL.md — ${actualLines} lines (>500 target)`),
+      `error message contains "fat-skill"`,
+      stdout.includes('fat-skill'),
       stdout.slice(-400)
     );
-    assert('exit code is 0 (soft warning, not an error)', exit === 0);
+    assert('exit code is non-zero (hard error)', exit !== 0);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+function testOver500LineIsNowError() {
+  console.log('\nCase: skill file with >500 lines is an error (not warning)');
+  const tmp = mkdtempSync(join(tmpdir(), 'validate-skills-500error-'));
+  try {
+    const src = resolve(__dirname, '..');
+    cpSync(join(src, 'scripts'), join(tmp, 'scripts'), { recursive: true });
+    mkdirSync(join(tmp, 'skills', 'fat-skill'), { recursive: true });
+    // Build exactly 501 lines by generating lines array directly
+    const lines = [
+      '---',
+      'name: sage:fat-skill',
+      'description: test',
+      'user-invocable: false',
+      '---',
+      '',
+      '# Fat',
+      '',
+      '## Verification',
+      '',
+    ];
+    while (lines.length < 498) lines.push(`<!-- ${lines.length} -->`);
+    lines.push('', '## Failure modes', '', '- none');
+    // lines.length should be 502; trim to exactly 501
+    while (lines.length > 501) lines.pop();
+    while (lines.length < 501) lines.push(`<!-- pad ${lines.length} -->`);
+    const content = lines.join('\n');
+    writeFileSync(join(tmp, 'skills', 'fat-skill', 'SKILL.md'), content);
+    mkdirSync(join(tmp, 'agents'), { recursive: true });
+    for (const f of ['.claude-plugin/plugin.json', '.cursor-plugin/plugin.json', 'plugin.json']) {
+      const dest = join(tmp, f);
+      mkdirSync(dirname(dest), { recursive: true });
+      cpSync(join(src, f), dest);
+    }
+    const { stdout, exit } = runValidator(tmp);
+    assert('exit code non-zero (error, not warning)', exit !== 0, `stdout: ${stdout.slice(-200)}`);
+    assert('error message for fat-skill', stdout.includes('fat-skill'), stdout.slice(-200));
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+function testMissingRefsWarnedFor300LSkill() {
+  console.log('\nCase: skill ≥300 lines with no references/ emits warning');
+  const tmp = mkdtempSync(join(tmpdir(), 'validate-skills-norefs-'));
+  try {
+    const src = resolve(__dirname, '..');
+    cpSync(join(src, 'scripts'), join(tmp, 'scripts'), { recursive: true });
+    mkdirSync(join(tmp, 'skills', 'dense-skill'), { recursive: true });
+    // Build exactly 300 lines by generating lines array directly
+    const lines = [
+      '---',
+      'name: sage:dense-skill',
+      'description: test',
+      'user-invocable: false',
+      '---',
+      '',
+      '# Dense',
+      '',
+      '## Verification',
+      '',
+    ];
+    while (lines.length < 296) lines.push(`<!-- ${lines.length} -->`);
+    lines.push('', '## Failure modes', '', '- none');
+    // lines.length is 300; adjust if needed
+    while (lines.length > 300) lines.pop();
+    while (lines.length < 300) lines.push(`<!-- pad ${lines.length} -->`);
+    const content = lines.join('\n');
+    writeFileSync(join(tmp, 'skills', 'dense-skill', 'SKILL.md'), content);
+    mkdirSync(join(tmp, 'agents'), { recursive: true });
+    for (const f of ['.claude-plugin/plugin.json', '.cursor-plugin/plugin.json', 'plugin.json']) {
+      const dest = join(tmp, f);
+      mkdirSync(dirname(dest), { recursive: true });
+      cpSync(join(src, f), dest);
+    }
+    const { stdout, exit } = runValidator(tmp);
+    assert('exit code 0 (warning, not error)', exit === 0, `stdout: ${stdout.slice(-200)}`);
+    assert('warning mentions dense-skill and references/',
+      stdout.includes('dense-skill') && stdout.includes('references/'),
+      stdout.slice(-200));
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
@@ -208,6 +292,8 @@ testHappyPath();
 testCRLFFrontmatterParses();
 testMissingFrontmatterCaught();
 testOver500LineWarning();
+testOver500LineIsNowError();
+testMissingRefsWarnedFor300LSkill();
 
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed === 0 ? 0 : 1);

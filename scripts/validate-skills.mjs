@@ -87,8 +87,16 @@ if (existsSync(skillsDir)) {
 
     const lineCount = content.split(/\r?\n/).length;
     if (lineCount > 500) {
-      log('⚠', `${label} — ${lineCount} lines (>500 target)`);
-      warnings++;
+      log('✗', `${label} — ${lineCount} lines (max 500)`);
+      errors++;
+    }
+
+    if (lineCount >= 300) {
+      const refsDir = join(skillsDir, entry.name, 'references');
+      if (!existsSync(refsDir)) {
+        log('⚠', `${label} — ${lineCount} lines but no references/ directory`);
+        warnings++;
+      }
     }
   }
 }
