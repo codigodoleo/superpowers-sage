@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:designing
-description: Design tool integration for Sage projects; routes to Paper, Stitch, or Figma MCPs (or local assets) based on the URL/source the user provides. Paper enriches extraction with screenshots, computed styles, and JSX structural references. Use when you need to consult or capture design references.
+description: >
+  Design UI/UX in a Sage project — Figma to Blade, design tokens to Tailwind v4,
+  Paper/Figma MCP integration, component design, layout design, responsive design,
+  design-to-code workflow, visual design review, design system alignment,
+  design approval before implementation
 user-invocable: true
 ---
 

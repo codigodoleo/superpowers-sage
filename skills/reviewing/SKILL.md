@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:reviewing
-description: Code review against Sage/Acorn conventions and design alignment; checks providers, hooks, ACF patterns, Blade structure, content modeling decisions, and visual alignment with design. Dispatches sage-reviewer agent.
+description: >
+  Code review for Sage/Acorn projects — review PHP Blade JS CSS,
+  review Service Providers ACF Composer blocks Livewire components,
+  Eloquent models Acorn routes, security review, performance review,
+  code quality, coding standards, PR review workflow, code review checklist
 user-invocable: true
 argument-hint: "[file path or scope]"
 ---

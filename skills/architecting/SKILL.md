@@ -1,6 +1,9 @@
 ---
 name: superpowers-sage:architecting
-description: Compatibility wrapper for the new two-step planning flow. Delegates to superpowers-sage:architecture-discovery first, then superpowers-sage:plan-generator after architecture approval.
+description: >
+  Define architecture for a Sage/Acorn feature — architecture decision records,
+  component boundaries, data flow, dependency mapping, pre-implementation design,
+  trade-off analysis, Acorn architecture patterns, ADR, design before building
 user-invocable: true
 argument-hint: "[feature or scope description]"
 ---
