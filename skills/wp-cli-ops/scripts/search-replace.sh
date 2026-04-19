@@ -11,7 +11,7 @@ TO="${2:?usage: search-replace.sh <from> <to> [--live]}"
 LIVE="${3:-}"
 if [[ "$LIVE" != "--live" ]]; then
     echo "DRY RUN (pass --live to apply):"
-    lando wp search-replace "$FROM" "$TO" --dry-run --report-changed-only
+    lando wp search-replace "$FROM" "$TO" --precise --dry-run --report-changed-only
 else
-    lando wp search-replace "$FROM" "$TO" --report-changed-only
+    lando wp search-replace "$FROM" "$TO" --precise --report-changed-only
 fi
