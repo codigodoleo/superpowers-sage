@@ -114,7 +114,7 @@ Before completion, confirm all items:
 - Each component has acceptance criteria in its sub-plan
 - If visual artifacts exist in source spec, `assets/visual-approval.md` and per-component `visual-checks.md` are generated
 
-## Failure Modes
+## Failure modes
 
 - Spec missing or unapproved: block and request architecture approval.
 - Dependency cycle detected: surface cycle and propose reordering.

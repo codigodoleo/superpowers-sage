@@ -76,7 +76,7 @@ Before completion, confirm all items:
 - If visual was enabled: `events.jsonl` and `approval-summary.md` exist and are referenced in spec
 - If visual was disabled: explicit opt-out is recorded in the spec
 
-## Failure Modes
+## Failure modes
 
 - No design reference available: proceed text-first, mark visual assumptions explicitly.
 - Scope too broad: decompose into sub-projects and complete first sub-scope only.
