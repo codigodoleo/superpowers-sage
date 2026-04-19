@@ -33,6 +33,7 @@ KEYWORD_MAP=(
   "rest api|wp_rest|rest endpoint:wp-rest-api"
   "design token|@theme block|tailwind token:sage-design-system"
   "block refactor|block evolution|block migration:block-refactoring"
+  "ai-setup|acorn ai|mcp adapter|discover-abilities|install mcp:ai-setup"
 )
 
 MATCHED_SKILL=""
