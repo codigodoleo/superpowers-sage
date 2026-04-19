@@ -30,7 +30,7 @@ If no scope specified, review all changed files (`git diff` against base branch)
 ### 1) Convention checklist
 
 #### Service Providers
-- [ ] Providers extend `SageServiceProvider`
+- [ ] `ThemeServiceProvider` extends `Roots\Acorn\Sage\SageServiceProvider`; other feature providers extend `Illuminate\Support\ServiceProvider`
 - [ ] `register()` only contains bindings (no hooks, no side effects)
 - [ ] `boot()` contains hooks and initialization
 - [ ] Dependencies injected via constructor
