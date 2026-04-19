@@ -137,6 +137,69 @@ function testMissingFrontmatterCaught() {
   }
 }
 
+function testOver500LineWarning() {
+  console.log('\nCase: skill file with >500 lines triggers soft warning (exit 0)');
+  const tmp = mkdtempSync(join(tmpdir(), 'validate-skills-fat-'));
+  try {
+    const src = resolve(__dirname, '..');
+    cpSync(join(src, 'scripts'), join(tmp, 'scripts'), { recursive: true });
+    // Copy plugin manifests so the validator doesn't error on missing files
+    for (const [dir, file] of [['.claude-plugin', 'plugin.json'], ['.cursor-plugin', 'plugin.json'], ['', 'plugin.json']]) {
+      if (dir) {
+        mkdirSync(join(tmp, dir), { recursive: true });
+        cpSync(join(src, dir, file), join(tmp, dir, file));
+      } else {
+        cpSync(join(src, file), join(tmp, file));
+      }
+    }
+    mkdirSync(join(tmp, 'skills', 'fat-skill'), { recursive: true });
+    mkdirSync(join(tmp, 'agents'), { recursive: true });
+
+    // Build a valid SKILL.md with exactly 501 lines total.
+    // The validator uses content.split(/\r?\n/).length.
+    // Strategy: start with the required header lines, then append padding lines
+    // until the total reaches 501.
+    const headerLines = [
+      '---',
+      'name: sage:fat-skill',
+      'description: A deliberately fat skill for testing the 500-line soft warning.',
+      '---',
+      '',
+      '## Verification',
+      '',
+      'Run the validator and check for the warning message.',
+      '',
+      '## Failure modes',
+      '',
+      'The validator exits 1 instead of 0.',
+    ];
+    const targetLines = 501;
+    const paddingCount = targetLines - headerLines.length;
+    const allLines = [
+      ...headerLines,
+      ...Array.from({ length: paddingCount }, (_, i) => `<!-- padding line ${i + 1} -->`),
+    ];
+    const content = allLines.join('\n');
+    // Verify line count is exactly 501
+    const actualLines = content.split(/\r?\n/).length;
+
+    writeFileSync(
+      join(tmp, 'skills', 'fat-skill', 'SKILL.md'),
+      content
+    );
+
+    const { stdout, exit } = runValidator(tmp);
+    assert(
+      `warning message contains "fat-skill/SKILL.md — ${actualLines} lines (>500 target)"`,
+      stdout.includes(`fat-skill/SKILL.md — ${actualLines} lines (>500 target)`),
+      stdout.slice(-400)
+    );
+    assert('exit code is 0 (soft warning, not an error)', exit === 0);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 // --- Run ---
 
 console.log('Testing scripts/validate-skills.mjs');
@@ -144,6 +207,7 @@ console.log('Testing scripts/validate-skills.mjs');
 testHappyPath();
 testCRLFFrontmatterParses();
 testMissingFrontmatterCaught();
+testOver500LineWarning();
 
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed === 0 ? 0 : 1);

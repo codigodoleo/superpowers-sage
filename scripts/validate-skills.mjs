@@ -84,6 +84,12 @@ if (existsSync(skillsDir)) {
       log("⚠", `${label} — missing "## Failure modes" section`);
       warnings++;
     }
+
+    const lineCount = content.split(/\r?\n/).length;
+    if (lineCount > 500) {
+      log('⚠', `${label} — ${lineCount} lines (>500 target)`);
+      warnings++;
+    }
   }
 }
 
