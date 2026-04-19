@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:modeling
-description: Content architecture analysis for Sage projects; classifies block content as static, dynamic collection (CPT), dynamic global (Options Page), or dynamic relation. Recommends Poet config, ACF fields, and data modeling. Invoked standalone or automatically by /building.
+description: >
+  Content modeling for Sage/Bedrock — classify as CPT ACF fields Blade component
+  Livewire component or Options Page, Poet CPT configuration, ACF Composer fields
+  vs GUI, relational content, static vs dynamic, content architecture decisions,
+  config/poet.php, modeling before building, content classification matrix
 user-invocable: true
 ---
 

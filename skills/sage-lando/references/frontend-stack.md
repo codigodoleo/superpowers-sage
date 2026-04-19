@@ -1,8 +1,8 @@
+Deep reference for Sage frontend stack (Vite, Tailwind, assets). Loaded on demand from `skills/sage-lando/SKILL.md`.
+
 # Frontend Stack
 
-Sage uses Vite as its build tool, Tailwind CSS v4 for utility-first styling, and the Laravel Vite plugin for seamless asset integration with Acorn. This reference covers the complete frontend configuration for a Lando-based WordPress development environment.
-
----
+Sage uses Vite as its build tool, Tailwind CSS v4 for utility-first styling, and the Laravel Vite plugin for seamless asset integration with Acorn.
 
 ## `vite.config.js` -- Complete Configuration
 

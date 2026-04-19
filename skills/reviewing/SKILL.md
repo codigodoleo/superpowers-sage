@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:reviewing
-description: Code review against Sage/Acorn conventions and design alignment; checks providers, hooks, ACF patterns, Blade structure, content modeling decisions, and visual alignment with design. Dispatches sage-reviewer agent.
+description: >
+  Code review for Sage/Acorn projects — review PHP Blade JS CSS,
+  review Service Providers ACF Composer blocks Livewire components,
+  Eloquent models Acorn routes, security review, performance review,
+  code quality, coding standards, PR review workflow, code review checklist
 user-invocable: true
 argument-hint: "[file path or scope]"
 ---
@@ -26,7 +30,7 @@ If no scope specified, review all changed files (`git diff` against base branch)
 ### 1) Convention checklist
 
 #### Service Providers
-- [ ] Providers extend `SageServiceProvider`
+- [ ] `ThemeServiceProvider` extends `Roots\Acorn\Sage\SageServiceProvider`; other feature providers extend `Illuminate\Support\ServiceProvider`
 - [ ] `register()` only contains bindings (no hooks, no side effects)
 - [ ] `boot()` contains hooks and initialization
 - [ ] Dependencies injected via constructor

@@ -1,4 +1,8 @@
+Deep reference for testing Sage/Acorn projects. Loaded on demand from `skills/sage-lando/SKILL.md`.
+
 # Testing
+
+Setting up Pest in the Sage/Acorn theme — installing dependencies, writing unit and feature tests, and mocking WordPress functions with Brain Monkey.
 
 ## Setup Pest
 

@@ -1,4 +1,8 @@
+Deep reference for Sage/Lando troubleshooting. Loaded on demand from `skills/sage-lando/SKILL.md`.
+
 # Troubleshooting
+
+Common issues in Sage/Acorn/Lando development — Blade cache staleness, ACF sync errors, Vite HMR failures, autoloading problems, and container resolution failures.
 
 ## 1. Blade templates don't update after editing
 

@@ -1,6 +1,13 @@
 ---
 name: superpowers-sage:sage-lando
-description: Use when architecting or developing WordPress projects with Roots Sage theme, Acorn (Laravel IoC for WordPress), and Lando local development. Use when setting up service providers, view composers, view components, ACF Composer blocks/fields, or Blade templates in a Sage theme. Use when adding custom services, bindings, or facades to a WordPress project.
+description: >
+  Sage theme with Acorn (Laravel IoC for WordPress) and Lando — lando start,
+  lando info, lando acorn, Service Providers, View Composers, Blade components,
+  ACF Composer blocks and fields, Poet CPT config/poet.php, AppServiceProvider,
+  ViewServiceProvider, resources/views/, resources/css/app.css @theme Tailwind v4,
+  resources/js/app.js, content/themes/{theme}/, lando yarn dev, lando yarn build,
+  Blade @extends @section @include @component, Bedrock directory structure,
+  lando wp, composer require, lando composer
 user-invocable: false
 ---
 
@@ -128,76 +135,24 @@ project-root/
 
 #### Acorn generators (`make:*`)
 
-| Command                                   | Class generated                        | View generated                                      |
-| ----------------------------------------- | -------------------------------------- | --------------------------------------------------- |
-| `lando acorn make:component Button`       | `app/View/Components/Button.php`       | `resources/views/components/button.blade.php`       |
-| `lando acorn make:component Cards/Button` | `app/View/Components/Cards/Button.php` | `resources/views/components/cards/button.blade.php` |
-| `lando acorn make:composer FrontPage`     | `app/View/Composers/FrontPage.php`     | _(none)_                                            |
-| `lando acorn make:provider MyProvider`    | `app/Providers/MyProvider.php`         | _(none)_                                            |
-| `lando acorn make:command SyncData`       | `app/Console/Commands/SyncData.php`    | _(none)_                                            |
+- `lando acorn make:component {Name}` — class + view in `app/View/Components/` + `resources/views/components/`
+- `lando acorn make:composer {Name}` — view composer in `app/View/Composers/`
+- `lando acorn make:provider {Name}` — service provider in `app/Providers/`
+- `lando acorn make:command {Name}` — console command in `app/Console/Commands/`
 
-**`make:component` options:**
-
-- `--inline` — renders inline Blade string (no view file)
-- `--view` — anonymous component (view only, no class)
-- `--path=custom/path` — override view destination
-
-**`make:composer` options:**
-
-- `--views 'front-page'` — pre-fills the `$views` array
-- Note: `make:composer` does **not** support custom stubs (hardcoded in package)
+Pass `Category/Name` for nested directories. Use `--inline`, `--view`, `--path` on `make:component`.
 
 #### ACF Composer generators (`acf:*`)
 
-| Command                                   | Class generated                      | View generated                                        |
-| ----------------------------------------- | ------------------------------------ | ----------------------------------------------------- |
-| `lando acorn acf:block Hero`              | `app/Blocks/Hero.php`                | `resources/views/blocks/hero.blade.php`               |
-| `lando acorn acf:block Sections/Hero`     | `app/Blocks/Sections/Hero.php`       | `resources/views/blocks/sections/hero.blade.php`      |
-| `lando acorn acf:field PostMeta`          | `app/Fields/PostMeta.php`            | _(none)_                                              |
-| `lando acorn acf:partial HeroFields`      | `app/Fields/Partials/HeroFields.php` | _(none)_                                              |
-| `lando acorn acf:options GlobalSettings`  | `app/Options/GlobalSettings.php`     | _(none)_                                              |
-| `lando acorn acf:widget NewsletterWidget` | `app/Widgets/NewsletterWidget.php`   | `resources/views/widgets/newsletter-widget.blade.php` |
+- `lando acorn acf:block {Name}` — block class + view (interactive prompts)
+- `lando acorn acf:field {Name}` — field group class
+- `lando acorn acf:partial {Name}` — reusable field partial
+- `lando acorn acf:options {Name}` — options page class
+- `lando acorn acf:widget {Name}` — widget class + view
 
-**Options:**
+All accept `--force`. `acf:block --localize` for i18n stub. Bootstrap stubs: `lando acorn acf:stubs`.
 
-- `acf:block` is interactive — prompts for description, category, post types, supports
-- `acf:block --localize` — localized name/description stub
-- `acf:options --full` — complete options page configuration
-- All `acf:*` accept `--force` — overwrite existing files
-
-#### Subdirectory notation
-
-Pass `Category/Name` to any generator to create nested directories in both class and view paths:
-
-```bash
-lando acorn make:component Cards/ServiceCard
-# → app/View/Components/Cards/ServiceCard.php
-# → resources/views/components/cards/service-card.blade.php
-
-lando acorn acf:block Sections/Hero
-# → app/Blocks/Sections/Hero.php
-# → resources/views/blocks/sections/hero.blade.php
-```
-
-#### Custom stubs
-
-Acorn resolves `basePath` to the theme directory via `get_theme_file_path('composer.json')`. Placing stub files there overrides generator defaults automatically — no publish command needed.
-
-| Stub file (inside theme)                  | Overrides                    |
-| ----------------------------------------- | ---------------------------- |
-| `stubs/acf-composer/block.stub`           | `acf:block` class            |
-| `stubs/acf-composer/block.localized.stub` | `acf:block --localize` class |
-| `stubs/acf-composer/views/block.stub`     | `acf:block` Blade view       |
-| `stubs/acf-composer/field.stub`           | `acf:field`                  |
-| `stubs/acf-composer/partial.stub`         | `acf:partial`                |
-| `stubs/acf-composer/options.stub`         | `acf:options`                |
-| `stubs/acf-composer/options.full.stub`    | `acf:options --full`         |
-| `stubs/acf-composer/widget.stub`          | `acf:widget` class           |
-| `stubs/acf-composer/views/widget.stub`    | `acf:widget` Blade view      |
-| `stubs/view-component.stub`               | `make:component`             |
-| `stubs/provider.stub`                     | `make:provider`              |
-
-To bootstrap stubs from package defaults: `lando acorn acf:stubs`
+For full generator details and custom stubs, see [`references/acf-composer.md`](references/acf-composer.md).
 
 ### 4) Run common Lando commands as needed
 
@@ -309,76 +264,4 @@ Read the relevant reference file **before generating code** in that domain:
 
 ## Canonical Lando Command Reference
 
-**This section is the single source of truth for Lando commands in Sage/Acorn projects. Other skills should reference `@sage-lando` rather than repeat commands.**
-
-### Theme-level tooling (runs inside `wp-content/themes/{theme}/`)
-
-| Command | Purpose |
-|---|---|
-| `lando theme-composer require <package>` | Install a PHP package into the theme |
-| `lando theme-composer remove <package>` | Uninstall a theme package |
-| `lando theme-composer update` | Update theme dependencies |
-| `lando theme-yarn add <package>` | Install a JS package into the theme |
-| `lando theme-yarn add -D <package>` | Install a dev-only JS package |
-| `lando theme-build` | Production build via Vite — exits 0 when successful |
-| `lando theme-dev` / `lando vite` | Vite dev server with HMR |
-
-### Acorn (artisan-style)
-
-| Command | Purpose |
-|---|---|
-| `lando acorn make:command <Name>` | Scaffold a console command |
-| `lando acorn make:provider <Name>` | Scaffold a service provider |
-| `lando acorn make:controller <Name>` | Scaffold a controller |
-| `lando acorn make:livewire <Name>` | Scaffold a Livewire component |
-| `lando acorn make:job <Name>` | Scaffold a queue job |
-| `lando acorn queue:work` | Run queue workers |
-| `lando acorn route:list` | List all registered Acorn routes |
-| `lando acorn schedule:run` | Execute scheduled tasks once |
-| `lando acorn config:cache` | Cache all config for production |
-| `lando acorn config:clear` | Clear config cache |
-| `lando acorn vendor:publish --tag=<tag>` | Publish package config/assets |
-
-### ACF Composer
-
-| Command | Purpose |
-|---|---|
-| `lando acorn acf:block <Name> --localize` | Scaffold an ACF block localization-ready |
-| `lando acorn acf:field <Name>` | Scaffold a field group class |
-| `lando acorn acf:partial <Name>` | Scaffold a reusable field partial |
-| `lando acorn acf:options <Name>` | Scaffold an ACF Options Page |
-| `lando acorn acf:widget <Name>` | Scaffold an ACF widget |
-
-### WordPress CLI
-
-| Command | Purpose |
-|---|---|
-| `lando wp <any wp-cli command>` | Run WP-CLI inside the container |
-| `lando wp shell` | Interactive PHP shell with WP loaded |
-| `lando wp eval '<php>'` | Run PHP snippet with WP context |
-| `lando wp db export <file>` | Export DB to SQL file |
-| `lando wp db import <file>` | Import SQL file into DB |
-| `lando wp search-replace <from> <to> --precise --dry-run` | Safe search-replace with serialized data |
-
-For full WP-CLI patterns see `@wp-cli-ops`.
-
-### Cache and build management
-
-| Command | Purpose |
-|---|---|
-| `lando flush` | Clear Acorn + Blade + OPcache — **run after every PHP change** |
-| `lando theme-build` | Production Vite build — **run after every CSS/JS change** |
-| `lando restart` | Restart Lando services (rarely needed) |
-
-### Direct project-root tools
-
-| Command | Purpose |
-|---|---|
-| `lando composer <any>` | Project-root Composer (WP core, root deps) |
-| `lando php <any>` | PHP in container — debug snippets, version check |
-
-**Never run `composer` or `php` on the host.** Always use `lando` wrappers to ensure correct PHP version, extensions, database connection, and paths.
-
-### Full Lando reference
-
-For deep Lando setup (recipe config, services, proxy, databases, host mapping, custom tooling authoring), see `references/lando-setup.md`.
+See [references/lando-command-reference.md](references/lando-command-reference.md).

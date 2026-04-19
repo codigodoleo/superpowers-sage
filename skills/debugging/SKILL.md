@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:debugging
-description: Guided troubleshooting for Sage/Acorn/Lando projects; categorizes issues, runs targeted diagnostics, knows common pitfalls (Blade cache, OPcache, Vite HMR). Wraps superpowers systematic-debugging with Sage domain knowledge.
+description: >
+  Debug issues in Sage/Acorn/Lando projects — PHP errors, Blade rendering errors,
+  Livewire mount failures, Eloquent query errors, Acorn boot errors,
+  queue job failures, middleware blocking, WP hook conflicts,
+  lando logs, Query Monitor, Xdebug, lando php -r, WP_DEBUG, debug session
 user-invocable: true
 disable-model-invocation: true
 argument-hint: "[error description]"

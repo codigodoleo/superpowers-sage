@@ -1,6 +1,11 @@
 ---
 name: superpowers-sage:building
-description: Scaffold and implement Sage components following a plan; reads sub-plans and design assets, consults reference skills, implements PHP blocks + Blade views + CSS, invokes /verifying after each component. Knows how to delegate independent components to parallel subagents.
+description: >
+  Build a feature in a Sage/Acorn project — implement from an approved plan,
+  write code, commit, iterate; orchestrates acorn-routes, acorn-livewire,
+  acorn-eloquent, block-scaffolding, acorn-commands; TDD in Sage,
+  implementation phase, commit hygiene, PR creation, incremental delivery,
+  changelog entry, lando acorn, lando yarn build, lando yarn dev
 user-invocable: true
 argument-hint: "[plan path or component description]"
 ---

@@ -1,6 +1,12 @@
 ---
 name: superpowers-sage:acorn-redis
-description: Redis caching, sessions, and object cache in WordPress via Acorn; configuration with Lando, cache tags, and Laravel's Redis facade
+description: >
+  Redis caching, sessions, and queue driver in WordPress via Acorn — lando redis-cli,
+  Cache::remember(), Cache::tags(), cache invalidation, WP object cache drop-in,
+  wp_cache_set, wp_cache_get, Redis facade, session driver redis, REDIS_HOST,
+  REDIS_PORT, Lando Redis service, predis, phpredis, queue connection redis,
+  cache tags group invalidation, WP transient replacement, cache hit rate,
+  lando wp cache type, object-cache.php drop-in
 user-invocable: false
 ---
 
@@ -36,153 +42,12 @@ Lando provides Redis as a service. Acorn connects to it through Laravel's Redis 
 - **Session driver** — user sessions backed by Redis instead of filesystem
 - **Queue driver** — background job processing (see `sage:acorn-queues`)
 
-## Lando Configuration
+See [`references/cache-config.md`](references/cache-config.md) for full Lando service config, `config/cache.php`, and `Cache::remember()` patterns.
+See [`references/cache-tags.md`](references/cache-tags.md) for tag-based invalidation with `save_post` and `edited_term`.
+See [`references/session-queue.md`](references/session-queue.md) for session driver and queue connection wiring.
+See [`references/troubleshooting.md`](references/troubleshooting.md) for connection refused, drop-in not installed, cache not persisting, session issues.
 
-The Redis service is already defined in `.lando.yml` (see `sage:roots-sage-lando` lando-setup reference):
-
-```yaml
-services:
-  cache:
-    type: redis:6
-```
-
-Add to your `.env`:
-
-```env
-REDIS_HOST=cache
-REDIS_PORT=6379
-REDIS_PASSWORD=null
-
-CACHE_DRIVER=redis
-SESSION_DRIVER=redis
-```
-
-The hostname is `cache` because that is the Lando service name. Lando DNS resolves service names automatically.
-
-## Cache Configuration
-
-`config/cache.php` — register the Redis store:
-
-```php
-return [
-    'default' => env('CACHE_DRIVER', 'file'),
-
-    'stores' => [
-        'redis' => [
-            'driver' => 'redis',
-            'connection' => 'cache',
-            'lock_connection' => 'default',
-        ],
-    ],
-
-    'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'sage'), '_') . '_cache_'),
-];
-```
-
-`config/database.php` — Redis connections:
-
-```php
-'redis' => [
-    'client' => env('REDIS_CLIENT', 'phpredis'),
-
-    'default' => [
-        'host' => env('REDIS_HOST', '127.0.0.1'),
-        'password' => env('REDIS_PASSWORD'),
-        'port' => env('REDIS_PORT', '6379'),
-        'database' => env('REDIS_DB', '0'),
-    ],
-
-    'cache' => [
-        'host' => env('REDIS_HOST', '127.0.0.1'),
-        'password' => env('REDIS_PASSWORD'),
-        'port' => env('REDIS_PORT', '6379'),
-        'database' => env('REDIS_CACHE_DB', '1'),
-    ],
-],
-```
-
-Separate databases (`0` for general, `1` for cache) prevent `FLUSHDB` on cache from wiping session data.
-
-## Using the Cache
-
-```php
-use Illuminate\Support\Facades\Cache;
-
-// Basic get/set
-Cache::put('featured_ids', $ids, now()->addMinutes(30));
-$ids = Cache::get('featured_ids');
-
-// Recommended: remember pattern — fetch from cache or compute and store
-$posts = Cache::remember('homepage:featured', now()->addHour(), function (): array {
-    return get_posts(['post_type' => 'post', 'posts_per_page' => 6]);
-});
-
-// Forever (no TTL) — use sparingly, invalidate explicitly
-Cache::forever('site:settings', $settings);
-
-// Remove
-Cache::forget('homepage:featured');
-
-// Check existence
-if (Cache::has('featured_ids')) {
-    // ...
-}
-
-// Increment/decrement (atomic)
-Cache::increment('page:views:' . $postId);
-```
-
-Always prefer `Cache::remember()` over manual get-then-set. It is atomic and avoids race conditions.
-
-## Cache Tags
-
-Tags group related entries for bulk invalidation. Requires a tag-aware driver (Redis supports this).
-
-```php
-// Store with tags
-Cache::tags(['posts', 'homepage'])->remember('homepage:grid', now()->addHour(), fn () =>
-    get_posts(['posts_per_page' => 12])
-);
-
-Cache::tags(['posts', 'archive'])->put('archive:page:1', $archiveData, now()->addMinutes(30));
-
-// Flush everything tagged "posts" — clears both homepage and archive caches
-Cache::tags(['posts'])->flush();
-
-// Flush only homepage-related caches
-Cache::tags(['homepage'])->flush();
-```
-
-Invalidate tags in a service provider or save_post hook:
-
-```php
-add_action('save_post', function (int $postId): void {
-    Cache::tags(['posts'])->flush();
-});
-```
-
-## Session Configuration
-
-`config/session.php`:
-
-```php
-return [
-    'driver' => env('SESSION_DRIVER', 'redis'),
-    'lifetime' => env('SESSION_LIFETIME', 120),
-    'connection' => env('SESSION_CONNECTION', 'default'),
-    'cookie' => env('SESSION_COOKIE', Str::slug(env('APP_NAME', 'sage'), '_') . '_session'),
-];
-```
-
-Sessions use the `default` Redis connection (database `0`), separate from cache (database `1`).
-
-## Queue Driver
-
-Set `QUEUE_CONNECTION=redis` in `.env`. Queue configuration lives in `config/queue.php`. See `sage:acorn-queues` for job dispatching, workers, and retry strategies.
-
-```env
-QUEUE_CONNECTION=redis
-```
+Scripts: [`scripts/redis-health.sh`](scripts/redis-health.sh)
 
 ## WordPress Object Cache
 
@@ -241,32 +106,15 @@ lando redis-cli -h cache MONITOR
 # List all keys (dev only — never in production)
 lando redis-cli -h cache KEYS '*'
 
-# Count keys by pattern
-lando redis-cli -h cache KEYS 'sage_cache_*' | wc -l
-
 # Inspect a key's TTL
 lando redis-cli -h cache TTL "sage_cache:homepage:featured"
 
 # Flush a specific database
 lando redis-cli -h cache -n 1 FLUSHDB
 
-# Flush everything (dev only)
-lando redis-cli -h cache FLUSHALL
-
 # Check memory usage
 lando redis-cli -h cache INFO memory
 ```
-
-## Best Practices
-
-1. **Use `Cache::remember()` by default** — avoids manual get/set boilerplate and handles race conditions.
-2. **Set explicit TTLs** — never rely on implicit expiration. Use `now()->addMinutes(30)` or `now()->addHour()`.
-3. **Prefix keys with context** — `homepage:featured`, `user:{id}:preferences` — avoids collisions across features.
-4. **Never cache user-specific data in global keys** — tag or key by user ID if caching per-user data.
-5. **Separate Redis databases** — `0` sessions, `1` cache, `2` WP object cache. Prevents one `FLUSHDB` from nuking everything.
-6. **Invalidate on write, not on read** — hook into `save_post`, model events, or deploy scripts to flush stale caches.
-7. **Use cache tags for related groups** — easier to invalidate "all post caches" than tracking individual keys.
-8. **Monitor in development** — `lando redis-cli -h cache MONITOR` shows exactly what hits Redis and when.
 
 ## Verification
 

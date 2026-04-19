@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:onboarding
-description: Analyze a Sage/Acorn project and present an onboarding overview; detect installed packages, configured services, theme structure, design tools, active plans, and guide the developer on what to explore or work on
+description: >
+  Onboard to a Sage/Acorn/Lando project — understand project structure,
+  discover CPTs routes field groups Livewire components, lando start, lando info,
+  project orientation, first session setup, read CLAUDE.md, activate skills,
+  understand what exists before building, lando wp post-type list
 user-invocable: true
 context: fork
 ---

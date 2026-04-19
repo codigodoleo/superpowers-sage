@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:install-plugin
-description: "Install a WordPress plugin via Composer in Lando from either a local .zip file or a plugin name/slug searched on wp-packages.org. Use when user asks /install-plugin or asks to add plugin without wp plugin install."
+description: >
+  Install WordPress plugins in Bedrock — lando composer require, Bedrock plugin
+  management, composer.json for WP plugins, WP packagist, wpackagist-plugin,
+  mu-plugins vs plugins, Bedrock plugin activation, composer.json repositories,
+  lando wp plugin list, plugin compatibility, roots/wordpress-packagist
 user-invocable: true
 argument-hint: "[plugin slug|composer package|/absolute/or/relative/path/to/plugin.zip]"
 ---

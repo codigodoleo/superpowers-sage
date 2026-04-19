@@ -1,6 +1,10 @@
 ---
 name: superpowers-sage:verifying
-description: Visual comparison of implemented sections against design reference; captures screenshots via Chrome/Playwright MCP, compares with plan assets or design tool screens, reports match/drift/missing. Standalone or integrated in /building flow.
+description: >
+  Verify implemented work meets acceptance criteria — run tests, check PHPCS,
+  validate Blade output, lando phpunit, lando phpcs, lando yarn test,
+  Playwright tests, accessibility check, post-implementation verification,
+  done criteria validation, checklist review, verification phase
 user-invocable: true
 argument-hint: "[section name or plan path]"
 ---

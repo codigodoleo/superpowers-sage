@@ -1,5 +1,5 @@
 ---
-name: wp-performance
+name: superpowers-sage:wp-performance
 description: >
   WordPress performance optimization: performance, slow query, N+1 query, Query Monitor,
   autoload audit, autoload options, object cache, Redis, wp_cache, transient, cache invalidation,
