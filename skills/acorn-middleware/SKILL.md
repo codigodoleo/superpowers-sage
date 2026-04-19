@@ -131,13 +131,7 @@ For detailed debug tips and common mistake patterns, read [`references/troublesh
 
 ## Failure modes
 
-### Problem: Middleware not executing (requests pass through unfiltered)
-Middleware class is not registered in `app/Http/Kernel.php`. Add to `$middlewareAliases` or `$middlewareGroups`.
-
-### Problem: JWT secret missing or invalid (all tokens rejected)
-`JWT_SECRET` not set in `.env`, or differs between environments. Add it and re-issue tokens.
-
-For the full troubleshooting guide (more failure modes, common mistakes table, escalation), read [`references/troubleshooting.md`](references/troubleshooting.md).
+See [`references/troubleshooting.md`](references/troubleshooting.md) for the full failure modes list, common mistakes table, and escalation paths.
 
 ## Critical Rules
 

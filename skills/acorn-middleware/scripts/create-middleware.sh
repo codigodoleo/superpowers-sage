@@ -18,5 +18,23 @@ if ! command -v lando >/dev/null 2>&1; then
 fi
 
 lando acorn make:middleware "$NAME"
-echo "Created middleware: app/Http/Middleware/${NAME}.php"
-echo "Next: register in app/Providers/RouteServiceProvider.php"
+
+PLUGIN_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+TARGET="app/Http/Middleware/${NAME}.php"
+
+case "$TYPE" in
+    auth)
+        TPL="$PLUGIN_ROOT/skills/acorn-middleware/assets/middleware-auth.php.tpl"
+        ;;
+    filter|*)
+        TPL="$PLUGIN_ROOT/skills/acorn-middleware/assets/middleware-filter.php.tpl"
+        ;;
+esac
+
+if [ -f "$TPL" ] && [ -f "$TARGET" ]; then
+    sed "s/{{CLASS_NAME}}/$NAME/g" "$TPL" > "$TARGET"
+    echo "Applied ${TYPE} template to ${TARGET}"
+fi
+
+echo "Created middleware: ${TARGET}"
+echo "Next: register in app/Http/Kernel.php (middleware groups or route middleware aliases)"

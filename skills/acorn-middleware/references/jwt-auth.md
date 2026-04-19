@@ -100,7 +100,7 @@ class JwtService
 ```php
 // In ThemeServiceProvider::register() or a dedicated AuthServiceProvider
 $this->app->singleton(JwtService::class, fn () => new JwtService(
-    secret: config('app.key', env('JWT_SECRET', '')),
+    secret: env('JWT_SECRET', ''),
     ttl: (int) env('JWT_TTL', 3600),
     refreshTtl: (int) env('JWT_REFRESH_TTL', 604800),
 ));
