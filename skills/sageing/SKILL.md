@@ -1,6 +1,6 @@
 ---
 name: superpowers-sage:sageing
-description: Meta-skill for Sage/Acorn projects; explains the gerund workflow ecosystem, Lando commands, architectural preferences, plan system, design tool integration, and when to use which skill. Read this first in any Sage project.
+description: Meta-skill for Sage/Acorn projects; explains the gerund workflow ecosystem, Lando commands, architectural preferences, plan system, design tool integration, and when to use which skill. Read this first in any Sage project., WordPress MCP Adapter, discover-abilities, execute-ability, Acorn AI, mcp-query-patterns, query-first workflow
 ---
 
 # Sageing — The Sage/Acorn Ecosystem Guide
@@ -148,6 +148,8 @@ Routing is by URL, not by which MCP happens to be configured. If the user sends 
 When using Paper as source, `/designing` persists three artifacts per section in `assets/`: `.png` (screenshot), `.styles.json` (computed styles, consumed by `/verifying` for style spot-check), and `.reference.jsx` (structural reference — never copied as code, since Sage uses Blade not React).
 
 When no design MCP is available, skills work with local assets in `docs/plans/<plan>/assets/`.
+
+See [`references/mcp-query-patterns.md`](references/mcp-query-patterns.md) for query-before-generate patterns (populated by Onda 5).
 
 ## Playwright MCP vs Playwright Test npm
 
