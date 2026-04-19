@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.0.0...superpowers-sage-v2.1.0) (2026-04-19)
+
+
+### Features
+
+* **onda-1:** foundation layer — CLAUDE.md + 7 skill progressive-disclosure refactors + validator ([#26](https://github.com/codigodoleo/superpowers-sage/issues/26)) ([d8ea4c5](https://github.com/codigodoleo/superpowers-sage/commit/d8ea4c547e9d082ad574739899e4f718c5ea17bf))
+
 ## [2.0.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v1.7.1...superpowers-sage-v2.0.0) (2026-04-18)
 
 
