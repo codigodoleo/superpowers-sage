@@ -21,7 +21,7 @@
 | 3 — New deterministic capabilities | [onda-3](2026-04-18-plugin-expansion-onda-3.md) | 6 | Done |
 | 4 — Specialized subagents | [onda-4](2026-04-18-plugin-expansion-onda-4.md) | 4 | Done |
 | 5 — AI-native integration | [onda-5](2026-04-18-plugin-expansion-onda-5.md) | 5 | Done |
-| 6 — Hardening from field feedback | [onda-6](2026-04-18-plugin-expansion-onda-6.md) | 5 | Ready (full TDD) |
+| 6 — Hardening from field feedback | [onda-6](2026-04-18-plugin-expansion-onda-6.md) | 5 | Done |
 
 ---
 
