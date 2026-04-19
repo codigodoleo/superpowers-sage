@@ -2,6 +2,8 @@ Deep reference for keeping block edit preview and frontend render consistent. Lo
 
 # Edit Preview vs Frontend Parity
 
+ACF blocks render twice — once in the Gutenberg editor preview and once on the frontend — making CSS loading order and wrapper structure a common source of visual drift.
+
 ## The Problem
 
 ACF blocks render twice: once in the Gutenberg editor (preview mode) and once

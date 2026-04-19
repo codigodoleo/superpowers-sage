@@ -2,6 +2,8 @@ Deep reference for Query Monitor setup and usage in Lando. Loaded on demand from
 
 # Query Monitor
 
+Query Monitor is the primary debugging tool for inspecting slow queries, hooks, transients, and HTTP requests in a Lando Sage project.
+
 ## Installation in Lando
 
 ```bash

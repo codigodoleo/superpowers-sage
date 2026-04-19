@@ -2,6 +2,8 @@ Deep reference for InnerBlocks in ACF Composer blocks. Loaded on demand from `sk
 
 # InnerBlocks in ACF Composer Blocks
 
+InnerBlocks renders a nested block editor area inside a parent ACF Composer block, letting editors drop other blocks into a container.
+
 ## What InnerBlocks Does
 
 `InnerBlocks` renders a nested block editor area inside a parent block.

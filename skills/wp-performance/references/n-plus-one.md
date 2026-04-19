@@ -2,6 +2,8 @@ Deep reference for N+1 query detection and remediation in Sage/Eloquent. Loaded 
 
 # N+1 Query Detection and Remediation
 
+N+1 queries are the most common performance killer in Eloquent-backed Sage themes; detecting and eliminating them requires eager loading and Query Monitor.
+
 ## What Is N+1?
 
 An N+1 pattern executes one query to retrieve a list of items (1 query),

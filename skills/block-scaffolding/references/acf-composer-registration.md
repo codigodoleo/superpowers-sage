@@ -2,6 +2,8 @@ Deep reference for ACF Composer block class structure in Sage themes. Loaded on 
 
 # ACF Composer Block Registration
 
+Full block class shape, `$fields` definition, and required overrides for registering ACF Composer blocks in a Sage theme.
+
 ## Full Block Class Shape
 
 ```php

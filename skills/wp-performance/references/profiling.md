@@ -2,6 +2,8 @@ Deep reference for PHP profiling in Lando-based WordPress/Sage projects. Loaded 
 
 # PHP Profiling
 
+Xdebug profiling mode generates callgrind files that identify which functions consume the most time in a WordPress/Sage request.
+
 ## Xdebug in Lando
 
 Lando's `php` service includes Xdebug. Enable it for profiling mode:

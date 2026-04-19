@@ -2,6 +2,8 @@ Deep reference for block.json schema and its relationship with ACF Composer. Loa
 
 # block.json in ACF Composer Blocks
 
+ACF Composer handles block registration in PHP by default; `block.json` is optional but required for block variations, style variations declared in JSON, or WP 6.5+ render callbacks.
+
 ## When to Use block.json
 
 ACF Composer generates a PHP class that handles registration — `block.json` is **optional** for ACF blocks. Add it when you need:

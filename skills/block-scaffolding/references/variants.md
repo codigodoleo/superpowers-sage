@@ -2,6 +2,8 @@ Deep reference for ACF Composer block variants and the $styles system. Loaded on
 
 # Block Variants and $styles
 
+The `$styles` array on an ACF Composer block registers named Gutenberg style variations, each applying an `is-style-{name}` CSS class that the Blade view can target.
+
 ## $styles — The Gutenberg Style Picker
 
 `$styles` on an ACF Composer block registers named style variations in the

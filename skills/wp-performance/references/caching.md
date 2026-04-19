@@ -2,6 +2,8 @@ Deep reference for WordPress caching strategies in Sage/Bedrock. Loaded on deman
 
 # Caching in WordPress / Sage
 
+Caching in a Sage/Bedrock stack spans four layers — object cache, transients, full-page, and static assets — each with distinct scope and invalidation strategies.
+
 ## Strategy Selection
 
 | Strategy | Use when | TTL | Persistence |

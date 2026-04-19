@@ -2,6 +2,8 @@ Deep reference for Core Web Vitals optimization in Sage/Vite-based themes. Loade
 
 # Core Web Vitals for Sage / Vite
 
+Core Web Vitals — LCP, CLS, INP — are the key browser performance metrics affecting SEO ranking and user experience in Sage/Vite themes.
+
 ## Metrics and Targets
 
 | Metric | Target | Measurement |
