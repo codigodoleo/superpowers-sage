@@ -302,3 +302,16 @@ This survives context compaction and gives future sessions a fast recap of what 
 - **Hooks handle cache** — post-edit hook auto-runs `lando flush` and `lando theme-build`
 - **Worktree per component** — every component is implemented in an isolated branch+worktree, merged to the feature branch only after visual verification passes
 - **Zero arbitrary Tailwind values** — all colours, fonts, and spacing must be `@theme` tokens; arbitrary `[#hex]` classes are a Critical issue caught by visual-verifier
+
+## Query First — MCP Integration
+
+Before generating code that references CPTs, fields, routes, or Livewire components:
+
+```
+discover-abilities
+execute-ability posts/list-types
+execute-ability acf/field-groups
+```
+
+Never invent slugs or field names — always query first when the stack is available.
+See [`sageing/references/mcp-query-patterns.md`](../sageing/references/mcp-query-patterns.md).

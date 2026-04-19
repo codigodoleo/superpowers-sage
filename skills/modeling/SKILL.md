@@ -110,3 +110,14 @@ $projects = get_posts([
 - **YAGNI** — a repeater is simpler than a CPT; use the simpler option when both work
 - **Poet for CPTs** — never `register_post_type()` directly
 - **Future-proof wisely** — if content will "probably" grow, use a CPT; if "maybe someday", use a repeater
+
+## Query First — MCP Integration
+
+Before proposing CPTs or ACF field groups, query what already exists:
+
+```
+execute-ability posts/list-types
+execute-ability acf/field-groups
+```
+
+See [`sageing/references/mcp-query-patterns.md`](../sageing/references/mcp-query-patterns.md).
