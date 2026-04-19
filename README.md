@@ -182,6 +182,10 @@ After installing, open your Sage project and run:
 
 This analyzes your project, detects installed packages, design tools, and active plans, then suggests next steps.
 
+> **Plugin-level rules** live in [`CLAUDE.md`](CLAUDE.md) at the plugin
+> root — universal Roots/Bedrock/Lando/Tailwind v4 constraints that
+> apply to every session.
+
 ### Which skill do I use?
 
 Quick decision tree for common tasks:
