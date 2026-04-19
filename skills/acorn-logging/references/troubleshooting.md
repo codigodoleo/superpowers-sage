@@ -25,17 +25,17 @@ Common errors when configuring and using Acorn's logging system in Lando/WordPre
 ## Slack Not Notified
 
 **Symptom:** Critical errors occur but no Slack notifications arrive.
-**Cause:** The Slack channel is not added to the `stack` channels array, or the `SLACK_LOG_WEBHOOK_URL` env var is not set.
+**Cause:** The Slack channel is not added to the `stack` channels array, or the `LOG_SLACK_WEBHOOK_URL` env var is not set.
 **Fix:** Add the Slack channel to `config/logging.php`:
 
 ```php
 'slack' => [
     'driver' => 'slack',
-    'url' => env('SLACK_LOG_WEBHOOK_URL'),
+    'url' => env('LOG_SLACK_WEBHOOK_URL'),
     'username' => 'Acorn Log',
     'emoji' => ':boom:',
     'level' => env('LOG_LEVEL', 'critical'),
 ],
 ```
 
-Set `SLACK_LOG_WEBHOOK_URL` in `.env` and include `'slack'` in your `stack` channels: `'channels' => ['daily', 'slack']`. Verify the webhook URL is valid by testing with `curl`.
+Set `LOG_SLACK_WEBHOOK_URL` in `.env` and include `'slack'` in your `stack` channels: `'channels' => ['daily', 'slack']`. Verify the webhook URL is valid by testing with `curl`.
