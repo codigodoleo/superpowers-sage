@@ -79,6 +79,129 @@ For each job:
 - Propose a Queue Job class in `app/Jobs/`.
 - Show how to dispatch it with Action Scheduler.
 
+### Phase 4 — ACF Field Data Migration Scripts
+
+When renaming an ACF field group (e.g., from `hero` to `hero_section`), ACF stores data in three layers of `wp_postmeta`. All three must be updated or `get_field()` silently returns empty values.
+
+#### The three layers
+
+| Layer | Meta key pattern | Example |
+|---|---|---|
+| Field-level | `{group_prefix}_{field_name}` | `hero_title` → `hero_section_title` |
+| Row-level (repeater) | `{group_prefix}_{N}_{field_name}` | `hero_0_item` → `hero_section_0_item` |
+| `_field` references | Value: `field_{group_prefix}_{field_name}` | `field_hero_title` → `field_hero_section_title` |
+
+Layer 1 and 2 are handled by a single regex-style rename of meta keys starting with `{old_prefix}_`. Layer 3 requires a separate pass that rewrites meta **values** matching `field_{old_prefix}_*`.
+
+#### Migration script template
+
+Generate this script as `scripts/migrate-acf-{old}-to-{new}.php`:
+
+```php
+<?php
+/**
+ * ACF field group rename migration.
+ * Usage: wp eval-file scripts/migrate-acf-hero-to-hero-section.php dry-run
+ * Usage: wp eval-file scripts/migrate-acf-hero-to-hero-section.php
+ *
+ * Note: wp eval-file does NOT support --flag syntax. Pass arguments positionally.
+ * $args is available in eval-file context — it contains positional args as an array.
+ */
+
+$dry_run = isset($args) && in_array('dry-run', (array) $args, true);
+
+$old_prefix = 'hero';
+$new_prefix = 'hero_section';
+
+global $wpdb;
+$changed = 0;
+
+echo "ACF migration: {$old_prefix} → {$new_prefix}" . ($dry_run ? " [DRY RUN]" : "") . "\n\n";
+
+// PASS 1 — rename field meta keys (field-level AND row-level repeater keys)
+$rows = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT meta_id, meta_key, post_id FROM {$wpdb->postmeta}
+         WHERE meta_key LIKE %s AND meta_key NOT LIKE %s",
+        $old_prefix . '_%',
+        '\_%'
+    ),
+    ARRAY_A
+);
+
+foreach ($rows as $row) {
+    if (!str_contains($row['meta_key'], $old_prefix . '_')) {
+        continue;
+    }
+    $new_key = preg_replace(
+        '/^' . preg_quote($old_prefix, '/') . '_/',
+        $new_prefix . '_',
+        $row['meta_key']
+    );
+    if (!$dry_run) {
+        $wpdb->update(
+            $wpdb->postmeta,
+            ['meta_key' => $new_key],
+            ['meta_id'  => $row['meta_id']],
+            ['%s'],
+            ['%d']
+        );
+    }
+    echo "[post {$row['post_id']}] KEY  {$row['meta_key']} → {$new_key}\n";
+    $changed++;
+}
+
+// PASS 2 — rename _field reference values
+$ref_rows = $wpdb->get_results(
+    $wpdb->prepare(
+        "SELECT meta_id, meta_value, post_id FROM {$wpdb->postmeta}
+         WHERE meta_value LIKE %s",
+        'field_' . $old_prefix . '_%'
+    ),
+    ARRAY_A
+);
+
+foreach ($ref_rows as $row) {
+    $new_val = str_replace(
+        'field_' . $old_prefix . '_',
+        'field_' . $new_prefix . '_',
+        $row['meta_value']
+    );
+    if (!$dry_run) {
+        $wpdb->update(
+            $wpdb->postmeta,
+            ['meta_value' => $new_val],
+            ['meta_id'    => $row['meta_id']],
+            ['%s'],
+            ['%d']
+        );
+    }
+    echo "[post {$row['post_id']}] REF  {$row['meta_value']} → {$new_val}\n";
+    $changed++;
+}
+
+echo "\nTotal: {$changed} change(s)" . ($dry_run ? " (dry run — nothing written)" : " applied") . "\n";
+```
+
+#### How to run
+
+```bash
+# Dry run first — always
+lando wp eval-file scripts/migrate-acf-hero-to-hero-section.php dry-run
+
+# Review output, then apply
+lando wp eval-file scripts/migrate-acf-hero-to-hero-section.php
+```
+
+**Important:** `wp eval-file` does NOT accept `--flag` style arguments. Use positional arguments and read them from `$args` inside the script.
+
+#### Checklist before running
+
+- [ ] Take a database snapshot: `lando wp db export backup-$(date +%Y%m%d).sql`
+- [ ] Run dry-run and review all printed changes
+- [ ] Verify the new field group name exists in the ACF PHP registration (`config/poet.php` or the Block class)
+- [ ] After apply: clear WP object cache (`lando wp cache flush`) and verify `get_field()` returns expected values
+
 ## Output Format
 
 ```
