@@ -294,3 +294,14 @@ Deep content loaded on demand — zero tokens until needed.
 
 - Route needs WordPress REST API (`/wp-json/`): use `register_rest_route()` — see `superpowers-sage:wp-rest-api`.
 - Middleware not behaving: see `superpowers-sage:acorn-middleware` for Kernel setup and JWT.
+
+## Query First — MCP Integration
+
+Before adding routes that reference controllers or post types, query:
+
+```
+execute-ability routes/list
+```
+
+Use real route slugs and controller names from the query.
+See [`sageing/references/mcp-query-patterns.md`](../sageing/references/mcp-query-patterns.md).

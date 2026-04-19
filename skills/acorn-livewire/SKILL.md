@@ -169,3 +169,16 @@ For all other failure modes (419 CSRF, Alpine conflicts, 404 on Livewire endpoin
 5. **Never store large collections in public properties.** Livewire serializes all public properties on every request. Use `#[Computed]` for post lists and other derived data.
 6. **Do not load Alpine separately.** Livewire bundles Alpine. A second Alpine instance causes conflicts. See `references/alpine-interop.md`.
 7. **`@livewireStyles` in `<head>`, `@livewireScripts` before `</body>`.** Both are required. Missing either causes Livewire to silently fail.
+
+## Query First — MCP Integration
+
+Before creating or referencing a Livewire component, query the live environment:
+
+```
+discover-abilities
+execute-ability livewire/components
+```
+
+Use real class names from the query. Do not invent component names.
+If the stack is not installed, run `/ai-setup` first.
+See [`sageing/references/mcp-query-patterns.md`](../sageing/references/mcp-query-patterns.md) for the full pattern.
