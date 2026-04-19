@@ -24,6 +24,7 @@ const DST = resolve(ROOT, 'hooks', 'cursor-hooks.json');
 
 // Claude Code event -> Cursor event mapping
 const EVENT_MAP = {
+  UserPromptSubmit: 'userPromptSubmit',
   SessionStart: 'sessionStart',
   PostToolUse: {
     // PostToolUse with matcher 'Write|Edit' maps to Cursor's afterFileEdit
@@ -35,11 +36,13 @@ const EVENT_MAP = {
   },
   PreToolUse: {
     // PreToolUse with matcher 'Bash' maps to Cursor's beforeShellExecution (needs matcher field)
+    // PreToolUse with matcher 'Write|Edit' maps to Cursor's beforeFileEdit
     matchers: {
       Bash: {
         event: 'beforeShellExecution',
         matcher: 'git commit', // Cursor-level matcher for the pre-commit hook
       },
+      'Write|Edit': 'beforeFileEdit',
     },
   },
   PostCompact: 'preCompact',
