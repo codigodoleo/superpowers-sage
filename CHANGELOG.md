@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.4.0...superpowers-sage-v2.5.0) (2026-04-19)
+
+
+### Features
+
+* **skills,scripts:** Wave 5 AI-native integration ([#34](https://github.com/codigodoleo/superpowers-sage/issues/34)) ([d406c03](https://github.com/codigodoleo/superpowers-sage/commit/d406c0318d90adee04c916b02a593181626757a0))
+
 ## [2.4.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.3.0...superpowers-sage-v2.4.0) (2026-04-19)
 
 
