@@ -36,7 +36,7 @@ class {{CLASS_NAME}} implements ShouldQueue
         }
 
         // If this job needs WordPress user context, set it first:
-        // wp_set_current_user($this->userId);
+        // wp_set_current_user($this->userId); // add: protected readonly int $userId to constructor
 
         Log::info('{{CLASS_NAME}}: starting', ['id' => $this->id]);
 
