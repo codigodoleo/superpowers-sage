@@ -122,9 +122,8 @@ echo "ACF migration: {$old_prefix} → {$new_prefix}" . ($dry_run ? " [DRY RUN]"
 $rows = $wpdb->get_results(
     $wpdb->prepare(
         "SELECT meta_id, meta_key, post_id FROM {$wpdb->postmeta}
-         WHERE meta_key LIKE %s AND meta_key NOT LIKE %s",
-        $old_prefix . '_%',
-        '\_%'
+         WHERE meta_key LIKE %s",
+        $old_prefix . '_%'
     ),
     ARRAY_A
 );
