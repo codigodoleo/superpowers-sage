@@ -176,6 +176,69 @@ Every unlocalized string is **CRITICAL** — same severity as arbitrary Tailwind
 
 If the project uses a non-`sage` text domain, check `functions.php` or `ThemeServiceProvider::boot()` for the registered domain. See `references/localization.md` for the full localization cycle.
 
-### G8. Mixed-language identifiers
+### G8. Mixed-language identifiers (extended)
 
 Grep view, controller, CSS for non-English tokens in class names, variable names, comments. Each instance is CRITICAL (violates the language policy in `sageing`).
+
+Beyond variables and comments, also check:
+
+- **Block slug** (`$slug = '...'` in controller) — if contains non-English words, propose rename to en-US equivalent
+- **Controller filename** (`app/Blocks/{ClassName}.php`) — must follow the en-US slug
+- **View filename** (`resources/views/blocks/{slug}.blade.php`) — idem
+- **CSS filename** (`resources/css/blocks/{slug}.css`) — idem
+- **JS filename** (`resources/js/blocks/{slug}.js`) — idem
+- **Custom element tag** (`<block-{slug}>` in view) — derived from slug; if slug changes, tag changes
+- **ACF field group key** (`Builder::make('{group_key}')`) — must be `snake_case` of the en-US slug
+- **ACF field keys** (`field_{group_key}_{field_name}`) — affected by group key rename
+
+**When the slug changes**, a second migration is required beyond the field names script:
+
+1. Rewrite `<!-- wp:acf/{old-slug}` → `<!-- wp:acf/{new-slug}` in `post_content`
+2. Rewrite `field_{old_group}_*` → `field_{new_group}_*` in field key references
+3. Rename files with `git mv` to preserve history
+4. Update any `editor.css` import referencing the old slug
+
+When G8 includes a slug rename, generate a **single consolidated migration script** in Phase 7 covering both field renames and slug/block type rewrite — avoids two human-gate cycles.
+
+### G9. Component reuse gap
+
+Check if repeated UI patterns in the view are candidates for shared `<x-ui.*>` components.
+
+Look for:
+- Repeated inline Blade structures (same HTML pattern ≥ 2 times in the same view or across blocks)
+- Hard-coded button markup instead of `<x-button>` / `<x-cta>`
+- Card-like structures not using `<x-card>`
+- Icon markup not using `<x-icon>`
+
+Each instance where an existing component would fit is a gap — flag for extraction or replacement.
+
+### G10. CSS variable cascade + dark section tone check
+
+**Cascade check:** Verify that hardcoded token values do not appear directly in the view where a `--block-*` custom property should be the intermediary.
+
+Look for:
+- `text-[var(--color-*)]` or `bg-[var(--color-*)]` in the view (should route through `--block-text` / `--block-bg`)
+- `style="color: var(--color-*)"` inline styles bypassing the block CSS layer
+- Any `var(--color-*)` in the view that skips the block's custom-property abstraction
+
+**Dark section eyebrow tone check:**
+
+For blocks with a dark background (`bg-primary`, `bg-depth`, `bg-identity`, or any class mapping to a dark `--color-*` token), verify that all `<x-eyebrow>` and `<x-section-header>` components pass a compatible `tone` prop.
+
+`<x-eyebrow>` defaults to `text-fg` (dark graphite) — invisible on dark backgrounds. Dark blocks must use `tone="identity"` (sage) or another tone appropriate to the contrast.
+
+**Signal:** `<x-eyebrow>` or `<x-section-header>` without a `tone` prop inside a section with a dark background class. Flag as **CRITICAL**.
+
+### G11. `nl2br` on textarea fields
+
+Check ACF `textarea` fields rendered in the view for missing newline handling.
+
+Look for `{{ $field }}` or `{!! $field !!}` where the backing ACF field type is `textarea`.
+
+Raw textarea output ignores newlines in HTML. Use:
+
+```blade
+{!! nl2br(esc_html($field)) !!}
+```
+
+or `wpautop()` for richer paragraph handling.

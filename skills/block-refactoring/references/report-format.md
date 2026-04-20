@@ -57,6 +57,11 @@ After user approves proposals:
 1. Apply CSS coverage removals
 2. Apply variation expansions (CSS + `$styles`)
 3. Apply gap fixes (G1–G11 as approved)
+   - If **G8 includes a slug rename**: generate a **single consolidated migration script** covering
+     field key renames + slug/group key rewrite + block type in `post_content`. This avoids two
+     separate human-gate cycles. Structure: PASS 1 (field keys), PASS 2 (group key references),
+     PASS 3 (`<!-- wp:acf/{old-slug}` → `<!-- wp:acf/{new-slug}` in `post_content`). Use
+     `git mv` for the four filename renames to preserve history.
 4. If G1 v1 → v2 migration was approved:
    - Ensure `BaseCustomElement.js` exists in theme
    - Rewrite view, CSS, create JS file, update provider
