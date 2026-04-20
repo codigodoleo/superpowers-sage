@@ -42,12 +42,12 @@ Scan the project using native tools (Glob, Grep, Read — no bash pipes needed):
 **Lando config:** Use `Read` on `.lando.yml` (top-level only).
 
 **Runner detection:** After reading `.lando.yml`:
-- If `.lando.yml` exists at repo root:
+- If `.lando.yml` exists at repo root (Read succeeded):
   → runner: Lando
   → isolation: branch+commit-per-phase
   → reason: Lando mounts /app to a fixed path; worktrees require
             re-mounting per worktree — incompatible.
-- If `.lando.yml` does not exist:
+- If `.lando.yml` does not exist (Read returned not-found or file is absent):
   → runner: docker-compose / bare-metal
   → isolation: worktree-per-component (default building behavior)
 
