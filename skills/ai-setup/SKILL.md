@@ -33,14 +33,22 @@ Read the `missing` array. Proceed through only the steps that apply.
 
 ## Step 2 — Install packages (if `missing` includes `acorn-ai` or `mcp-adapter`)
 
-Show the user the commands and ask for confirmation before running:
+The two packages belong to different layers — install them separately:
 
 ```bash
-lando composer require roots/acorn-ai wordpress/mcp-adapter
+# Laravel AI bridge — goes into the theme
+lando theme-composer require roots/acorn-ai
+
+# WordPress MCP plugin — goes into the Bedrock root (installer-paths)
+lando composer require wordpress/mcp-adapter
+
 lando wp acorn vendor:publish --tag=acorn-ai
 ```
 
-See [`references/install-steps.md`](references/install-steps.md) for full install details and version conflict resolution.
+`wordpress/mcp-adapter` is a `wordpress-plugin` type package. If installed via the theme Composer it
+lands in `theme/vendor/` with no WordPress activation — always use root `composer`.
+
+See [`references/install-steps.md`](references/install-steps.md) for full install details, version conflict resolution, and the Bedrock autoloader stub fix.
 
 ## Step 3 — Add API key (if `missing` includes `api-key`)
 
@@ -72,6 +80,9 @@ lando wp mcp-adapter list
 
 Expected: at least one server listed (e.g. `mcp-adapter-default-server`).
 
+If the command returns "not a registered wp command" with the plugin showing as active, see
+[Bedrock + installer-paths stub fix](references/install-steps.md#bedrock--installer-paths-autoloader-silently-broken).
+
 Then in Claude Code, confirm MCP is working:
 
 ```
@@ -98,6 +109,13 @@ Expected: `"ready": true` with all fields populated.
 
 - **Cause:** `roots/acorn-ai` or `wordpress/mcp-adapter` require a version of Acorn or WordPress that your project doesn't have.
 - **Fix:** See [`references/install-steps.md`](references/install-steps.md) for version resolution steps. Usually requires updating Acorn or WordPress first.
+
+### Problem: `wp mcp-adapter list` returns "not a registered wp command" (Bedrock)
+
+- **Cause:** `wordpress/mcp-adapter` looks for `vendor/autoload.php` inside its own plugin directory.
+  In Bedrock with `installer-paths` the autoloading lives in the root `vendor/` — the plugin-local
+  path never exists, so the plugin silently skips registering all hooks.
+- **Fix:** See [`references/install-steps.md`](references/install-steps.md) for the stub solution.
 
 ### Problem: MCP server not appearing in `discover-abilities`
 
