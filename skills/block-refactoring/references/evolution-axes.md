@@ -221,13 +221,15 @@ Look for:
 - `style="color: var(--color-*)"` inline styles bypassing the block CSS layer
 - Any `var(--color-*)` in the view that skips the block's custom-property abstraction
 
-**Dark section eyebrow tone check:**
+**Dark section contrast check:**
 
-For blocks with a dark background (`bg-primary`, `bg-depth`, `bg-identity`, or any class mapping to a dark `--color-*` token), verify that all `<x-eyebrow>` and `<x-section-header>` components pass a compatible `tone` prop.
+For blocks with a dark background, verify that UI components rendered inside it receive the correct contrast variant via their props/attributes. Many Blade components default to a light-on-white appearance and become invisible on dark surfaces unless explicitly told otherwise.
 
-`<x-eyebrow>` defaults to `text-fg` (dark graphite) — invisible on dark backgrounds. Dark blocks must use `tone="identity"` (sage) or another tone appropriate to the contrast.
+- **Symptom:** element is present in the DOM but invisible (check with browser devtools or `curl` + inspect rendered HTML — the component is there but its default color matches the dark background)
+- **Cause:** the component has a default color prop suited for light backgrounds; no override was passed for this dark context
+- **Fix:** pass the contrast-aware variant prop the component exposes (whatever controls its foreground color), choosing the value appropriate for the block's background
 
-**Signal:** `<x-eyebrow>` or `<x-section-header>` without a `tone` prop inside a section with a dark background class. Flag as **CRITICAL**.
+**Signal:** any Blade component inside a dark-background block that does not explicitly set a color/tone/variant prop. Flag as **CRITICAL** — invisible elements are a silent regression.
 
 ### G11. `nl2br` on textarea fields
 
