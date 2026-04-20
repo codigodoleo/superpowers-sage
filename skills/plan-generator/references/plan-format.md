@@ -17,7 +17,6 @@ docs/plans/YYYY-MM-DD-<topic>/
       design-guide.md                  # Design tokens + layout contract
       visual-checks.md                 # Visual verification checklist
   assets/
-    visual-approval.md                 # Extracted from approval-summary.md + events.jsonl
     section-<name>.png                 # Design reference screenshots
     section-<name>-spec.md             # Structured section spec
 ```
@@ -36,7 +35,6 @@ components:
   - name: <ComponentName>
     strategy: <autonomous|interactive>
     depends_on: [<ComponentName>]
-    visual_checkpoint: <required|optional>
 ---
 
 # <Feature Title> Execution Plan
@@ -58,7 +56,6 @@ components:
 ## Global Done Criteria
 
 - [ ] All component done criteria reached
-- [ ] Visual checkpoints completed where required
 - [ ] Final reviewer checkpoint completed
 ```
 
@@ -92,7 +89,6 @@ components:
 - [ ] Functional behavior matches architecture spec
 - [ ] Data model integration validated
 - [ ] Tests for component behavior pass
-- [ ] Visual checkpoint executed (if required)
 
 ## Owner Skill Routing
 
@@ -134,7 +130,6 @@ components:
 
 ## Source of Truth
 
-- Visual approval summary: ../../assets/visual-approval.md
 - Source spec: ../../architecture.md
 
 ## Required Checks
@@ -156,33 +151,6 @@ components:
 - Notes: <short summary>
 ```
 
-## `assets/visual-approval.md`
-
-```markdown
-# Visual Approval Summary
-
-## Session
-
-- Session path: <docs/superpowers/visual-companion/...>
-- Source files: approval-summary.md, events.jsonl
-
-## Decisions
-
-- Approach decision: <A/B/...>
-- Overview gate: <approved/rejected>
-- Components/data-flow gate: <approved/rejected>
-- Quality strategy gate: <approved/rejected>
-
-## Constraints for Implementation
-
-- <constraint>
-- <constraint>
-
-## Notes
-
-- If browser mode was declined, record explicit terminal opt-out here.
-```
-
 ## Dependency Graph Classification
 
 Classify every implementation unit:
@@ -200,6 +168,5 @@ Next recommended path:
 
 1. Run superpowers-sage:building against the generated plan directory
 2. Execute parallel batch A components first
-3. Run visual checkpoints before moving to dependent batch
-4. Run final review and verification before completion
+3. Run final review and verification before completion
 ```
