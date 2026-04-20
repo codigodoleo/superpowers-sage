@@ -41,6 +41,18 @@ Scan the project using native tools (Glob, Grep, Read — no bash pipes needed):
 
 **Lando config:** Use `Read` on `.lando.yml` (top-level only).
 
+**Runner detection:** After reading `.lando.yml`:
+- If `.lando.yml` exists at repo root:
+  → runner: Lando
+  → isolation: branch+commit-per-phase
+  → reason: Lando mounts /app to a fixed path; worktrees require
+            re-mounting per worktree — incompatible.
+- If `.lando.yml` does not exist:
+  → runner: docker-compose / bare-metal
+  → isolation: worktree-per-component (default building behavior)
+
+Record the detected runner for use in Step 3.
+
 ### 1) Detect design tools
 
 Use ToolSearch to check for available design MCPs:
@@ -100,6 +112,7 @@ Report active plans that survive this cross-check with accurate status.
 ### Stack
 - Acorn: {version} | PHP: {version} | Node: {version}
 - Tailwind: {v3 or v4} | Database: {mysql/mariadb}
+- Runner: {Lando → isolation: branch+commit-per-phase | docker-compose/bare-metal → isolation: worktree-per-component}
 
 ### Installed Packages
 {list from composer.json — highlight: acf-composer, livewire, poet, navi}
