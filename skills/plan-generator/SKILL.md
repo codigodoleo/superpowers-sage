@@ -55,7 +55,6 @@ Extract:
 - Data model decisions
 - Integration points
 - Quality constraints
-- Visual approval artifacts (if present): session path, event summary, section-level approvals
 
 Translate each into concrete implementation units.
 
@@ -76,14 +75,10 @@ For each unit, define:
 - Strategy: autonomous, interactive, or mixed
 - Suggested skill(s): `superpowers-sage:building`, `superpowers-sage:modeling`, `superpowers-sage:designing`, `superpowers-sage:verifying`, and reference skills (`acorn-*`, `wp-*`) as needed
 - Acceptance criteria
-- Visual checkpoint requirement (must verify against approved visual section before marking done)
 
 ### 6) Generate plan directory and files
 
 Create the directory and file structure as defined in `references/plan-format.md`.
-
-When visual artifacts exist, also create `assets/visual-approval.md` with extracted
-decision summary from `approval-summary.md` and `events.jsonl`.
 
 > Full file templates and frontmatter schemas: `skills/plan-generator/references/plan-format.md`
 
@@ -112,7 +107,6 @@ Before completion, confirm all items:
 - Plan directory exists with required files
 - Dependency graph has no unresolved nodes
 - Each component has acceptance criteria in its sub-plan
-- If visual artifacts exist in source spec, `assets/visual-approval.md` and per-component `visual-checks.md` are generated
 
 ## Failure modes
 
@@ -120,4 +114,3 @@ Before completion, confirm all items:
 - Dependency cycle detected: surface cycle and propose reordering.
 - Incomplete component definitions: return to architecture spec for clarification.
 - Too many cross-component dependencies: split into phased plan and mark phase gates.
-- Missing visual artifacts despite visual-required components: mark visual checks as blocked and request refreshed architecture approval package.
