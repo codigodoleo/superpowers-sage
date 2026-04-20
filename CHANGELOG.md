@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.7.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.6.0...superpowers-sage-v2.7.0) (2026-04-20)
+
+
+### Features
+
+* **block-refactoring:** extend G8 to cover slug/filenames, add G9/G10/G11 definitions ([e88518e](https://github.com/codigodoleo/superpowers-sage/commit/e88518eef8404c17427684636f121f831d798923))
+
+
+### Bug Fixes
+
+* **ai-setup:** separate composer commands by layer + Bedrock autoloader stub gotcha ([c249ede](https://github.com/codigodoleo/superpowers-sage/commit/c249ede08abbface263e3de7ecb14696820b0029))
+
 ## [2.6.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.5.0...superpowers-sage-v2.6.0) (2026-04-19)
 
 
