@@ -121,7 +121,7 @@ Read the component's `design-guide.md` (`## Tokens → Colors` section) if avail
 | Token found in design-guide Colors | Background context | CSS action |
 |---|---|---|
 | `bg-depth`, `bg-primary`, `bg-dark`, `bg-inverse` | Dark | Override cascade vars with `*-on-dark` equivalents |
-| `bg-identity`, `bg-sage`, `bg-accent` | Identity (brand color bg) | Override cascade vars with `*-on-identity` equivalents |
+| `bg-identity`, `bg-sage`, `bg-accent` | Identity (brand color bg) | Override cascade vars with `*-on-identity` equivalents (e.g. `var(--color-identity-fg)`) |
 | `bg-bg`, `bg-surface`, `bg-muted`, absent | Light (default) | No override — inherit `:root` defaults |
 | Unrecognized token | Ambiguous | Generate with `/* VERIFY: background context unknown */` |
 
@@ -154,7 +154,7 @@ block-{slug} {
 block-{slug} {
   @apply block overflow-hidden;
 
-  /* cascade — dark section, override :root defaults */
+  /* cascade — dark section, override :root defaults; values may differ per component — adjust per design-guide */
   --eyebrow-color:   var(--color-depth-fg);
   --heading-color:   var(--color-depth-fg);
   --body-color:      var(--color-depth-fg);
@@ -335,7 +335,7 @@ lando flush         # clear Acorn/Blade/OPcache
 2. Verify `<link href="*/block-{slug}-*.css">` and `<script>` in DOM
 3. Custom element upgraded: `document.querySelector('block-{slug}').constructor !== HTMLElement`
 4. Full mode: test each variation via DevTools adding `is-style-neutral` / `is-style-dark`
-   to the outer `<section>` and confirm `--block-bg` resolves correctly
+   to the outer `<section>` and confirm cascade vars (e.g. `--eyebrow-color`, `--heading-color`) resolve correctly
 5. `git commit -m "feat(blocks): scaffold {slug}" && git push`
 
 ---
@@ -348,7 +348,7 @@ lando flush         # clear Acorn/Blade/OPcache
 4. **`get_block_wrapper_attributes()` on `<section>`** — provides accessibility, spacing, alignment, and variation classes.
 5. **`assets()` stays empty** — CSS/JS enqueue belongs in `ThemeServiceProvider::boot()`.
 6. **`@reference` not `@import` in block CSS** — avoids duplicating the full stylesheet.
-7. **`display: block` on the custom element** — custom elements default to `inline`.
+7. **`@apply block overflow-hidden` on the custom element** — custom elements default to `inline`; `overflow-hidden` prevents bleed.
 8. **Commit before declaring done** — git state is part of the Definition of Done.
 
 ---
