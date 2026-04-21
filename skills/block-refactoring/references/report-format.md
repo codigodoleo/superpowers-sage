@@ -75,6 +75,8 @@ block-{slug} {
 }
 ```
 
+*(For dark-background blocks, replace values per the decision table in SKILL.md G10 step 3.)*
+
 **Proposed fix — `resources/views/blocks/{slug}.blade.php`:**
 Remove `tone="fg"` from `<x-eyebrow>` and `<x-section-header>` calls.
 Child components will inherit color from CSS variables automatically.
@@ -85,7 +87,7 @@ Child components will inherit color from CSS variables automatically.
 After presenting the complete Phase 6 report (including G10 CSS diffs when applicable):
 
 ```
-"Apply all proposed fixes listed above? [y/N]"
+Apply all proposed fixes listed above? [y/N]
 ```
 
 On `y` → Phase 7 applies all fixes atomically.

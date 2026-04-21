@@ -153,8 +153,8 @@ Each instance is CRITICAL.
 3. Apply decision table:
    | Token found | Background | CSS action |
    |---|---|---|
-   | `bg-depth`, `bg-primary`, `bg-dark`, `bg-inverse` | Dark | Use `*-on-dark` equivalents |
-   | `bg-identity`, `bg-sage`, `bg-accent` | Identity | Use `*-on-identity` equivalents (e.g. `var(--color-identity-fg)`) |
+   | `bg-depth`, `bg-primary`, `bg-dark`, `bg-inverse` | Dark | Override cascade vars with `*-on-dark` equivalents |
+   | `bg-identity`, `bg-sage`, `bg-accent` | Identity (brand color bg) | Override cascade vars with `*-on-identity` equivalents (e.g. `var(--color-identity-fg)`) |
    | `bg-bg`, `bg-surface`, `bg-muted`, absent | Light (default) | Inherit `:root` defaults |
    | Unrecognized token | Ambiguous | Generate with `/* VERIFY: background context unknown */` |
 4. Include generated CSS in Phase 6 report (see report-format.md G10 section template)
