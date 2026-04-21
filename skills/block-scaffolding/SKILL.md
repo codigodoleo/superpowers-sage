@@ -90,8 +90,20 @@ Produces:
 Before writing the view, build a local registry of available shared components:
 
 1. Glob `resources/views/components/*.blade.php` — list all component files
-2. For each component, read its `@props` declaration
-3. Note the component API (prop names + defaults)
+2. For each component:
+   a. Read its `@props` declaration → note prop names + defaults
+   b. Grep for `var(--)` patterns → note CSS variable names consumed
+3. Build local registry:
+   ```
+   {
+     "section-header": { props: ["eyebrow","title","align"] },
+     "eyebrow":        { consumes: ["--eyebrow-color","--decorator-color"] },
+     "button":         { consumes: ["--btn-bg","--btn-text"] }
+   }
+   ```
+
+This registry drives CSS generation in S1 — variable names come from the project,
+not from the skill's assumptions.
 
 **Rule:** if the block needs eyebrow + heading markup, use `<x-section-header>` (or
 the equivalent shared component) — do NOT emit `<x-eyebrow>` + `<h2>` inline.
@@ -103,59 +115,96 @@ If no suitable component exists, use inline markup and note it for future extrac
 
 ### S1 — `resources/css/blocks/{slug}.css`
 
-**Full mode:**
+Before generating CSS, apply the background context decision table.
+Read the component's `design-guide.md` (`## Tokens → Colors` section) if available:
+
+| Token found in design-guide Colors | Background context | CSS action |
+|---|---|---|
+| `bg-depth`, `bg-primary`, `bg-dark`, `bg-inverse` | Dark | Override cascade vars with `*-on-dark` equivalents |
+| `bg-identity`, `bg-sage`, `bg-accent` | Identity (brand color bg) | Override cascade vars with `*-on-identity` equivalents (e.g. `var(--color-identity-fg)`) |
+| `bg-bg`, `bg-surface`, `bg-muted`, absent | Light (default) | No override — inherit `:root` defaults |
+| Unrecognized token | Ambiguous | Generate with `/* VERIFY: background context unknown */` |
+
+Variable names for the cascade block come from the Phase 0b registry (what each
+shared component actually consumes via `var(--)` references).
+
+**Full mode — light section (no override):**
 
 ```css
 @reference "../app.css";
 
 block-{slug} {
-  display: block;
-  --block-bg:        var(--color-surface);
-  --block-text:      var(--color-foreground);
-  --block-text-sub:  var(--color-foreground-muted);
-  --block-border:    var(--color-border);
-  --block-btn-bg:    var(--color-foreground);
-  --block-btn-text:  var(--color-foreground-on-inverse);
-  color: var(--block-text);
-  background: var(--block-bg);
-  overflow: hidden;
-}
+  @apply block overflow-hidden;
 
-.is-style-neutral block-{slug} {
-  --block-bg:     var(--color-surface-muted);
-  --block-border: var(--color-border-strong);
-}
-
-.is-style-dark block-{slug} {
-  --block-bg:        var(--color-surface-inverse);
-  --block-text:      var(--color-foreground-on-inverse);
-  --block-text-sub:  color-mix(in srgb, var(--color-foreground-on-inverse) 60%, transparent);
-  --block-border:    color-mix(in srgb, var(--color-foreground-on-inverse) 20%, transparent);
-  --block-btn-bg:    var(--color-foreground-on-inverse);
-  --block-btn-text:  var(--color-foreground);
+  /* cascade — inherited by child components */
+  --eyebrow-color:   var(--color-identity);
+  --heading-color:   var(--color-fg);
+  --body-color:      var(--color-fg);
+  --decorator-color: var(--color-identity);
 }
 ```
 
-**Minimal mode:** omit `.is-style-*` selectors. Include the token declarations commented
-out so the developer has the vocabulary available without forcing unused properties:
+*(variable names from Phase 0b registry; values from `:root` defaults)*
+
+**Full mode — dark section (`bg-depth` detected in design-guide):**
 
 ```css
 @reference "../app.css";
 
 block-{slug} {
-  display: block;
-  /* --block-bg:        var(--color-surface); */
-  /* --block-text:      var(--color-foreground); */
-  /* --block-text-sub:  var(--color-foreground-muted); */
-  /* --block-border:    var(--color-border); */
-  /* --block-btn-bg:    var(--color-foreground); */
-  /* --block-btn-text:  var(--color-foreground-on-inverse); */
+  @apply block overflow-hidden;
+
+  /* cascade — dark section, override :root defaults; values may differ per component — adjust per design-guide */
+  --eyebrow-color:   var(--color-depth-fg);
+  --heading-color:   var(--color-depth-fg);
+  --body-color:      var(--color-depth-fg);
+  --decorator-color: var(--color-depth-fg);
+}
+```
+
+**Full mode with `$styles` variations (background changes per variation):**
+
+```css
+@reference "../app.css";
+
+block-{slug} {
+  @apply block overflow-hidden;
+
+  /* cascade — light default */
+  --eyebrow-color:   var(--color-identity);
+  --heading-color:   var(--color-fg);
+  --body-color:      var(--color-fg);
+  --decorator-color: var(--color-identity);
+}
+
+.is-style-dark block-{slug} {
+  --eyebrow-color:   var(--color-depth-fg);
+  --heading-color:   var(--color-depth-fg);
+  --body-color:      var(--color-depth-fg);
+  --decorator-color: var(--color-depth-fg);
+}
+```
+
+**Minimal mode:** omit `.is-style-*` selectors. Include the token declarations
+commented out so the developer has the vocabulary available:
+
+```css
+@reference "../app.css";
+
+block-{slug} {
+  @apply block overflow-hidden;
+  /* --eyebrow-color:   var(--color-identity); */
+  /* --heading-color:   var(--color-fg); */
+  /* --body-color:      var(--color-fg); */
+  /* --decorator-color: var(--color-identity); */
 }
 ```
 
 **CSS rules:**
-- `@reference` not `@import` — grants Tailwind token access without duplicating styles
-- `display: block` mandatory — custom elements default to `inline`
+- `@apply` for all Tailwind utilities (`block`, `overflow-hidden`, `flex`, spacing, etc.)
+- CSS custom properties remain native CSS — no `@apply` equivalent exists for cascade variables
+- No hardcoded color values — all values reference `@theme` tokens via `var(--)`
+- `@reference` not `@import` — grants token access without duplicating the stylesheet
 - `.is-style-* block-{slug}` single selector — works in editor and frontend
 
 ### S2 — `app/Blocks/{ClassName}.php`
@@ -286,7 +335,7 @@ lando flush         # clear Acorn/Blade/OPcache
 2. Verify `<link href="*/block-{slug}-*.css">` and `<script>` in DOM
 3. Custom element upgraded: `document.querySelector('block-{slug}').constructor !== HTMLElement`
 4. Full mode: test each variation via DevTools adding `is-style-neutral` / `is-style-dark`
-   to the outer `<section>` and confirm `--block-bg` resolves correctly
+   to the outer `<section>` and confirm cascade vars (e.g. `--eyebrow-color`, `--heading-color`) resolve correctly
 5. `git commit -m "feat(blocks): scaffold {slug}" && git push`
 
 ---
@@ -299,7 +348,7 @@ lando flush         # clear Acorn/Blade/OPcache
 4. **`get_block_wrapper_attributes()` on `<section>`** — provides accessibility, spacing, alignment, and variation classes.
 5. **`assets()` stays empty** — CSS/JS enqueue belongs in `ThemeServiceProvider::boot()`.
 6. **`@reference` not `@import` in block CSS** — avoids duplicating the full stylesheet.
-7. **`display: block` on the custom element** — custom elements default to `inline`.
+7. **`@apply block overflow-hidden` on the custom element** — custom elements default to `inline`; `overflow-hidden` prevents bleed.
 8. **Commit before declaring done** — git state is part of the Definition of Done.
 
 ---
@@ -311,7 +360,7 @@ lando flush         # clear Acorn/Blade/OPcache
 | `<section class="b-{slug}">` + `$attributes->merge()` | `@unless preview <section {!! get_block_wrapper_attributes() !!}>` + `<block-{slug}>` |
 | `.b-{slug} { ... }` | `block-{slug} { ... }` tag selector |
 | `&.is-style-neutral, .is-style-neutral &` | `.is-style-neutral block-{slug}` |
-| No `display: block` | Explicit `display: block/flex/grid` always |
+| No `@apply block` on custom element | `@apply block overflow-hidden` always — custom elements default to `inline` |
 | `<hero>` (no hyphen) | `<block-hero>` |
 | `assets()` with enqueue | `assets()` empty — enqueue in ThemeServiceProvider |
 | `@import "../app.css"` | `@reference "../app.css"` |
