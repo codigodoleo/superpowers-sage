@@ -83,9 +83,9 @@ Full API and implementation: [references/hf-validation.md](references/hf-validat
 
 Three documented bugs that silently break forms in this stack. Full symptom/root cause/fix for each: [references/traps.md](references/traps.md).
 
-- **T1 — `pattern` attribute backslash escaping in Blade components.** `$attributes->merge()` double-escapes backslashes; `patternMismatch` never fires. Workaround: use a JS validator, not a `pattern` attribute.
-- **T2 — `type="tel"` skips `patternMismatch` in Chrome.** Use `type="text" inputmode="tel"` instead.
-- **T3 — `ValidityState` is non-enumerable.** Never spread with `{ ...field.validity }`. Access properties directly.
+- **T1 — `pattern` attribute backslash escaping in Blade components.** `$attributes->merge()` double-escapes backslashes; `patternMismatch` never fires. Symptom: form submits even though `pattern` regex doesn't match user input. Workaround: use a JS validator, not a `pattern` attribute.
+- **T2 — `type="tel"` skips `patternMismatch` in Chrome.** Use `type="text" inputmode="tel"` instead. Symptom: phone format validator silently no-ops in Chrome (works in Firefox/Safari).
+- **T3 — `ValidityState` is non-enumerable.** Spread (`{ ...field.validity }`) and `Object.keys()` return empty. Symptom: your error-message lookup object is always empty. Access named properties directly: `validity.valueMissing`, `validity.patternMismatch`, `validity.tooShort`, `validity.customError`, etc.
 
 ## File Map (canonical per form integration)
 
