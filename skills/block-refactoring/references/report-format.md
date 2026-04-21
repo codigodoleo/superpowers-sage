@@ -37,7 +37,7 @@ Produce this structured report in Phase 6:
 - G7 Missing localization: {count}
 - G8 Mixed-language identifiers: {count + locations}
 - G9 Component reuse gap: {count + locations}
-- G10 CSS variable cascade not used: {count + locations}
+- G10 CSS custom property cascade not used: {count + locations} — when flagged, see G10 section below
 - G11 nl2br on text fields: {count + locations}
 
 ### Suggested action
@@ -50,9 +50,50 @@ Produce this structured report in Phase 6:
 | {proposal from Phase 6} | Applied / Deferred | {reason} |
 ````
 
+---
+
+When G10 is flagged, include this section in the Phase 6 report:
+
+````markdown
+### G10 — CSS custom property cascade not used
+
+**Current:** `<x-eyebrow :label="$eyebrow" tone="fg" />` (color hardcoded via prop)
+**Impact:** Each new variation or dark mode requires touching every block view.
+
+**Proposed fix — `resources/css/blocks/{slug}.css`:**
+
+```css
+@reference "../app.css";
+
+block-{slug} {
+  @apply block overflow-hidden;
+
+  --eyebrow-color:   var(--color-identity);
+  --heading-color:   var(--color-fg);
+  --body-color:      var(--color-fg);
+  --decorator-color: var(--color-identity);
+}
+```
+
+**Proposed fix — `resources/views/blocks/{slug}.blade.php`:**
+Remove `tone="fg"` from `<x-eyebrow>` and `<x-section-header>` calls.
+Child components will inherit color from CSS variables automatically.
+````
+
+## Approval Gate — Before Phase 7
+
+After presenting the complete Phase 6 report (including G10 CSS diffs when applicable):
+
+```
+"Apply all proposed fixes listed above? [y/N]"
+```
+
+On `y` → Phase 7 applies all fixes atomically.
+On `N` → stop; user reviews report individually and re-runs with specific items.
+
 ## Applying Approved Changes (Phase 7)
 
-After user approves proposals:
+After user approves:
 
 1. Apply CSS coverage removals
 2. Apply variation expansions (CSS + `$styles`)

@@ -126,16 +126,38 @@ classes (e.g. `btn-`, `rounded-`, `px-`, `py-`, `font-`) — these should be
 
 Each instance where a component from the Phase 0b inventory exists but is not used: flag as IMPROVEMENT, naming the component (e.g., "use `<x-section-header>` instead of inline `<x-eyebrow>` + `<h2>`").
 
-#### G10. CSS variable cascade not used
+#### G10. CSS custom property cascade not used
 
-Check the view for any of:
-- `match($tone)` expressions returning Tailwind class strings (e.g. `'bg-brand-500'`)
-- Props declared as `tone="light"` / `tone="dark"` driving color conditionally
-- Hardcoded color utility classes (`text-gray-*`, `bg-brand-*`, `text-white`) on
-  `h2`, `p`, or `span` elements
+**Detection** — check the view for any of:
+- `match($tone)` expressions returning Tailwind class strings
+  (e.g. `match($tone) { 'fg' => 'text-fg', 'dark' => 'text-depth-fg' }`)
+- Props declared as `tone="fg"` / `tone="dark"` / `variant="*-dark"` encoding
+  color context in PHP and passing it to child components
+- Hardcoded color utility classes (`text-depth-fg`, `text-identity`, `text-white`)
+  applied directly on semantic elements (`h2`, `p`, `span`) instead of via
+  inherited CSS variables
 
-Colors must cascade from `--block-*` custom properties in the block's CSS; the view
-must not select color via conditional logic. Each instance is CRITICAL.
+Colors must cascade from custom properties in the block's CSS; the view must not
+encode color context via conditional logic or hardcoded utilities.
+Each instance is CRITICAL.
+
+**When detected, generate corrected CSS for the Phase 6 report:**
+1. Run inline component inventory: glob `resources/views/components/*.blade.php`,
+   grep each for `var(--)` patterns → build local variable name registry
+   (same logic as block-scaffolding Phase 0b; runs inline here, not delegated)
+2. Read `design-guide.md` `## Tokens → Colors` to determine background context:
+   - If `design-guide.md` exists at `docs/plans/*/components/*/design-guide.md`
+     → apply decision table
+   - If `design-guide.md` is absent → treat as Ambiguous; generate with
+     `/* VERIFY: design-guide.md not found — confirm background context */`
+3. Apply decision table:
+   | Token found | Background | CSS action |
+   |---|---|---|
+   | `bg-depth`, `bg-primary`, `bg-dark`, `bg-inverse` | Dark | Use `*-on-dark` equivalents |
+   | `bg-identity`, `bg-sage`, `bg-accent` | Identity | Use `*-on-identity` equivalents (e.g. `var(--color-identity-fg)`) |
+   | `bg-bg`, `bg-surface`, `bg-muted`, absent | Light (default) | Inherit `:root` defaults |
+   | Unrecognized token | Ambiguous | Generate with `/* VERIFY: background context unknown */` |
+4. Include generated CSS in Phase 6 report (see report-format.md G10 section template)
 
 #### G11. nl2br on non-textarea fields
 
