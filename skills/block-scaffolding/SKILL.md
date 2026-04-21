@@ -111,6 +111,57 @@ If no suitable component exists, use inline markup and note it for future extrac
 
 ---
 
+## Phase 0c — Form detection (conditional)
+
+Detect whether the block embeds an HTML Forms form. Two signals — any match triggers:
+
+1. Plan/argument description mentions: `form`, `formulário`, `contact form`, `contato`, `html forms` (case-insensitive)
+2. The planned `fields()` for this block includes an `addPostObject` with `post_type` containing `html-form`
+
+If **triggered**, load the `sage-forms` skill and its references (`blade-form-views.md`, `hf-validation.md`, `traps.md`) before continuing. After Phase 1 S2 (controller written), run the three coordinated scaffolds below. If **not triggered**, skip this phase entirely.
+
+### 0c.1 — Form Blade view (`resources/views/forms/{form-slug}.blade.php`)
+
+Resolve `{form-slug}`:
+- If the plan names a target `html-form` post (e.g. "contact form" → `contact`), use that slug.
+- Otherwise use `{slug}-form` as placeholder and prepend `{{-- TODO: rename file to match the html-form CPT post_name --}}` at the top.
+
+Write the form view using `<x-html-forms>` + `x-form.*` components, with one `x-form.field` per ACF field declared in S2. Submit button is `<x-button type="submit">`. Do not pass `pattern` attributes; do not use `type="tel"` (use `type="text" inputmode="tel"` for phone fields). See `skills/sage-forms/references/blade-form-views.md` for the full pattern and `references/traps.md` for the rationale.
+
+### 0c.2 — Validation module (`resources/js/modules/hf-validation.js`)
+
+Glob check: if `resources/js/modules/hf-validation.js` exists, **skip** — one module per project, reused across forms. If absent, write the scaffold from `skills/sage-forms/references/hf-validation.md` (the "Full Module Skeleton" section).
+
+### 0c.3 — Block JS patch (`resources/js/blocks/{slug}.js`)
+
+Add an import at the top:
+
+```js
+import { initHfValidation } from '../modules/hf-validation';
+```
+
+Inside the block's `init()` method, add:
+
+```js
+const form = this.querySelector('.hf-form');
+if (form) {
+  initHfValidation(form, {
+    messages: {
+      // TODO: configure per form — see skills/sage-forms/references/hf-validation.md
+    },
+    validators: {
+      // TODO: configure per form
+    },
+  });
+}
+```
+
+### Phase 0c non-objective
+
+Phase 0c does NOT write validator functions or localized messages — always produces `// TODO: configure per form` stubs. Validator content varies per project and per form; this is deliberate.
+
+---
+
 ## Phase 1 — Implement S1–S4
 
 ### S1 — `resources/css/blocks/{slug}.css`
@@ -318,6 +369,13 @@ Add one `@import` per block to `resources/css/editor.css`:
 
 Document: custom element name, ACF fields table, theme variations table (Full mode),
 CSS tokens table, and file dependency list (controller, view, CSS, JS, enqueue, editor CSS).
+
+**If Phase 0c triggered**, the README additionally documents:
+
+- Form view path: `resources/views/forms/{form-slug}.blade.php`
+- Validation module path: `resources/js/modules/hf-validation.js`
+- DOM events handled: `hf-success`, `hf-error`
+- Pointer to the `sage-forms` skill for the integration pattern
 
 ---
 
