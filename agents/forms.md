@@ -64,8 +64,8 @@ Read the form Blade view. Check:
 
 - Root is `<x-html-forms :form="$form">`? If missing or replaced with `<form>`, flag.
 - All inputs are `x-form.*` components? Grep for raw `<input`, `<label`, `<textarea`, `<select` — each occurrence is a finding.
-- **T1 check:** grep for `pattern="\` — every occurrence is CRITICAL.
-- **T2 check:** grep for `type="tel"` — every occurrence is CRITICAL (replace with `type="text" inputmode="tel"`).
+- **T1 check:** grep for both `pattern="\` and `pattern='\` (single- and double-quoted) and `:pattern=` (Blade bound attribute) — every occurrence is CRITICAL.
+- **T2 check:** grep for `<input[^>]*type="tel"` and `x-form.input[^>]*type="tel"` (anchored to the input tag to avoid matching CSS comments or string literals) — every occurrence is CRITICAL (replace with `type="text" inputmode="tel"`).
 - Submit button is `<x-button type="submit">`? If a plain `<button>` or `<input type="submit">`, flag.
 
 **A2 — JS module conformance**
@@ -76,7 +76,7 @@ Read the block JS and `resources/js/modules/hf-validation.js` (if present).
 - Block JS imports `initHfValidation` from `../modules/hf-validation`? If the validation logic is inlined in the block JS, flag as "inlined logic; extract to module".
 - Block JS calls `initHfValidation(form, { messages, validators })` with both `messages` and `validators` objects? If either is missing or empty, flag as incomplete configuration.
 - No `wp_enqueue_script` for form validation in any service provider? Grep `app/Providers/*.php` — if found, flag.
-- **T3 check:** grep `{ ...` + `.validity` and `Object.keys(` + `.validity` in the module. Each occurrence is CRITICAL.
+- **T3 check:** grep the exact regex `\{ \.\.\..*\.validity\|Object\.keys\(.*\.validity\)` in the module and block JS. Each occurrence is CRITICAL (see `sage-forms/references/traps.md` T3).
 
 **A3 — CSS hygiene**
 
@@ -93,9 +93,9 @@ Read the block JS for event handlers.
 - `hf-error` handler wired (scroll, optional `onError` callback)?
 - `hf-submitted` handler — optional; flag as SUGGESTION only if analytics or double-submit protection is mentioned in the block's README or controller docblock.
 
-**A5 — Block field contract**
+**A5 — Block field contract + view guard**
 
-Read the block controller.
+Read the block controller AND the block view (`resources/views/blocks/{slug}.blade.php`). Note that the `@if ($form)` guard check targets the block view, not the controller.
 
 - `fields()` declares `addPostObject` with `post_type` containing `html-form`? If the block uses a different field type (e.g. a text field for form ID), flag as non-canonical.
 - `return_format` is `object`? If `id` or `array`, flag.
@@ -157,7 +157,7 @@ Wait for user input. On `y` → Phase 7. On anything else → stop; report "No c
 Execute in order:
 
 1. Blade rewrites (replace raw inputs with `x-form.*`, remove `pattern` attributes with backslashes, fix `type="tel"` → `type="text" inputmode="tel"`, ensure `<x-html-forms>` wrapper, swap plain submit → `<x-button>`)
-2. JS module refactor (move inlined logic to `resources/js/modules/hf-validation.js`, remove `ValidityState` spreads, fix imports in block JS)
+2. JS module refactor (move inlined logic to `resources/js/modules/hf-validation.js`, remove `ValidityState` spreads AND `Object.keys(field.validity)` patterns, fix imports in block JS)
 3. CSS removals (delete form-specific rules from block CSS; preserve structural utilities)
 4. Event handler additions (wire missing `hf-success` / `hf-error`)
 5. Block controller fixes (correct `return_format`, `with()` fallback, view guard)
@@ -169,14 +169,16 @@ lando theme-build   # must exit 0
 lando flush
 ```
 
-If `lando theme-build` fails, report error, revert applied changes via `git checkout --`, and exit.
+**Before starting Phase 7**, capture the list of files to be modified — call it `$TOUCHED_FILES`. After any write in Phase 7, if `lando theme-build` fails, revert with `git checkout -- $TOUCHED_FILES` (specific files, never `.` or `-A`) and exit.
 
-On success, present a final `git diff --stat` and commit:
+On success, present a final `git diff --stat` of `$TOUCHED_FILES` and commit:
 
 ```bash
-git add -A
+git add {list of modified files by name}
 git commit -m "refactor(forms): {slug} — {one-line summary of applied fixes}"
 ```
+
+Never `git add -A` — always list the specific files modified.
 
 ## Procedure — Scaffold Mode
 
