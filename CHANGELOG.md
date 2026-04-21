@@ -1,5 +1,42 @@
 # Changelog
 
+## [2.8.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.7.0...superpowers-sage-v2.8.0) (2026-04-21)
+
+
+### Features
+
+* **agents:** add forms specialist agent ([62356ba](https://github.com/codigodoleo/superpowers-sage/commit/62356ba262280b5f06a8c0850339d365c2420148))
+* **skills:** add Lando runner detection to onboarding ([d61a3a1](https://github.com/codigodoleo/superpowers-sage/commit/d61a3a13f6550df84f61b81ae7e30d442ca18a8f))
+* **skills:** add Phase 0c form detection to block-scaffolding ([5810a60](https://github.com/codigodoleo/superpowers-sage/commit/5810a60c8f38b45c25b60af50eb1719c74caad20))
+* **skills:** add sage-forms Blade form views reference ([83ff947](https://github.com/codigodoleo/superpowers-sage/commit/83ff947f3e2085c89327cf8bc055089e0fb47835))
+* **skills:** add sage-forms hf-validation JS module reference ([0ae855e](https://github.com/codigodoleo/superpowers-sage/commit/0ae855eb200e1db440e8737f918855245ecb2f7e))
+* **skills:** add sage-forms installation reference ([f166d56](https://github.com/codigodoleo/superpowers-sage/commit/f166d56d7a5b400e5b48f7abae8e0596778e5389))
+* **skills:** add sage-forms SKILL.md entry point ([c0b1f91](https://github.com/codigodoleo/superpowers-sage/commit/c0b1f910955158023cf8715c85b62c6195eb177d))
+* **skills:** add sage-forms traps catalogue ([8633286](https://github.com/codigodoleo/superpowers-sage/commit/863328604dd6e18bb15cd96bbf70693428120721))
+* **skills:** Cluster A — Lando runner detection + CSS cascade specialist ([5731526](https://github.com/codigodoleo/superpowers-sage/commit/57315268baa12e301f7a99ca54f03f35ad860ce8))
+* **skills:** G10 CSS specialist + Phase 7 single approval gate in block-refactoring ([283cda5](https://github.com/codigodoleo/superpowers-sage/commit/283cda5888df6253a888ee9d101f7f5b9c60e7e9))
+* **skills:** sage-forms integration — skill + forms agent + block-scaffolding Phase 0c ([b2b400f](https://github.com/codigodoleo/superpowers-sage/commit/b2b400f63fd911a43de8921158e012eabcf959cc))
+* **skills:** spec-driven CSS cascade in block-scaffolding Phase 0b + S1 ([2f54c33](https://github.com/codigodoleo/superpowers-sage/commit/2f54c3335e80507d0210663ff1d27ddd81659a34))
+
+
+### Bug Fixes
+
+* **agents:** address code review findings in forms agent (rollback, grep precision, A5 scoping) ([89c5835](https://github.com/codigodoleo/superpowers-sage/commit/89c5835585c6b03277d99a4bd2e29862077da25a))
+* **skills:** add observable symptoms to sage-forms Traps bullets ([fe4d8d3](https://github.com/codigodoleo/superpowers-sage/commit/fe4d8d36674fda2bf9e9071a3b5745faaecc5c7d))
+* **skills:** address code review findings in block-scaffolding S1 ([73bb3ba](https://github.com/codigodoleo/superpowers-sage/commit/73bb3bada8dc9518a602e617bfa23266fa71f06c))
+* **skills:** align G10 decision table phrasing and clarify report template ([4666ae7](https://github.com/codigodoleo/superpowers-sage/commit/4666ae729375adebfa65cd84a2615a57d45da831))
+* **skills:** align G10 light row CSS action with block-scaffolding ([61cb131](https://github.com/codigodoleo/superpowers-sage/commit/61cb131f849e8a0d684adf06b47fa43062cfcc0e))
+* **skills:** clarify lando.yml read failure fallback in runner detection ([bf85029](https://github.com/codigodoleo/superpowers-sage/commit/bf85029a7a629db7b0a5e512fe420c4cf30cc586))
+
+
+### Documentation
+
+* **plans:** add Cluster A implementation plan — worktrees detection & CSS cascade ([f9c786d](https://github.com/codigodoleo/superpowers-sage/commit/f9c786d845622449c639d8e3224fd2dda22200a7))
+* **plans:** add sage-forms integration implementation plan ([9ce7c6e](https://github.com/codigodoleo/superpowers-sage/commit/9ce7c6e531597784a3cf26c048bb01a692372993))
+* **readme:** update Cursor installation for modern versions + note on Claude CLI superiority ([7d69e2b](https://github.com/codigodoleo/superpowers-sage/commit/7d69e2bc513809eaa7ef4dbf8f8a4ff42113c35e))
+* **specs:** add Cluster A spec — worktrees detection & CSS cascade generation ([c750f87](https://github.com/codigodoleo/superpowers-sage/commit/c750f8715cf640c17dac4098d0af56484be08112))
+* **specs:** add sage-forms integration design ([e955a62](https://github.com/codigodoleo/superpowers-sage/commit/e955a6202e273ec26a0f4833b4b5c74f58f1b042))
+
 ## [2.7.0](https://github.com/codigodoleo/superpowers-sage/compare/superpowers-sage-v2.6.0...superpowers-sage-v2.7.0) (2026-04-20)
 
 
