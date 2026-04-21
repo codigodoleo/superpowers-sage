@@ -75,14 +75,29 @@ Then search for and install `superpowers-sage` from the Extensions view.
 
 ### Cursor
 
-1. Open **Settings → Features → AI Rules / Plugins** (or the equivalent plugin panel for your Cursor version).
-2. Add the repository as a plugin source:
+> **Note:** We consistently see significantly better results with **Claude CLI + Sonnet**. This plugin was designed around Claude Code's execution model — worktrees, hooks, subagent dispatch, MCP tool routing — and those features are unavailable in Cursor. You get the skill instructions, but none of the automation. If you have access to the Claude CLI, it's worth using that instead.
 
-   ```
-   https://github.com/codigodoleo/superpowers-sage
-   ```
+Recent Cursor versions removed the "paste repo URL" plugin installation UI. The reliable approach is a one-time clone + symlink:
 
-3. Cursor discovers skills and agents from the `skills/` and `agents/` directories automatically. Hooks are loaded from `hooks/cursor-hooks.json`.
+```bash
+# Clone once to a shared location
+git clone https://github.com/codigodoleo/superpowers-sage ~/.ai-plugins/superpowers-sage
+
+# In each project root, symlink into .cursor/rules/
+ln -s ~/.ai-plugins/superpowers-sage/skills .cursor/rules/superpowers-sage-skills
+ln -s ~/.ai-plugins/superpowers-sage/agents .cursor/rules/superpowers-sage-agents
+```
+
+On **Windows** (Command Prompt as Administrator):
+
+```cmd
+mklink /D .cursor\rules\superpowers-sage-skills %USERPROFILE%\.ai-plugins\superpowers-sage\skills
+mklink /D .cursor\rules\superpowers-sage-agents %USERPROFILE%\.ai-plugins\superpowers-sage\agents
+```
+
+To update: `git -C ~/.ai-plugins/superpowers-sage pull` — all projects pick up changes automatically via the symlinks.
+
+Cursor discovers skills and agents from `.cursor/rules/` automatically. Hooks are loaded from `hooks/cursor-hooks.json`.
 
 ---
 
